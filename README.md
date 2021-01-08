@@ -21,3 +21,9 @@ Every Radio packet sets radio to Standby mode!
 - SendLastPacketAgain()
 - StartRX(freq,SF,BQ,IQ,timeout, HeaderMode,crcCheck)
 
+
+# USART Packet:
+
+|   |  2B | 2B  |   |  2B |
+|---|---|---|---|---|
+| Preamble  |size| crc size  |  payload |  crc |
