@@ -24,6 +24,11 @@ Every Radio packet sets radio to Standby mode!
 
 # USART Packet:
 
-|   |  2B | 2B  |   |  2B |
-|---|---|---|---|---|
-| Preamble  |size| crc size  |  payload |  crc |
+| 4B  |  4B  |  n |  2B |
+|---|---|---|---|
+| Sync Word  |Header|  payload |  crc |
+
+**Header**
+| 1B  |  1B | 2B  | 
+|---|---|---|
+| size of payload  |RFU| crc Header  
