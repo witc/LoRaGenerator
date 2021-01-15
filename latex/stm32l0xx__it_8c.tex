@@ -1,0 +1,52 @@
+\hypertarget{stm32l0xx__it_8c}{}\doxysection{Core/\+Src/stm32l0xx\+\_\+it.c File Reference}
+\label{stm32l0xx__it_8c}\index{Core/Src/stm32l0xx\_it.c@{Core/Src/stm32l0xx\_it.c}}
+
+
+Interrupt Service Routines.  
+
+
+{\ttfamily \#include \char`\"{}main.\+h\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}stm32l0xx\+\_\+it.\+h\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}Free\+R\+T\+O\+S.\+h\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}task.\+h\char`\"{}}\newline
+\doxysubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\Hypertarget{stm32l0xx__it_8c_a6ad7a5e3ee69cb6db6a6b9111ba898bc}\label{stm32l0xx__it_8c_a6ad7a5e3ee69cb6db6a6b9111ba898bc}} 
+void \mbox{\hyperlink{stm32l0xx__it_8c_a6ad7a5e3ee69cb6db6a6b9111ba898bc}{N\+M\+I\+\_\+\+Handler}} (void)
+\begin{DoxyCompactList}\small\item\em This function handles Non maskable Interrupt. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{stm32l0xx__it_8c_a2bffc10d5bd4106753b7c30e86903bea}\label{stm32l0xx__it_8c_a2bffc10d5bd4106753b7c30e86903bea}} 
+void \mbox{\hyperlink{stm32l0xx__it_8c_a2bffc10d5bd4106753b7c30e86903bea}{Hard\+Fault\+\_\+\+Handler}} (void)
+\begin{DoxyCompactList}\small\item\em This function handles Hard fault interrupt. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{stm32l0xx__it_8c_ab5e09814056d617c521549e542639b7e}\label{stm32l0xx__it_8c_ab5e09814056d617c521549e542639b7e}} 
+void \mbox{\hyperlink{stm32l0xx__it_8c_ab5e09814056d617c521549e542639b7e}{Sys\+Tick\+\_\+\+Handler}} (void)
+\begin{DoxyCompactList}\small\item\em This function handles System tick timer. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{stm32l0xx__it_8c_a63228cf68d44f021736001cc85c56e3b}\label{stm32l0xx__it_8c_a63228cf68d44f021736001cc85c56e3b}} 
+void \mbox{\hyperlink{stm32l0xx__it_8c_a63228cf68d44f021736001cc85c56e3b}{P\+V\+D\+\_\+\+I\+R\+Q\+Handler}} (void)
+\begin{DoxyCompactList}\small\item\em This function handles P\+VD interrupt through E\+X\+TI line 16. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{stm32l0xx__it_8c_af5dd30f24d12ce01d03c375f0802671f}\label{stm32l0xx__it_8c_af5dd30f24d12ce01d03c375f0802671f}} 
+void \mbox{\hyperlink{stm32l0xx__it_8c_af5dd30f24d12ce01d03c375f0802671f}{E\+X\+T\+I0\+\_\+1\+\_\+\+I\+R\+Q\+Handler}} (void)
+\begin{DoxyCompactList}\small\item\em This function handles E\+X\+TI line 0 and line 1 interrupts. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{stm32l0xx__it_8c_a3595b205bdfadf55a525f2d4f438d122}\label{stm32l0xx__it_8c_a3595b205bdfadf55a525f2d4f438d122}} 
+void \mbox{\hyperlink{stm32l0xx__it_8c_a3595b205bdfadf55a525f2d4f438d122}{E\+X\+T\+I4\+\_\+15\+\_\+\+I\+R\+Q\+Handler}} (void)
+\begin{DoxyCompactList}\small\item\em This function handles E\+X\+TI line 4 to 15 interrupts. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{stm32l0xx__it_8c_acfe2a3881f75792fa99da6416a0bda71}\label{stm32l0xx__it_8c_acfe2a3881f75792fa99da6416a0bda71}} 
+void \mbox{\hyperlink{stm32l0xx__it_8c_acfe2a3881f75792fa99da6416a0bda71}{T\+I\+M22\+\_\+\+I\+R\+Q\+Handler}} (void)
+\begin{DoxyCompactList}\small\item\em This function handles T\+I\+M22 global interrupt. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\doxysubsection*{Variables}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\Hypertarget{stm32l0xx__it_8c_a954d998992e5773abe466321473875f3}\label{stm32l0xx__it_8c_a954d998992e5773abe466321473875f3}} 
+T\+I\+M\+\_\+\+Handle\+Type\+Def {\bfseries htim22}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+Interrupt Service Routines. 
+
+\begin{DoxyAttention}{Attention}
+
+\end{DoxyAttention}
+\doxysubsubsection*{\begin{center}\copyright{} Copyright (c) 2020 S\+T\+Microelectronics. All rights reserved.\end{center} }
+
+This software component is licensed by ST under Ultimate Liberty license S\+L\+A0044, the \char`\"{}\+License\char`\"{}; You may not use this file except in compliance with the License. You may obtain a copy of the License at\+: www.\+st.\+com/\+S\+L\+A0044 
