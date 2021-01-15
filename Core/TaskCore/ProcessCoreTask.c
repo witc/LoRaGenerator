@@ -10,6 +10,8 @@
 #include "SignalProcessing.h"
 #include "AuxRfProcess.h"
 
+extern UART_HandleTypeDef huart1;
+
 uint8_t SyncUartMsg[4] = {0xAA,0xBB,0x29,0x63};
 
 /* CRC8 from CRSF crossfire */
@@ -40,9 +42,11 @@ static unsigned char crc8tab[256] = {
  */
 eUARTBufferMasg PCT_FindAnyMsg()
 {
+	DATA_QUEUE SendData;
+	SendData.pointer=NULL;
+
 	static uint8_t 	startToFind=0;
 	static uint8_t  lastRxed=0;
-	static uint8_t	sizeToFindPacket=0;	//velikost od startu
 	uint8_t			actualArrivalSize=0;
 	uint8_t 		startHeader;
 	uint8_t			startPayload;
@@ -51,39 +55,42 @@ eUARTBufferMasg PCT_FindAnyMsg()
 	eUartMsgs		UartPayload;
 	uint8_t 		tempCntDma;
 	uint32_t		dmaOverRun=0;
-	static uint8_t	remainsToFinish=0;
+	static uint8_t	remainsToZero=0;
 	static uint8_t  sumArrivalSize=0;
 	uint8_t			tempSizeOfRxMsg;
 
+	static uint8_t	sizeToCheck;
+
+	memset(workingBuffer,0,UART_CIRCLE_MAX_BUFFER_SIZE);
+
+	/* read DMA status */
 	dmaOverRun = LL_DMA_IsActiveFlag_TC3(DMA1);
 	LL_DMA_ClearFlag_TC3(DMA1);
-
 	tempCntDma = LL_DMA_GetDataLength(DMA1,LL_DMA_CHANNEL_3);
 
 	/* od minule kontroly prislo BYTU*/
 	actualArrivalSize=(UART_CIRCLE_MAX_BUFFER_SIZE-tempCntDma);
-	//actualArrivalSize-=lastRxed;	//preteklo to  -tudiz nyni prepis = 6-24 !!! - chyba
 	if(dmaOverRun)
 	{
-		actualArrivalSize+=remainsToFinish;
+		actualArrivalSize+=remainsToZero; /* dma preteklo, tudiz prictu k aktualnimu poctu zbytek z minula do 0 */
 	}
 	else
 	{
-		actualArrivalSize-=lastRxed;	//preteklo to  -tudiz nyni prepis = 6-24 !!! - chyba
+		actualArrivalSize-=lastRxed;	/* nic nepreteklo */
 	}
 
+	/* od posledni kontroly prisly data o delce actualArrivalSize*/
+	sizeToCheck+=actualArrivalSize;
+	lastRxed=(UART_CIRCLE_MAX_BUFFER_SIZE-tempCntDma);	//prejmenovat na pristevynechej
+
 	sumArrivalSize+=actualArrivalSize;
-	lastRxed+=actualArrivalSize;
-	lastRxed%=UART_CIRCLE_MAX_BUFFER_SIZE;
 
-	remainsToFinish = tempCntDma;
+	remainsToZero = tempCntDma;
 
+	/* pokud ted nic neprislo*/
 	if(actualArrivalSize == 0)	return eUART_MSG_EMPTY;	//neprislo nic
-	/* zacina kontrola bufferu*/
-	if(sumArrivalSize == 0)	return eUART_MSG_EMPTY;	//neprislo nic
 
 	/* data budeme hledat od startToFind az po sumArrivalSize */
-
 /********************************************************************************/
 
 	if(sumArrivalSize<MINIMAL_SIZE_USART_RX_MSG)	return eUART_MSG_TOO_SHORT;
@@ -92,7 +99,10 @@ eUARTBufferMasg PCT_FindAnyMsg()
 	memcpy(&workingBuffer[0],&GlUartRxBugger[startToFind],UART_CIRCLE_MAX_BUFFER_SIZE-startToFind);
 	if(startToFind!=0)
 	{
-		memcpy(&workingBuffer[UART_CIRCLE_MAX_BUFFER_SIZE-startToFind],&GlUartRxBugger[0],startToFind);
+		if(dmaOverRun)
+		{
+			memcpy(&workingBuffer[UART_CIRCLE_MAX_BUFFER_SIZE-startToFind],&GlUartRxBugger[0],startToFind);
+		}
 	}
 
 	/* hledame validni zpravu*/
@@ -105,45 +115,56 @@ eUARTBufferMasg PCT_FindAnyMsg()
 		{
 			startHeader+=workinkgStart;
 			/* nasleduje mozny header zacinajici indexem startHeader */ 		//TODO kontorla crc header
-			//startHeader = workinkgStart+sizeof(SyncUartMsg);
 			payloadSizeFromHeader = workingBuffer[startHeader];
-
-			/* payload */
-			startPayload=startHeader+UART_BUFF_HEADER_SIZE;
-			if((startPayload+payloadSizeFromHeader+UART_BUFF_CRC_SIZE) > sumArrivalSize)
+			if(payloadSizeFromHeader>MAX_SIZE_FOR_PAYLOAD)
 			{
-				/* zatim vse ok jen je zprava kratka */
-				return eUART_MSG_TOO_SHORT;
-			}
-
-			/* payload je pritomen */
-			memcpy(UartPayload.payload,&workingBuffer[startPayload],payloadSizeFromHeader);
-			uint8_t rxCrc=workingBuffer[startPayload+payloadSizeFromHeader];
-
-			if(PCT_CalcCRC(UartPayload.payload,payloadSizeFromHeader)!=rxCrc)
-			{
-				/* posuneme start hledani na n+1 */
+				/* mame bulshitni zacatek takze to zahod */
 				workinkgStart++;
 				sumArrivalSize--;
 			}
 			else
 			{
-				break; // paket nalezen
+				/* payload */
+				startPayload=startHeader+UART_BUFF_HEADER_SIZE;
+				if((startPayload+payloadSizeFromHeader+UART_BUFF_CRC_SIZE) > (sumArrivalSize+workinkgStart))
+				{
+					/* zatim vse ok jen je zprava kratka */
+					return eUART_MSG_TOO_SHORT;
+				}
+
+				/* payload je pritomen */
+				memcpy(UartPayload.payload,&workingBuffer[startPayload],payloadSizeFromHeader);
+				uint8_t rxCrc=workingBuffer[startPayload+payloadSizeFromHeader];
+
+				if(PCT_CalcCRC(UartPayload.payload,payloadSizeFromHeader)!=rxCrc)
+				{
+					/* posuneme start hledani na n+1 */
+					workinkgStart+=(startHeader-sizeof(SyncUartMsg)+1);	// TODO muze byt zaporny?
+					sumArrivalSize-=(startHeader-sizeof(SyncUartMsg)+1);	// TODO muze byt zaporny?
+				}
+				else
+				{
+					break; // paket nalezen
+				}
 			}
+
 		}
 		else
 		{
 			/* v danem rozsahu nenalezeno sync word */
-			startToFind+=workinkgStart;
+			startToFind+=workinkgStart+(sumArrivalSize-sizeof(SyncUartMsg));
 			startToFind%=UART_CIRCLE_MAX_BUFFER_SIZE;
+
+			sumArrivalSize=sizeof(SyncUartMsg);
 			return eUART_MSG_TOO_SHORT;
 		}
 	}
 	while(1);
 
+	HAL_UART_Transmit(&huart1,&workingBuffer[startPayload],payloadSizeFromHeader,10000);
+
 	LL_GPIO_TogglePin(LED_GREEN_GPIO_Port,LED_GREEN_Pin);
 	tempSizeOfRxMsg = (sizeof(SyncUartMsg)+UART_BUFF_HEADER_SIZE+payloadSizeFromHeader/*payload*/+UART_BUFF_CRC_SIZE/*crc*/);
-	//memset(&GlUartRxBugger[startToFind],0,tempSizeOfRxMsg);
 	/* crc ok posun start o prijatou zpravu*/
 	startToFind+=workinkgStart+tempSizeOfRxMsg;
 	/* pokud preteklo velikost bufferu  - protacime buffer zpet na zacatek*/
@@ -152,11 +173,20 @@ eUARTBufferMasg PCT_FindAnyMsg()
 	/*payload jsme nasli s velikosti tempSizeOfRxMsg - tu ted ponizime v hledacim prostoru*/
 	sumArrivalSize-=tempSizeOfRxMsg;
 
-	osDelay(1);
+	//SendData.Address=ADDR_TO_CORE_UART_RX_NEW_PACKET;
+
+
 
 }
 
 
+/**
+ *
+ * @param data
+ * @param sizeToSearch
+ * @param headerStarts
+ * @return
+ */
 bool PCT_FindSyncWord(uint8_t *data, uint8_t sizeToSearch, uint8_t *headerStarts)
 {
 	uint8_t cnt=0;
