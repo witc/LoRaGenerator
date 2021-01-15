@@ -12,11 +12,11 @@
 #include "TaskCore.h"
 
 #define UART_BUFF_CRC_SIZE				(1)
-#define UART_BUFF_HEADER_SIZE			(4)
+#define UART_BUFF_HEADER_SIZE			(2)
 #define MINIMAL_SIZE_USART_RX_MSG		(sizeof(SyncUartMsg)+UART_BUFF_HEADER_SIZE+1/*payload*/+UART_BUFF_CRC_SIZE/*crc*/)
 #define MAXIMAL_SIZE_USART_RX_MSG		(sizeof(SyncUartMsg)+UART_BUFF_HEADER_SIZE+60/*payload*/+UART_BUFF_CRC_SIZE/*crc*/)
-#define UART_CIRCLE_MAX_BUFFER_SIZE		(150)	//musi byt > 2= MAximal RX msg
-#define TIME_TO_CHECK_UART_RX_BUFFER	(5)// // pri 9600 Baud => 1200B/sec
+#define UART_CIRCLE_MAX_BUFFER_SIZE		(50)	//musi byt > 2= MAximal RX msg
+#define TIME_TO_CHECK_UART_RX_BUFFER	(2)// // pri 9600 Baud => 1200B/sec
 #define MAX_SIZE_FOR_PAYLOAD			(30)
 
 extern uint8_t GlUartRxBugger[UART_CIRCLE_MAX_BUFFER_SIZE];

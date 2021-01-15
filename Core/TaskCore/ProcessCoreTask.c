@@ -12,7 +12,7 @@
 
 extern UART_HandleTypeDef huart1;
 
-uint8_t SyncUartMsg[4] = {0xAA,0xBB,0x29,0x63};
+uint8_t SyncUartMsg[1] = {0xAA};
 
 /* CRC8 from CRSF crossfire */
 static unsigned char crc8tab[256] = {
@@ -33,6 +33,8 @@ static unsigned char crc8tab[256] = {
     0xD6, 0x03, 0xA9, 0x7C, 0x28, 0xFD, 0x57, 0x82, 0xFF, 0x2A, 0x80, 0x55, 0x01, 0xD4, 0x7E, 0xAB,
     0x84, 0x51, 0xFB, 0x2E, 0x7A, 0xAF, 0x05, 0xD0, 0xAD, 0x78, 0xD2, 0x07, 0x53, 0x86, 0x2C, 0xF9};
 
+
+volatile uint32_t		dmaOverRun=0;
 /**
  *
  * @param buff
@@ -54,8 +56,8 @@ eUARTBufferMasg PCT_FindAnyMsg()
 	uint8_t 		workingBuffer[UART_CIRCLE_MAX_BUFFER_SIZE];
 	eUartMsgs		UartPayload;
 	uint8_t 		tempCntDma;
-	uint32_t		dmaOverRun=0;
-	static uint8_t	remainsToZero=0;
+
+	static uint8_t	remainsToZero=UART_CIRCLE_MAX_BUFFER_SIZE;
 	static uint8_t  sumArrivalSize=0;
 	uint8_t			tempSizeOfRxMsg;
 
@@ -64,9 +66,17 @@ eUARTBufferMasg PCT_FindAnyMsg()
 	memset(workingBuffer,0,UART_CIRCLE_MAX_BUFFER_SIZE);
 
 	/* read DMA status */
-	dmaOverRun = LL_DMA_IsActiveFlag_TC3(DMA1);
-	LL_DMA_ClearFlag_TC3(DMA1);
+	//dmaOverRun = LL_DMA_IsActiveFlag_TC3(DMA1);
+	//if (dmaOverRun) 	LL_DMA_ClearFlag_TC3(DMA1);
 	tempCntDma = LL_DMA_GetDataLength(DMA1,LL_DMA_CHANNEL_3);
+
+	if(tempCntDma<3)
+	{
+		osDelay(1);
+	}
+	dmaOverRun=0;
+	if(remainsToZero<tempCntDma)	dmaOverRun=1;
+
 
 	/* od minule kontroly prislo BYTU*/
 	actualArrivalSize=(UART_CIRCLE_MAX_BUFFER_SIZE-tempCntDma);
@@ -99,7 +109,7 @@ eUARTBufferMasg PCT_FindAnyMsg()
 	memcpy(&workingBuffer[0],&GlUartRxBugger[startToFind],UART_CIRCLE_MAX_BUFFER_SIZE-startToFind);
 	if(startToFind!=0)
 	{
-		if(dmaOverRun)
+		//if(dmaOverRun)
 		{
 			memcpy(&workingBuffer[UART_CIRCLE_MAX_BUFFER_SIZE-startToFind],&GlUartRxBugger[0],startToFind);
 		}
@@ -116,7 +126,7 @@ eUARTBufferMasg PCT_FindAnyMsg()
 			startHeader+=workinkgStart;
 			/* nasleduje mozny header zacinajici indexem startHeader */ 		//TODO kontorla crc header
 			payloadSizeFromHeader = workingBuffer[startHeader];
-			if(payloadSizeFromHeader>MAX_SIZE_FOR_PAYLOAD)
+			if((payloadSizeFromHeader>MAX_SIZE_FOR_PAYLOAD)||(payloadSizeFromHeader==0))
 			{
 				/* mame bulshitni zacatek takze to zahod */
 				workinkgStart++;
@@ -129,6 +139,9 @@ eUARTBufferMasg PCT_FindAnyMsg()
 				if((startPayload+payloadSizeFromHeader+UART_BUFF_CRC_SIZE) > (sumArrivalSize+workinkgStart))
 				{
 					/* zatim vse ok jen je zprava kratka */
+					startToFind+=workinkgStart;
+					/* pokud preteklo velikost bufferu  - protacime buffer zpet na zacatek*/
+					startToFind%=UART_CIRCLE_MAX_BUFFER_SIZE;
 					return eUART_MSG_TOO_SHORT;
 				}
 
