@@ -145,11 +145,9 @@ eUARTBufferMasg PCT_FindAnyMsg()
 					return eUART_MSG_TOO_SHORT;
 				}
 
-				/* payload je pritomen */
-				memcpy(UartPayload.payload,&workingBuffer[startPayload],payloadSizeFromHeader);
 				uint8_t rxCrc=workingBuffer[startPayload+payloadSizeFromHeader];
 
-				if(PCT_CalcCRC(UartPayload.payload,payloadSizeFromHeader)!=rxCrc)
+				if(PCT_CalcCRC(&workingBuffer[startHeader-1],sizeof(SyncUartMsg)+UART_BUFF_HEADER_SIZE+payloadSizeFromHeader)!=rxCrc)
 				{
 					/* posuneme start hledani na n+1 */
 					workinkgStart+=(startHeader-sizeof(SyncUartMsg)+1);	// TODO muze byt zaporny?
@@ -157,8 +155,11 @@ eUARTBufferMasg PCT_FindAnyMsg()
 				}
 				else
 				{
+					/* payload je pritomen */
+					memcpy(UartPayload.payload,&workingBuffer[startPayload],payloadSizeFromHeader);
 					break; // paket nalezen
 				}
+
 			}
 
 		}
@@ -227,7 +228,10 @@ bool PCT_FindSyncWord(uint8_t *data, uint8_t sizeToSearch, uint8_t *headerStarts
 
 /**
  *
- * @param data
+ * @param data			29
+133
+196
+89
  * @param length
  * @return
  */
