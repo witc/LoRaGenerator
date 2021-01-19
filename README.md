@@ -26,7 +26,7 @@ Every Radio packet sets radio to Standby mode!
 
 | 4B  |  4B  |  n |  2B |
 |---|---|---|---|
-| Sync Word  |Header|  payload |  crc |
+| Sync Word  |Header|  payload |  crc - pocitano z celeho paketu |
 
 **Header**
 | 1B  |  1B | 2B  | 
