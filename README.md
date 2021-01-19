@@ -48,6 +48,7 @@ Every Radio packet sets radio to Standby mode!
 | setTxBW  | 0x5  |   BandWidth 7.81 - 500 kHz (2B)|
 | setTxIQ  | 0x6  |   IQ invert true/false (1B)|
 | setTxCR  | 0x7  |   CodeRate 4/5-4/8 (1B)|
+| setStandby  | 0x8  |  |
 
 **Table of commands for packet**
 | **cmd**  | **opCode**  | **parameters**| 
