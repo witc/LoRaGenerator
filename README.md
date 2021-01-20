@@ -20,6 +20,7 @@ Every Radio packet sets radio to Standby mode!
 - Sendpacket(data,size)
 - SendLastPacketAgain()
 - StartRX(freq,SF,BQ,IQ,timeout, HeaderMode,crcCheck)
+- StartTxCW()
 
 
 # USART Packet:
@@ -49,6 +50,8 @@ Every Radio packet sets radio to Standby mode!
 | setTxIQ  | 0x6  |   IQ invert true/false (1B)|
 | setTxCR  | 0x7  |   CodeRate 4/5-4/8 (1B)|
 | setStandby  | 0x8  |  |
+| startTXCW  | 0x9  |  |
+
 
 **Table of commands for packet**
 | **cmd**  | **opCode**  | **parameters**| 
