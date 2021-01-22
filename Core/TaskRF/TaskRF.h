@@ -11,6 +11,7 @@
 #include "radio.h"
 
 
+
 /**
  *
  */
@@ -29,11 +30,6 @@ typedef enum
 typedef struct
 {
 	RadioState_t		RF_State;
-	DrConfig_t			RxConfig;
-	DrConfig_t			TxConfig;
-	uint32_t			RxFreq;
-	uint32_t			TxFreq;
-	int8_t				Power;
 
 }__packed tRfGlobalData;
 
@@ -52,5 +48,19 @@ typedef struct
 
 }tStaticStructure_RF, *p_tStaticStructure_RF;
 
+/**
+ *
+ */
+typedef struct
+{
+	DrConfig_t		RxConfig;
+	DrConfig_t		TxConfig;
+	uint32_t			RxFreq;
+	uint32_t			TxFreq;
+	int8_t				Power;
+
+}tRadioParam;
+
+extern tRadioParam RadioParam;
 
 #endif /* TASKRF_TASKRF_H_ */

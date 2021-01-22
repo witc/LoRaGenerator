@@ -150,12 +150,21 @@ static void RF_StateOFF(DATA_QUEUE ReceiveData,tRfGlobalData* GlobalData, tState
 			xQueueSend(QueueCoreHandle,&SendData,portMAX_DELAY);
 
 			/* Init Variables. */
-			GlobalData->RxConfig.Bits.BW=DR_BW_125_KHZ;
-			GlobalData->RxConfig.Bits.IqInvert = DR_IQ_FALSE;
-			GlobalData->RxConfig.Bits.SF=DR_SF9;
-			GlobalData->Power = 10;
-			GlobalData->RxFreq = 869525000;
-			GlobalData->TxFreq = 869525000;
+			RadioParam.TxConfig.Bits.BW=RadioParam.RxConfig.Bits.BW=DR_BW_125_KHZ;
+			RadioParam.TxConfig.Bits.IqInvert=RadioParam.RxConfig.Bits.IqInvert = DR_IQ_TRUE;
+			RadioParam.TxConfig.Bits.SF=RadioParam.RxConfig.Bits.SF=DR_SF9;
+			EepromStart(false);
+			memcpy(&RadioParam.Power,(uint8_t*)EEPROM_RF_TX_POWER,1);
+			EepromStop();
+			if(RadioParam.Power>22)	RadioParam.Power = 22;
+			else if (RadioParam.Power<(-80)) RadioParam.Power = -80;
+			RadioParam.RxFreq = 869525000;
+			RadioParam.TxFreq = 869525000;
+			PRT_SetAtten1To(0);
+			PRT_SetAtten2To(0);
+
+			RadioCleanAndStandby();
+			RU_LoRaConfigAndStartRX(RadioParam.RxFreq,RadioParam.RxConfig,true,portMAX_DELAY);
 
 		}
 		else if(ReceiveData.Data==DATA_TO_RF_START_OFF)
@@ -300,3 +309,4 @@ void StartTaskRF(void const * argument)
 		}
 	}
 }
+

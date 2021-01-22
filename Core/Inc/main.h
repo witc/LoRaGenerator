@@ -240,6 +240,7 @@ bool	M_IsMcuLocked	(void);
 #define ADDR_TO_RF_SX1262_IRQ				252
 #define ADDR_TO_RF_INFO						251
 #define ADDR_TO_RF_CHECK_RF_IS_LIVE			250
+#define ADDR_TO_RF_SET_RADIO_PARAM			249
 
 
 /*!
@@ -330,6 +331,9 @@ typedef struct
 } tStateRfAutomat;
 //eStateRfSystem
 
+//** EEPROM */
+#define EE_ADDR_STATE_OF_SYSTEM			(FLASH_EEPROM_BASE)
+#define EE_RF_POWER						(EE_ADDR_STATE_OF_SYSTEM)	//uint8_t
 /* USER CODE END Private defines */
 
 #ifdef __cplusplus

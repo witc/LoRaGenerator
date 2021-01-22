@@ -117,7 +117,7 @@ void RU_CommandProcess(RfCommands cmd,tRfGlobalData* GlobalData, DATA_QUEUE *Rec
 			RadioCleanAndStandby();
 			PRT_SetAtten1To(0);
 			PRT_SetAtten2To(0);
-			RadioSetTxContinuousWave(GlobalData->TxFreq,22,0);
+			RadioSetTxContinuousWave(RadioParam.TxFreq,RadioParam.Power,0);
 			break;
 
 		case RF_CMD_STOP_TX_AND_DISCARD:
@@ -133,13 +133,12 @@ void RU_CommandProcess(RfCommands cmd,tRfGlobalData* GlobalData, DATA_QUEUE *Rec
 		case RF_CMD_SEND_UNIVERSAL_PAYLOAD_NOW:
 			TxPacket=ReceiveData->pointer;
 
-			RadioCleanAndStandby();
-
-			PRT_PowerDistribution((int8_t)(ReceiveData->temp),&tempPower,&atten1,&atten2);
+			PRT_PowerDistribution((int8_t)(RadioParam.Power),&tempPower,&atten1,&atten2);
 			PRT_SetAtten1To(atten1);
 			PRT_SetAtten2To(atten2);
 
-			RU_RFSetTXUp(tempPower,GlobalData->TxFreq,GlobalData->TxConfig);
+			RadioCleanAndStandby();
+			RU_RFSetTXUp(tempPower,RadioParam.TxFreq,RadioParam.TxConfig);
 
 			taskENTER_CRITICAL();
 			RadioSend(TxPacket,ReceiveData->temp);
@@ -203,14 +202,14 @@ uint8_t RU_IRQProcess(tRfGlobalData* GlobalData)
 		    }
 
 
-			RU_LoRaConfigAndStartRX(GlobalData->RxFreq,GlobalData->RxConfig,true,portMAX_DELAY);
+			RU_LoRaConfigAndStartRX(RadioParam.RxFreq,RadioParam.RxConfig,true,portMAX_DELAY);
 
 	        break;
 
         case RF_TX_RUNNING:
 
 			/*Open window for a short time*/
-			RU_LoRaConfigAndStartRX(GlobalData->RxFreq,GlobalData->RxConfig,true,portMAX_DELAY);
+			RU_LoRaConfigAndStartRX(RadioParam.RxFreq,RadioParam.RxConfig,true,portMAX_DELAY);
            	SendData.Address=ADDR_TO_CORE_TX_PACKET_DONE;
            	xQueueSend(QueueCoreHandle, &SendData, portMAX_DELAY);
 

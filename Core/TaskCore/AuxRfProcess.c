@@ -11,7 +11,6 @@
 #include "TemplateRadioUser.h"
 #include "AuxRfProcess.h"
 #include "EepromAddress.h"
-#include "EEPROM_counter.h"
 #include "SignalProcessing.h"
 
 

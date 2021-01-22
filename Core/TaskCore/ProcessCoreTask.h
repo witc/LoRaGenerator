@@ -12,11 +12,11 @@
 #include "TaskCore.h"
 
 #define UART_BUFF_CRC_SIZE				(1)
-#define UART_BUFF_HEADER_SIZE			(2)
+#define UART_BUFF_HEADER_SIZE			(1)
 #define MINIMAL_SIZE_USART_RX_MSG		(sizeof(SyncUartMsg)+UART_BUFF_HEADER_SIZE+1/*payload*/+UART_BUFF_CRC_SIZE/*crc*/)
 #define MAXIMAL_SIZE_USART_RX_MSG		(sizeof(SyncUartMsg)+UART_BUFF_HEADER_SIZE+60/*payload*/+UART_BUFF_CRC_SIZE/*crc*/)
 #define UART_CIRCLE_MAX_BUFFER_SIZE		(50)	//musi byt > 2= MAximal RX msg
-#define TIME_TO_CHECK_UART_RX_BUFFER	(2)// // pri 9600 Baud => 1200B/sec
+#define TIME_TO_CHECK_UART_RX_BUFFER	(5)// // pri 9600 Baud => 1200B/sec
 #define MAX_SIZE_FOR_PAYLOAD			(30)
 
 extern uint8_t GlUartRxBugger[UART_CIRCLE_MAX_BUFFER_SIZE];
@@ -35,13 +35,34 @@ typedef enum
 
 }eSoundSType;
 
+/*
+ *
+ */
 typedef enum
 {
-	COLOR_NONE=0,
-	COLOR_GREEN,
-	COLOR_RED,
-	COLOR_ORANGE,
-	COLOR_SWAP,
+	UART_MSG_NONE=0,
+	UART_MSG_SET_TX_FREQ=1,
+	UART_MSG_SET_RX_FREQ=2,
+	UART_MSG_SET_TX_POWER=3,
+	UART_MSG_SET_TX_SF=4,
+	UART_MSG_SET_TX_BW=5,
+	UART_MSG_SET_TX_IQ=6,
+	UART_MSG_SET_TX_CR=7,
+	UART_MSG_SET_STANDBY=8,
+	UART_MSG_SET_TX_CW=9,
+
+}eUartMsgCmds;
+
+/**
+ *
+ */
+typedef enum
+{
+	COLOR_NONE=0,//!< COLOR_NONE
+	COLOR_GREEN, //!< COLOR_GREEN
+	COLOR_RED,   //!< COLOR_RED
+	COLOR_ORANGE,//!< COLOR_ORANGE
+	COLOR_SWAP,  //!< COLOR_SWAP
 
 
 }eColorLed;
@@ -67,7 +88,16 @@ typedef union
 
 
 uint8_t PCT_CalcCRC(uint8_t *data, uint8_t size);
-bool PCT_FindSyncWord(uint8_t *data, uint8_t sizeToSearch, uint8_t *headerStarts);
-
+bool 	PCT_FindSyncWord(uint8_t *data, uint8_t sizeToSearch, uint8_t *headerStarts);
+bool	PCT_RadioSetTxFreq(uint32_t freq);
+bool 	PCT_RadioSetRxFreq(uint32_t freq);
+bool 	PCT_RadioSetTxPower(int8_t power);
+bool	PCT_RadioSetTxSF(uint8_t sf);
+bool	PCT_RadioSetTxBW(uint16_t bw);
+bool 	PCT_RadioSetTxIQ(bool *iqInvert);
+bool	PCT_RadioSetTxCR(uint8_t *cr);
+bool	PCT_RadioSetStandby();
+bool    PCT_RadioSetTxCW();
+void 	PCT_DecodeUartRxMsg(uint8_t *rxBuffer);
 
 #endif /* TASKCORE_PROCESSCORETASK_H_ */

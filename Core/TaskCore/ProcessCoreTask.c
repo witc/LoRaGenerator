@@ -11,8 +11,10 @@
 #include "AuxRfProcess.h"
 
 extern UART_HandleTypeDef huart1;
+extern osMessageQId QueueCoreHandle;
+extern osMessageQId QueueRFHandle;
 
-uint8_t SyncUartMsg[1] = {0xAA};
+uint8_t SyncUartMsg[2] = {0x29,0x63};
 
 /* CRC8 from CRSF crossfire */
 static unsigned char crc8tab[256] = {
@@ -35,6 +37,20 @@ static unsigned char crc8tab[256] = {
 
 
 volatile uint32_t		dmaOverRun=0;
+
+bool (*PCT_RadioSetFunc[sizeof(eUartMsgCmds)])() = {&PCT_RadioSetTxFreq,
+													&PCT_RadioSetRxFreq,
+													&PCT_RadioSetTxPower,
+													&PCT_RadioSetTxSF,
+													&PCT_RadioSetTxBW,
+													&PCT_RadioSetTxIQ,
+													&PCT_RadioSetTxCR,
+													&PCT_RadioSetStandby,
+													&PCT_RadioSetTxCW,
+													};
+
+tRadioParam RadioParam;
+
 /**
  *
  * @param buff
@@ -55,6 +71,7 @@ eUARTBufferMasg PCT_FindAnyMsg()
 	uint16_t 		payloadSizeFromHeader;
 	uint8_t 		workingBuffer[UART_CIRCLE_MAX_BUFFER_SIZE];
 	eUartMsgs		UartPayload;
+	uint8_t			*TxPacket;
 	uint8_t 		tempCntDma;
 
 	static uint8_t	remainsToZero=UART_CIRCLE_MAX_BUFFER_SIZE;
@@ -62,7 +79,7 @@ eUARTBufferMasg PCT_FindAnyMsg()
 	uint8_t			tempSizeOfRxMsg;
 
 	static uint8_t	sizeToCheck;
-
+	LL_GPIO_TogglePin(LED_GREEN_GPIO_Port,LED_GREEN_Pin);
 	memset(workingBuffer,0,UART_CIRCLE_MAX_BUFFER_SIZE);
 
 	/* read DMA status */
@@ -70,10 +87,10 @@ eUARTBufferMasg PCT_FindAnyMsg()
 	//if (dmaOverRun) 	LL_DMA_ClearFlag_TC3(DMA1);
 	tempCntDma = LL_DMA_GetDataLength(DMA1,LL_DMA_CHANNEL_3);
 
-	if(tempCntDma<3)
-	{
-		osDelay(1);
-	}
+//	if(tempCntDma<3)
+//	{
+//		osDelay(1);
+//	}
 	dmaOverRun=0;
 	if(remainsToZero<tempCntDma)	dmaOverRun=1;
 
@@ -147,7 +164,7 @@ eUARTBufferMasg PCT_FindAnyMsg()
 
 				uint8_t rxCrc=workingBuffer[startPayload+payloadSizeFromHeader];
 
-				if(PCT_CalcCRC(&workingBuffer[startHeader-1],sizeof(SyncUartMsg)+UART_BUFF_HEADER_SIZE+payloadSizeFromHeader)!=rxCrc)
+				if(PCT_CalcCRC(&workingBuffer[startHeader-sizeof(SyncUartMsg)],sizeof(SyncUartMsg)+UART_BUFF_HEADER_SIZE+payloadSizeFromHeader)!=rxCrc)
 				{
 					/* posuneme start hledani na n+1 */
 					workinkgStart+=(startHeader-sizeof(SyncUartMsg)+1);	// TODO muze byt zaporny?
@@ -156,7 +173,16 @@ eUARTBufferMasg PCT_FindAnyMsg()
 				else
 				{
 					/* payload je pritomen */
-					memcpy(UartPayload.payload,&workingBuffer[startPayload],payloadSizeFromHeader);
+					TxPacket=pvPortMalloc(sizeof(eUartMsgs));
+					if(TxPacket==NULL)
+					{
+						osDelay(10);
+						TxPacket=pvPortMalloc(sizeof(eUartMsgs));
+						if(TxPacket==NULL)			LogError(635121);
+					}
+
+					memcpy(TxPacket,&workingBuffer[startPayload],payloadSizeFromHeader);
+					//memcpy(UartPayload.payload,&workingBuffer[startPayload],payloadSizeFromHeader);
 					break; // paket nalezen
 				}
 
@@ -175,9 +201,9 @@ eUARTBufferMasg PCT_FindAnyMsg()
 	}
 	while(1);
 
-	HAL_UART_Transmit(&huart1,&workingBuffer[startPayload],payloadSizeFromHeader,10000);
+	HAL_UART_Transmit(&huart1,&workingBuffer[startHeader-sizeof(SyncUartMsg)],sizeof(SyncUartMsg)+UART_BUFF_HEADER_SIZE+payloadSizeFromHeader+UART_BUFF_CRC_SIZE,10000);
 
-	LL_GPIO_TogglePin(LED_GREEN_GPIO_Port,LED_GREEN_Pin);
+	//LL_GPIO_TogglePin(LED_GREEN_GPIO_Port,LED_GREEN_Pin);
 	tempSizeOfRxMsg = (sizeof(SyncUartMsg)+UART_BUFF_HEADER_SIZE+payloadSizeFromHeader/*payload*/+UART_BUFF_CRC_SIZE/*crc*/);
 	/* crc ok posun start o prijatou zpravu*/
 	startToFind+=workinkgStart+tempSizeOfRxMsg;
@@ -187,9 +213,9 @@ eUARTBufferMasg PCT_FindAnyMsg()
 	/*payload jsme nasli s velikosti tempSizeOfRxMsg - tu ted ponizime v hledacim prostoru*/
 	sumArrivalSize-=tempSizeOfRxMsg;
 
-	//SendData.Address=ADDR_TO_CORE_UART_RX_NEW_PACKET;
-
-
+	SendData.Address=ADDR_TO_CORE_UART_RX_NEW_PACKET;
+	SendData.pointer = TxPacket;
+	xQueueSend(QueueCoreHandle,&SendData,portMAX_DELAY);
 
 }
 
@@ -225,6 +251,131 @@ bool PCT_FindSyncWord(uint8_t *data, uint8_t sizeToSearch, uint8_t *headerStarts
 	return true;
 }
 
+
+/**
+ *
+ */
+bool PCT_RadioSetTxFreq(uint32_t freq)
+{
+	taskENTER_CRITICAL();
+	RadioParam.TxFreq = freq;
+	taskEXIT_CRITICAL();
+
+	return true;
+}
+
+/**
+ *
+ */
+bool PCT_RadioSetRxFreq(uint32_t freq)
+{
+	taskENTER_CRITICAL();
+	RadioParam.RxFreq = freq;
+	taskEXIT_CRITICAL();
+
+	return true;
+}
+
+/**
+ *
+ * @param power
+ * @return
+ */
+bool PCT_RadioSetTxPower(int8_t power)
+{
+	taskENTER_CRITICAL();
+	RadioParam.Power = power;
+	taskEXIT_CRITICAL();
+
+	EepromStart(true);
+	HAL_FLASHEx_DATAEEPROM_Program(FLASH_TYPEPROGRAMDATA_BYTE,EEPROM_RF_TX_POWER,power);
+	EepromStop();
+
+	return true;
+}
+
+/**
+ *
+ * @return
+ */
+bool	PCT_RadioSetStandby()
+{
+	DATA_QUEUE SendData;
+	SendData.pointer = NULL;
+	SendData.Address = ADDR_TO_RF_CMD;
+	SendData.Data = RF_CMD_STANDBY;
+
+	xQueueSend(QueueRFHandle,&SendData,portMAX_DELAY);
+
+}
+
+/**
+ *
+ * @return
+ */
+bool    PCT_RadioSetTxCW()
+{
+	DATA_QUEUE SendData;
+	SendData.pointer = NULL;
+	SendData.Address = ADDR_TO_RF_CMD;
+	SendData.Data = RF_CMD_TX_CW;
+
+	xQueueSend(QueueRFHandle,&SendData,portMAX_DELAY);
+}
+
+/**
+ *
+ * @param rxBuffer
+ */
+void PCT_DecodeUartRxMsg(uint8_t *rxBuffer)
+{
+	//PCT_RadioSetFunc[rxBuffer[0]]();
+	//return;
+
+	switch((eUartMsgCmds)rxBuffer[0])
+	{
+		case UART_MSG_SET_TX_FREQ:
+
+			PCT_RadioSetTxFreq((rxBuffer[1]<<24)|(rxBuffer[2]<<16)|(rxBuffer[3]<<8)|(rxBuffer[4]));
+
+			break;
+
+		case UART_MSG_SET_RX_FREQ:
+
+			break;
+
+		case UART_MSG_SET_TX_POWER:
+			PCT_RadioSetTxPower((int8_t)rxBuffer[1]);
+			break;
+
+		case UART_MSG_SET_TX_SF:
+
+			break;
+
+		case UART_MSG_SET_TX_BW:
+
+			break;
+
+		case UART_MSG_SET_TX_IQ:
+
+			break;
+
+		case UART_MSG_SET_TX_CR:
+
+			break;
+
+		case UART_MSG_SET_STANDBY:
+			PCT_RadioSetStandby();
+			break;
+
+		case UART_MSG_SET_TX_CW:
+			PCT_RadioSetTxCW();
+			break;
+
+		default:
+			break;
+	}
+}
 
 /**
  *
