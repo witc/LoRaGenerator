@@ -13,6 +13,7 @@
 extern UART_HandleTypeDef huart1;
 
 uint8_t SyncUartMsg[1] = {0xAA};
+volatile uint32_t	counter_smazat=0;
 
 /* CRC8 from CRSF crossfire */
 static unsigned char crc8tab[256] = {
@@ -63,20 +64,14 @@ eUARTBufferMasg PCT_FindAnyMsg()
 
 	static uint8_t	sizeToCheck;
 
-	memset(workingBuffer,0,UART_CIRCLE_MAX_BUFFER_SIZE);
-
+	//memset(workingBuffer,0,UART_CIRCLE_MAX_BUFFER_SIZE);
 	/* read DMA status */
 	//dmaOverRun = LL_DMA_IsActiveFlag_TC3(DMA1);
 	//if (dmaOverRun) 	LL_DMA_ClearFlag_TC3(DMA1);
 	tempCntDma = LL_DMA_GetDataLength(DMA1,LL_DMA_CHANNEL_3);
 
-	if(tempCntDma<3)
-	{
-		osDelay(1);
-	}
 	dmaOverRun=0;
 	if(remainsToZero<tempCntDma)	dmaOverRun=1;
-
 
 	/* od minule kontroly prislo BYTU*/
 	actualArrivalSize=(UART_CIRCLE_MAX_BUFFER_SIZE-tempCntDma);
@@ -105,7 +100,7 @@ eUARTBufferMasg PCT_FindAnyMsg()
 
 	if(sumArrivalSize<MINIMAL_SIZE_USART_RX_MSG)	return eUART_MSG_TOO_SHORT;
 
-	/* seradime si buffer vzdy od nuly */
+	/* seradime si buffer vzdy od nuly */	//TODO odstranit zbytecne kopirovani - bere cpu cas
 	memcpy(&workingBuffer[0],&GlUartRxBugger[startToFind],UART_CIRCLE_MAX_BUFFER_SIZE-startToFind);
 	if(startToFind!=0)
 	{
@@ -175,9 +170,18 @@ eUARTBufferMasg PCT_FindAnyMsg()
 	}
 	while(1);
 
-	HAL_UART_Transmit(&huart1,&workingBuffer[startPayload],payloadSizeFromHeader,10000);
+	if(UartPayload.payload[0]==1)
+	{
+		counter_smazat++;//=UartPayload.payload[1]<<24;
+		//counter_smazat|=UartPayload.payload[2]<<16;
+		//counter_smazat|=UartPayload.payload[3]<<8;
+		//counter_smazat|=UartPayload.payload[4];
+	}
 
-	LL_GPIO_TogglePin(LED_GREEN_GPIO_Port,LED_GREEN_Pin);
+
+	//HAL_UART_Transmit(&huart1,&workingBuffer[startPayload],payloadSizeFromHeader,10000);
+
+	//LL_GPIO_TogglePin(LED_GREEN_GPIO_Port,LED_GREEN_Pin);
 	tempSizeOfRxMsg = (sizeof(SyncUartMsg)+UART_BUFF_HEADER_SIZE+payloadSizeFromHeader/*payload*/+UART_BUFF_CRC_SIZE/*crc*/);
 	/* crc ok posun start o prijatou zpravu*/
 	startToFind+=workinkgStart+tempSizeOfRxMsg;
@@ -188,8 +192,6 @@ eUARTBufferMasg PCT_FindAnyMsg()
 	sumArrivalSize-=tempSizeOfRxMsg;
 
 	//SendData.Address=ADDR_TO_CORE_UART_RX_NEW_PACKET;
-
-
 
 }
 

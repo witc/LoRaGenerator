@@ -22,7 +22,7 @@
 extern osMessageQId QueueCoreHandle;
 extern osMessageQId QueueRFHandle;
 extern osTimerId TimerUartRxCheckHandle;
-
+extern volatile uint32_t	counter_smazat;
 
 /*  						*/
 size_t volatile Gl_HeapFree;
@@ -118,6 +118,21 @@ void CallbackUartRxCheck(void const * argument)
 	xQueueSend(QueueCoreHandle,&SendData,portMAX_DELAY);
 }
 
+/**
+ *
+ * @param htim
+ */
+void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
+{
+	DATA_QUEUE SendData;
+	SendData.pointer = NULL;
+	portBASE_TYPE xHigherPriorityTaskWoken = pdFALSE;
+
+	SendData.Address = ADDR_TO_CORE_UART_READ_RX_BUFFER;
+	xQueueSendFromISR(QueueCoreHandle,&SendData,&xHigherPriorityTaskWoken);
+
+	portYIELD_FROM_ISR(xHigherPriorityTaskWoken);
+}
 
 /**
  *
@@ -214,7 +229,15 @@ static void CORE_StateStartON(DATA_QUEUE ReceiveData,tCoreGlobalData* GlobalData
 		/* Enable DMA Channel Rx */
 		LL_DMA_EnableChannel(DMA1, LL_DMA_CHANNEL_3);
 
-		osTimerStart(TimerUartRxCheckHandle,TIME_TO_CHECK_UART_RX_BUFFER);
+	//	osTimerStart(TimerUartRxCheckHandle,TIME_TO_CHECK_UART_RX_BUFFER);
+		HAL_NVIC_DisableIRQ(TIM6_IRQn);
+		HAL_NVIC_ClearPendingIRQ(TIM6_IRQn);
+		HAL_NVIC_EnableIRQ(TIM6_IRQn);
+
+		LL_TIM_SetAutoReload(TIM6,__LL_TIM_CALC_ARR(32000000,LL_TIM_GetPrescaler(TIM6),3600));
+		LL_TIM_EnableIT_UPDATE(TIM6);
+		LL_TIM_SetCounter(TIM6,0);
+		LL_TIM_EnableCounter(TIM6);
 
 	}
 }
@@ -239,6 +262,10 @@ static void CORE_StateON(DATA_QUEUE ReceiveData,tCoreGlobalData* GlobalData, tSt
 
 	Gl_HeapFree=xPortGetMinimumEverFreeHeapSize();
 
+	if(counter_smazat == 10000)
+	{
+		//osDelay(1);
+	}
 	switch (ReceiveData.Address)
 	{
 		case ADDR_TO_CORE_RF_DATA_RECEIVED:
@@ -262,8 +289,12 @@ static void CORE_StateON(DATA_QUEUE ReceiveData,tCoreGlobalData* GlobalData, tSt
 			break;
 
 		case ADDR_TO_CORE_UART_READ_RX_BUFFER:
+
 			PCT_FindAnyMsg();
-			osTimerStart(TimerUartRxCheckHandle,TIME_TO_CHECK_UART_RX_BUFFER);
+
+		//	LL_TIM_EnableCounter(TIM6);
+
+			//osTimerStart(TimerUartRxCheckHandle,TIME_TO_CHECK_UART_RX_BUFFER);
 			break;
 
 		default:
@@ -324,6 +355,7 @@ void StartTaskCore(void const * argument)
 	static portBASE_TYPE ReturnValue;
 
 	CORE_StateINIT(ReceiveData,&DataTaskCore, &StateAutomat);
+
 
 	for(;;)
 	{
