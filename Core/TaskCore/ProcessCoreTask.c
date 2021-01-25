@@ -14,7 +14,7 @@ extern UART_HandleTypeDef huart1;
 extern osMessageQId QueueCoreHandle;
 extern osMessageQId QueueRFHandle;
 
-uint8_t SyncUartMsg[2] = {0x29,0x63};
+uint8_t SyncUartMsg[1] = {0xaa};
 
 /* CRC8 from CRSF crossfire */
 static unsigned char crc8tab[256] = {
