@@ -18,6 +18,7 @@
 #define UART_CIRCLE_MAX_BUFFER_SIZE		(100)	//musi byt > 2= MAximal RX msg ?!?
 #define TIME_TO_CHECK_UART_RX_BUFFER	(1)// // pri 9600 Baud => 1200B/sec
 #define MAX_SIZE_FOR_PAYLOAD			(30)
+#define UART_CHECK_FREQUENCY			(3600)
 
 extern uint8_t GlUartRxBugger[UART_CIRCLE_MAX_BUFFER_SIZE];
 

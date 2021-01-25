@@ -234,7 +234,7 @@ static void CORE_StateStartON(DATA_QUEUE ReceiveData,tCoreGlobalData* GlobalData
 		HAL_NVIC_ClearPendingIRQ(TIM6_IRQn);
 		HAL_NVIC_EnableIRQ(TIM6_IRQn);
 
-		LL_TIM_SetAutoReload(TIM6,__LL_TIM_CALC_ARR(32000000,LL_TIM_GetPrescaler(TIM6),3600));
+		LL_TIM_SetAutoReload(TIM6,__LL_TIM_CALC_ARR(32000000,LL_TIM_GetPrescaler(TIM6),UART_CHECK_FREQUENCY));   //(1/MINIMAL_SIZE_USART_RX_MSG)
 		LL_TIM_EnableIT_UPDATE(TIM6);
 		LL_TIM_SetCounter(TIM6,0);
 		LL_TIM_EnableCounter(TIM6);
