@@ -46,11 +46,15 @@ Every Radio packet sets radio to Standby mode!
 | setRxFreq  | 0x2  |   Frequency (4B)|
 | setTxPower  | 0x3  |   Power (1B)|
 | setTxSF  | 0x4  |  Spreading factor SF5-SF12 (1B)|
-| setTxBW  | 0x5  |   BandWidth 7.81 - 500 kHz (2B)|
-| setTxIQ  | 0x6  |   IQ invert true/false (1B)|
-| setTxCR  | 0x7  |   CodeRate 4/5-4/8 (1B)|
-| setStandby  | 0x8  |  |
-| startTXCW  | 0x9  |  |
+| setRxSF  | 0x5  |  Spreading factor SF5-SF12 (1B)|
+| setTxBW  | 0x6  |   BandWidth 7.81 - 500 kHz (2B)|
+| setRxBW  | 0x7  |   BandWidth 7.81 - 500 kHz (2B)|
+| setTxIQ  | 0x8  |   IQ invert true/false (1B)|
+| setRxIQ  | 0x9  |   IQ invert true/false (1B)|
+| setTxCR  | 0xA  |   CodeRate 4/5-4/8 (1B)|
+| setRxCR  | 0xB  |   CodeRate 4/5-4/8 (1B)|
+| setStandby  | 0xC  |  |
+| startTXCW  | 0xD  |  |
 
 
 **Table of commands for packet**
