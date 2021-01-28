@@ -55,7 +55,7 @@ Every Radio packet sets radio to Standby mode!
 | setRxCR  | 0xB  |   CodeRate 4/5-4/8 (1B)|
 | setStandby  | 0xC  |  |
 | startTXCW  | 0xD  |  |
-| preparePacket  | 0xE  |   data[N] (N B)|
+| preparePacket  | 0xE  | data[0] - nasledna velikost,  data[N] (N B)|
 | setAutoRepeating  | 0xF  |   true/false (1 B)|
 | setRepeatingPeriod  | 0x10  |   Period (ms) (4 B)|
 | setRxCRCCheck  | 0x11  |   Crc check true/false (1 B)|
