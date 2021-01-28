@@ -10,11 +10,12 @@
 #include "ProcessCoreTask.h"
 #include "LoRa_Codec.h"
 #include "AuxRfProcess.h"
-#include "EEPROM_counter.h"
 #include "SignalProcessing.h"
 #include "TemplateRadioUser.h"
 
 
+const uint8_t	defaultTxPacket[]={160,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,35,35,35,35,35,35,35,35,84,101,115,116,111,118,97,99,105,32,112,97,107,101,116,0,228,189};
+tPacketParam	PacketParam;
 
 /*!
  *  Freertos objects
@@ -22,7 +23,7 @@
 extern osMessageQId QueueCoreHandle;
 extern osMessageQId QueueRFHandle;
 extern osTimerId TimerUartRxCheckHandle;
-extern volatile uint32_t	counter_smazat;
+extern osTimerId TimerRepeateTXHandle;
 
 /*  						*/
 size_t volatile Gl_HeapFree;
@@ -206,7 +207,7 @@ static void CORE_StateStartON(DATA_QUEUE ReceiveData,tCoreGlobalData* GlobalData
 		osDelay(200);
 		LL_GPIO_ResetOutputPin(LED_GREEN_GPIO_Port,LED_GREEN_Pin);
 
-		/* Init DMA */
+		/*Uart  Init DMA */
 		LL_DMA_DisableChannel(DMA1,LL_DMA_CHANNEL_3);
 		LL_DMA_ConfigTransfer(DMA1, LL_DMA_CHANNEL_3,
 		                        LL_DMA_DIRECTION_PERIPH_TO_MEMORY |
@@ -258,14 +259,12 @@ static void CORE_StateON(DATA_QUEUE ReceiveData,tCoreGlobalData* GlobalData, tSt
 	SendData.pointer=NULL;
 	static GeneralPacketsUpOrDown_t	localTxBuffer;
 	static uint8_t			localTxPacketSize=0;
-
+	uint8_t					*TxBuffer;
+	uint8_t					*RxUartMsg;
 
 	Gl_HeapFree=xPortGetMinimumEverFreeHeapSize();
 
-	if(counter_smazat == 10000)
-	{
-		//osDelay(1);
-	}
+
 	switch (ReceiveData.Address)
 	{
 		case ADDR_TO_CORE_RF_DATA_RECEIVED:
@@ -278,14 +277,26 @@ static void CORE_StateON(DATA_QUEUE ReceiveData,tCoreGlobalData* GlobalData, tSt
 
 			//osTimerStart(TimerEnSendPacketHandle,TIME_TO_EN_SEND_NEXT_PACKET);	// Po kazdem odeslanem paketu cekame na mozny prijem dat
 
+			osTimerStart(TimerRepeateTXHandle,300);
+
 			break;
 
 		case ADDR_TO_CORE_TX_PERIODIC:
 
+
 			break;
 
 		case ADDR_TO_CORE_SEND_LAST_PACKET:
-
+			if(RC_GetSizeOfSavedPacket()!=0)
+			{
+				SendData.Address=ADDR_TO_RF_CMD;
+				SendData.Data=RF_CMD_SEND_UNIVERSAL_PAYLOAD_NOW;
+				xQueueSend(QueueRFHandle,&SendData,portMAX_DELAY);
+			}
+			else
+			{
+				//todo send error
+			}
 			break;
 
 		case ADDR_TO_CORE_UART_READ_RX_BUFFER:
@@ -296,6 +307,12 @@ static void CORE_StateON(DATA_QUEUE ReceiveData,tCoreGlobalData* GlobalData, tSt
 
 			//osTimerStart(TimerUartRxCheckHandle,TIME_TO_CHECK_UART_RX_BUFFER);
 			break;
+
+		case ADDR_TO_CORE_UART_RX_NEW_PACKET:
+			RxUartMsg=ReceiveData.pointer;
+			PCT_DecodeUartRxMsg(RxUartMsg);
+			break;
+
 
 		default:
 			break;

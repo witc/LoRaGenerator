@@ -12,6 +12,8 @@
 #include "AES_SW.h"
 #include "ProcessRFTask.h"
 #include "LoRa_Codec.h"
+#include "RadioUser.h"
+#include "RadioCommands.h"
 
 /*!
  *
@@ -37,16 +39,16 @@ bool RU_SX1262Assign(void)
 	/* init */
 	spiDevice.AtomicActionEnter=vPortEnterCritical;
 	spiDevice.AtomicActionExit=vPortExitCritical;
-	spiDevice.pin_BUSY.port=RF_BUSY_GPIO_Port;
-	spiDevice.pin_BUSY.pin=RF_BUSY_Pin;
-	spiDevice.pin_RESET.port=RF_NRESET_GPIO_Port;
-	spiDevice.pin_RESET.pin=RF_NRESET_Pin;
-	spiDevice.pin_DIO1.port=RF_DIO_GPIO_Port;
-	spiDevice.pin_DIO1.pin=RF_DIO_Pin;
-	spiDevice.pin_NSS.port=RF_NSS_GPIO_Port;
-	spiDevice.pin_NSS.pin=RF_NSS_Pin;
-	spiDevice.pin_RF_SWITCH.port=RF_TX_ENABLE_GPIO_Port;
-	spiDevice.pin_RF_SWITCH.pin=RF_TX_ENABLE_Pin;
+	spiDevice.pin_BUSY.port=SX1262_BUSY_GPIO_Port;
+	spiDevice.pin_BUSY.pin=SX1262_BUSY_Pin;
+	spiDevice.pin_RESET.port=SX1262_NRESET_GPIO_Port;
+	spiDevice.pin_RESET.pin=SX1262_NRESET_Pin;
+	spiDevice.pin_DIO1.port=SX1262_DIO_GPIO_Port;
+	spiDevice.pin_DIO1.pin=SX1262_DIO_Pin;
+	spiDevice.pin_NSS.port=SX1262_NSS_GPIO_Port;
+	spiDevice.pin_NSS.pin=SX1262_NSS_Pin;
+	spiDevice.pin_RF_SWITCH.port=SX1262_TX_ENABLE_GPIO_Port;
+	spiDevice.pin_RF_SWITCH.pin=SX1262_TX_ENABLE_Pin;
 
 #if AES_USE_SW_VERSION
 	spiDevice.AES_ECB_Encrypt=AES_ECB_encrypt;
@@ -117,7 +119,7 @@ void RU_CommandProcess(RfCommands cmd,tRfGlobalData* GlobalData, DATA_QUEUE *Rec
 			RadioCleanAndStandby();
 			PRT_SetAtten1To(0);
 			PRT_SetAtten2To(0);
-			RadioSetTxContinuousWave(GlobalData->TxFreq,22,0);
+			RadioSetTxContinuousWave(RadioParam.TxFreq,RadioParam.Power,0);
 			break;
 
 		case RF_CMD_STOP_TX_AND_DISCARD:
@@ -133,16 +135,15 @@ void RU_CommandProcess(RfCommands cmd,tRfGlobalData* GlobalData, DATA_QUEUE *Rec
 		case RF_CMD_SEND_UNIVERSAL_PAYLOAD_NOW:
 			TxPacket=ReceiveData->pointer;
 
-			RadioCleanAndStandby();
-
-			PRT_PowerDistribution((int8_t)(ReceiveData->temp),&tempPower,&atten1,&atten2);
+			PRT_PowerDistribution((int8_t)(RadioParam.Power),&tempPower,&atten1,&atten2);
 			PRT_SetAtten1To(atten1);
 			PRT_SetAtten2To(atten2);
 
-			RU_RFSetTXUp(tempPower,GlobalData->TxFreq,GlobalData->TxConfig);
+			RadioCleanAndStandby();
+			RU_RFSetTXUp(tempPower,RadioParam.TxFreq,RadioParam.TxConfig);
 
 			taskENTER_CRITICAL();
-			RadioSend(TxPacket,ReceiveData->temp);
+			RadioSend((uint8_t *)EEPROM_RF_DATA_PACKET,RC_GetSizeOfSavedPacket());
 			taskEXIT_CRITICAL();
 
 			break;
@@ -203,14 +204,14 @@ uint8_t RU_IRQProcess(tRfGlobalData* GlobalData)
 		    }
 
 
-			RU_LoRaConfigAndStartRX(GlobalData->RxFreq,GlobalData->RxConfig,true,portMAX_DELAY);
+			RU_LoRaConfigAndStartRX(RadioParam.RxFreq,RadioParam.RxConfig,true,portMAX_DELAY);
 
 	        break;
 
         case RF_TX_RUNNING:
 
 			/*Open window for a short time*/
-			RU_LoRaConfigAndStartRX(GlobalData->RxFreq,GlobalData->RxConfig,true,portMAX_DELAY);
+			RU_LoRaConfigAndStartRX(RadioParam.RxFreq,RadioParam.RxConfig,true,portMAX_DELAY);
            	SendData.Address=ADDR_TO_CORE_TX_PACKET_DONE;
            	xQueueSend(QueueCoreHandle, &SendData, portMAX_DELAY);
 

@@ -26,9 +26,9 @@ void PRT_SetAtten1To(double atten)
 
 	temp = (uint8_t ) (atten*4);
 
-	HAL_GPIO_WritePin(ATTEN_LE1_GPIO_Port,ATTEN_LE1_Pin,0);
 	HAL_SPI_Transmit(&hspi2,&temp,1,10000);
 	HAL_GPIO_WritePin(ATTEN_LE1_GPIO_Port,ATTEN_LE1_Pin,1);
+	HAL_GPIO_WritePin(ATTEN_LE1_GPIO_Port,ATTEN_LE1_Pin,0);
 }
 
 /**
@@ -42,9 +42,9 @@ void PRT_SetAtten2To(double atten)
 	atten=SP_ConstrainDouble(atten,0,31.75);
 	temp = (uint8_t ) (atten*4);
 
-	HAL_GPIO_WritePin(ATTEN_LE1_GPIO_Port,ATTEN_LE2_Pin,0);
 	HAL_SPI_Transmit(&hspi2,&temp,1,10000);
-	HAL_GPIO_WritePin(ATTEN_LE1_GPIO_Port,ATTEN_LE2_Pin,1);
+	HAL_GPIO_WritePin(ATTEN_LE2_GPIO_Port,ATTEN_LE2_Pin,1);
+	HAL_GPIO_WritePin(ATTEN_LE2_GPIO_Port,ATTEN_LE2_Pin,0);
 }
 
 /**
@@ -68,12 +68,14 @@ void PRT_PowerDistribution(double wantedPowerdBm, int8_t *outPowerdB, double *at
 	double tempAtten;
 	double tempAttenResid=0;
 
-	tempPower = SP_ConstrainDouble(wantedPowerdBm,-80,15);
+	wantedPowerdBm+=6;	//6 = utlum na cestach
+
+	tempPower = SP_ConstrainDouble(wantedPowerdBm,-80,22);
 
 	tempResiduePower = fmod(tempPower,1);
 	//tempResiduePower = (double)(tempPower%1);
 
-	if(tempPower >= (-17) )
+	if(tempPower >= (-9) )
 	{
 		if(tempResiduePower == 0)
 		{
@@ -90,8 +92,8 @@ void PRT_PowerDistribution(double wantedPowerdBm, int8_t *outPowerdB, double *at
 	}
 	else
 	{	//napr (-18,75)
-		*outPowerdB = (-17);
-		tempAtten = -(tempPower+17); // zbyde pouze utlum napr (46,75)
+		*outPowerdB = (-9);
+		tempAtten = -(tempPower+9); // zbyde pouze utlum napr (46,75)
 
 		tempAtten*=2;	// napr 93,5
 		tempAttenResid=fmod(tempAtten,1);

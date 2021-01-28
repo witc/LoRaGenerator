@@ -469,43 +469,38 @@ void SX126xSetTxParams( int8_t power, RadioRampTimes_t rampTime  )
     {
     	uint8_t paDutyCycle;
     	uint8_t hpMax;
+    	uint8_t paMode=0;
 
-    	if (power > 20)
+    	if (power == 22)
     	{
     		paDutyCycle = 0x4;
     		hpMax = 0x07;
     	}
-    	else if(power > 17)
+    	else if(power > 20)
     	{
     		paDutyCycle = 0x3;
 			hpMax = 0x05;
     	}
-    	else if(power > 14)
+    	else if(power > 17)
 		{
 			paDutyCycle = 0x2;
-			hpMax = 0x02;
+			hpMax = 0x03;
 		}
-    	else if(power > 10)
-    	{
-    		paDutyCycle = 0x1;
-			hpMax = 0x00;
-    	}
+//    	else if(power >= (-9) )
+//    	{
+//    		paDutyCycle = 0x2;
+//			hpMax = 0x02;
+//    	}
+//    	 	/* prechod na low PA */
     	else
     	{
-    		paDutyCycle = 0x0;
-			hpMax = 0x00;
+    		paDutyCycle = 0x2;
+			hpMax = 0x02;
+			//paMode = 1;
     	}
 
+        SX126xSetPaConfig( paDutyCycle, hpMax, paMode, 0x01 );
 
-        SX126xSetPaConfig( paDutyCycle, hpMax, 0x00, 0x01 );
-//        if( power > 22 )
-//        {
-//            power = 22;
-//        }
-//        else if( power < -3 )
-//        {
-//            power = -3;
-//        }
         RG_SX126xWriteRegister( REG_OCP, 0x38 ); // current max 160mA for the whole device
     }
 
