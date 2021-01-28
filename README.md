@@ -55,7 +55,14 @@ Every Radio packet sets radio to Standby mode!
 | setRxCR  | 0xB  |   CodeRate 4/5-4/8 (1B)|
 | setStandby  | 0xC  |  |
 | startTXCW  | 0xD  |  |
-
+| preparePacket  | 0xE  |   data[N] (N B)|
+| setAutoRepeating  | 0xF  |   true/false (1 B)|
+| setRepeatingPeriod  | 0x10  |   Period (ms) (4 B)|
+| setRxCRCCheck  | 0x11  |   Crc check true/false (1 B)|
+| setHeaderMode Rx & TX | 0x12  |   Enable header mode true/false (1 B)|
+| sendPacket  | 0x13  |   empty |
+| sendLastPacketAgain  | 0x14  |   empty |
+| startRx  | 0x15  |   Timeout (ms) (4 B) |
 
 **Table of commands for packet**
 | **cmd**  | **opCode**  | **parameters**| 
