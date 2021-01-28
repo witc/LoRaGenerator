@@ -21,6 +21,10 @@
 
 extern uint8_t GlUartRxBugger[UART_CIRCLE_MAX_BUFFER_SIZE];
 
+
+
+
+
 /**
  *
  */
@@ -45,11 +49,22 @@ typedef enum
 	UART_MSG_SET_RX_FREQ=2,
 	UART_MSG_SET_TX_POWER=3,
 	UART_MSG_SET_TX_SF=4,
-	UART_MSG_SET_TX_BW=5,
-	UART_MSG_SET_TX_IQ=6,
-	UART_MSG_SET_TX_CR=7,
-	UART_MSG_SET_STANDBY=8,
-	UART_MSG_SET_TX_CW=9,
+	UART_MSG_SET_RX_SF=5,
+	UART_MSG_SET_TX_BW=6,
+	UART_MSG_SET_RX_BW,
+	UART_MSG_SET_TX_IQ,
+	UART_MSG_SET_RX_IQ,
+	UART_MSG_SET_TX_CR,
+	UART_MSG_SET_RX_CR,
+	UART_MSG_SET_STANDBY,
+	UART_MSG_SET_TX_CW,
+	UART_MSG_PREP_PACKET,
+	UART_MSG_SET_AUTO_REPEAT,
+	UART_MSG_RX_CRC_CHECK,
+	UART_MSG_SET_HEADER_MODE,
+	UART_MSG_SEND_PACKET,
+	UART_MSG_SEND_LAST_PAKET_AGAIN,
+	UART_MSG_START_RX,
 
 }eUartMsgCmds;
 
@@ -89,15 +104,6 @@ typedef union
 
 uint8_t PCT_CalcCRC(uint8_t *data, uint8_t size);
 bool 	PCT_FindSyncWord(uint8_t *data, uint8_t sizeToSearch, uint8_t *headerStarts);
-bool	PCT_RadioSetTxFreq(uint32_t freq);
-bool 	PCT_RadioSetRxFreq(uint32_t freq);
-bool 	PCT_RadioSetTxPower(int8_t power);
-bool	PCT_RadioSetTxSF(uint8_t sf);
-bool	PCT_RadioSetTxBW(uint16_t bw);
-bool 	PCT_RadioSetTxIQ(bool *iqInvert);
-bool	PCT_RadioSetTxCR(uint8_t *cr);
-bool	PCT_RadioSetStandby();
-bool    PCT_RadioSetTxCW();
 void 	PCT_DecodeUartRxMsg(uint8_t *rxBuffer);
 
 #endif /* TASKCORE_PROCESSCORETASK_H_ */

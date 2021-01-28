@@ -12,6 +12,7 @@
 #include "AES_SW.h"
 #include "ProcessRFTask.h"
 #include "LoRa_Codec.h"
+#include "RadioUser.h"
 
 /*!
  *
@@ -37,16 +38,16 @@ bool RU_SX1262Assign(void)
 	/* init */
 	spiDevice.AtomicActionEnter=vPortEnterCritical;
 	spiDevice.AtomicActionExit=vPortExitCritical;
-	spiDevice.pin_BUSY.port=RF_BUSY_GPIO_Port;
-	spiDevice.pin_BUSY.pin=RF_BUSY_Pin;
-	spiDevice.pin_RESET.port=RF_NRESET_GPIO_Port;
-	spiDevice.pin_RESET.pin=RF_NRESET_Pin;
-	spiDevice.pin_DIO1.port=RF_DIO_GPIO_Port;
-	spiDevice.pin_DIO1.pin=RF_DIO_Pin;
-	spiDevice.pin_NSS.port=RF_NSS_GPIO_Port;
-	spiDevice.pin_NSS.pin=RF_NSS_Pin;
-	spiDevice.pin_RF_SWITCH.port=RF_TX_ENABLE_GPIO_Port;
-	spiDevice.pin_RF_SWITCH.pin=RF_TX_ENABLE_Pin;
+	spiDevice.pin_BUSY.port=SX1262_BUSY_GPIO_Port;
+	spiDevice.pin_BUSY.pin=SX1262_BUSY_Pin;
+	spiDevice.pin_RESET.port=SX1262_NRESET_GPIO_Port;
+	spiDevice.pin_RESET.pin=SX1262_NRESET_Pin;
+	spiDevice.pin_DIO1.port=SX1262_DIO_GPIO_Port;
+	spiDevice.pin_DIO1.pin=SX1262_DIO_Pin;
+	spiDevice.pin_NSS.port=SX1262_NSS_GPIO_Port;
+	spiDevice.pin_NSS.pin=SX1262_NSS_Pin;
+	spiDevice.pin_RF_SWITCH.port=SX1262_TX_ENABLE_GPIO_Port;
+	spiDevice.pin_RF_SWITCH.pin=SX1262_TX_ENABLE_Pin;
 
 #if AES_USE_SW_VERSION
 	spiDevice.AES_ECB_Encrypt=AES_ECB_encrypt;

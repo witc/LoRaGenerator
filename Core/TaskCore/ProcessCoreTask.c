@@ -9,6 +9,7 @@
 #include "TemplateRadioUser.h"
 #include "SignalProcessing.h"
 #include "AuxRfProcess.h"
+#include "RadioCommands.h"
 
 extern UART_HandleTypeDef huart1;
 extern osMessageQId QueueCoreHandle;
@@ -38,18 +39,7 @@ static unsigned char crc8tab[256] = {
 
 volatile uint32_t		dmaOverRun=0;
 
-bool (*PCT_RadioSetFunc[sizeof(eUartMsgCmds)])() = {&PCT_RadioSetTxFreq,
-													&PCT_RadioSetRxFreq,
-													&PCT_RadioSetTxPower,
-													&PCT_RadioSetTxSF,
-													&PCT_RadioSetTxBW,
-													&PCT_RadioSetTxIQ,
-													&PCT_RadioSetTxCR,
-													&PCT_RadioSetStandby,
-													&PCT_RadioSetTxCW,
-													};
 
-tRadioParam RadioParam;
 
 /**
  *
@@ -254,77 +244,6 @@ bool PCT_FindSyncWord(uint8_t *data, uint8_t sizeToSearch, uint8_t *headerStarts
 
 /**
  *
- */
-bool PCT_RadioSetTxFreq(uint32_t freq)
-{
-	taskENTER_CRITICAL();
-	RadioParam.TxFreq = freq;
-	taskEXIT_CRITICAL();
-
-	return true;
-}
-
-/**
- *
- */
-bool PCT_RadioSetRxFreq(uint32_t freq)
-{
-	taskENTER_CRITICAL();
-	RadioParam.RxFreq = freq;
-	taskEXIT_CRITICAL();
-
-	return true;
-}
-
-/**
- *
- * @param power
- * @return
- */
-bool PCT_RadioSetTxPower(int8_t power)
-{
-	taskENTER_CRITICAL();
-	RadioParam.Power = power;
-	taskEXIT_CRITICAL();
-
-	EepromStart(true);
-	HAL_FLASHEx_DATAEEPROM_Program(FLASH_TYPEPROGRAMDATA_BYTE,EEPROM_RF_TX_POWER,power);
-	EepromStop();
-
-	return true;
-}
-
-/**
- *
- * @return
- */
-bool	PCT_RadioSetStandby()
-{
-	DATA_QUEUE SendData;
-	SendData.pointer = NULL;
-	SendData.Address = ADDR_TO_RF_CMD;
-	SendData.Data = RF_CMD_STANDBY;
-
-	xQueueSend(QueueRFHandle,&SendData,portMAX_DELAY);
-
-}
-
-/**
- *
- * @return
- */
-bool    PCT_RadioSetTxCW()
-{
-	DATA_QUEUE SendData;
-	SendData.pointer = NULL;
-	SendData.Address = ADDR_TO_RF_CMD;
-	SendData.Data = RF_CMD_TX_CW;
-
-	xQueueSend(QueueRFHandle,&SendData,portMAX_DELAY);
-}
-
-/**
- *
  * @param rxBuffer
  */
 void PCT_DecodeUartRxMsg(uint8_t *rxBuffer)
@@ -336,7 +255,7 @@ void PCT_DecodeUartRxMsg(uint8_t *rxBuffer)
 	{
 		case UART_MSG_SET_TX_FREQ:
 
-			PCT_RadioSetTxFreq((rxBuffer[1]<<24)|(rxBuffer[2]<<16)|(rxBuffer[3]<<8)|(rxBuffer[4]));
+			RC_RadioSetTxFreq((rxBuffer[1]<<24)|(rxBuffer[2]<<16)|(rxBuffer[3]<<8)|(rxBuffer[4]));
 
 			break;
 
@@ -345,7 +264,7 @@ void PCT_DecodeUartRxMsg(uint8_t *rxBuffer)
 			break;
 
 		case UART_MSG_SET_TX_POWER:
-			PCT_RadioSetTxPower((int8_t)rxBuffer[1]);
+			RC_RadioSetTxPower((int8_t)rxBuffer[1]);
 			break;
 
 		case UART_MSG_SET_TX_SF:
@@ -365,11 +284,15 @@ void PCT_DecodeUartRxMsg(uint8_t *rxBuffer)
 			break;
 
 		case UART_MSG_SET_STANDBY:
-			PCT_RadioSetStandby();
+			RC_RadioSetStandby();
 			break;
 
 		case UART_MSG_SET_TX_CW:
-			PCT_RadioSetTxCW();
+			RC_RadioSetTxCW();
+			break;
+
+		case UART_MSG_PREP_PACKET:
+			RC_SavePacket(rxBuffer);
 			break;
 
 		default:
