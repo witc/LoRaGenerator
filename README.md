@@ -51,18 +51,18 @@ Every Radio packet sets radio to Standby mode!
 | setRxBW  | 0x7  |   BandWidth 7.81 - 500 kHz (2B)|
 | setTxIQ  | 0x8  |   IQ invert true/false (1B)|
 | setRxIQ  | 0x9  |   IQ invert true/false (1B)|
-| setTxCR  | 0xA  |   CodeRate 4/5-4/8 (1B)|
-| setRxCR  | 0xB  |   CodeRate 4/5-4/8 (1B)|
-| setStandby  | 0xC  |  |
-| startTXCW  | 0xD  |  |
-| preparePacket  | 0xE  | data[0] - nasledna velikost,  data[N] (N B)|
-| setAutoRepeating  | 0xF  |   true/false (1 B)|
-| setRepeatingPeriod  | 0x10  |   Period (ms) (4 B)|
-| setRxCRCCheck  | 0x11  |   Crc check true/false (1 B)|
-| setHeaderMode Rx & TX | 0x12  |   Enable header mode true/false (1 B)|
-| sendPacket  | 0x13  |   empty |
-| sendLastPacketAgain  | 0x14  |   empty |
-| startRx  | 0x15  |   Timeout (ms) (4 B) |
+| setTxCR  | 10  |   CodeRate 4/5-4/8 (1B)|
+| setRxCR  | 11  |   CodeRate 4/5-4/8 (1B)|
+| setStandby  | 12  |  |
+| startTXCW  | 13  |  |
+| preparePacket  | 14  | data[0] - nasledna velikost,  data[N] (N B)|
+| setAutoRepeating  | 15  |   true/false (1 B)|
+| setRepeatingPeriod  | 16  |   Period (ms) (4 B)|
+| setRxCRCCheck  | 17  |   Crc check true/false (1 B)|
+| setHeaderMode Rx & TX | 18  |   Enable header mode true/false (1 B)|
+| sendPacket  | 19 |   empty |
+| sendLastPacketAgain  | 20  |   empty |
+| startRx  | 21  |   Timeout (ms) (4 B) |
 
 **Table of commands for packet**
 | **cmd**  | **opCode**  | **parameters**| 
