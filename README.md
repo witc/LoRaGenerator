@@ -46,12 +46,23 @@ Every Radio packet sets radio to Standby mode!
 | setRxFreq  | 0x2  |   Frequency (4B)|
 | setTxPower  | 0x3  |   Power (1B)|
 | setTxSF  | 0x4  |  Spreading factor SF5-SF12 (1B)|
-| setTxBW  | 0x5  |   BandWidth 7.81 - 500 kHz (2B)|
-| setTxIQ  | 0x6  |   IQ invert true/false (1B)|
-| setTxCR  | 0x7  |   CodeRate 4/5-4/8 (1B)|
-| setStandby  | 0x8  |  |
-| startTXCW  | 0x9  |  |
-
+| setRxSF  | 0x5  |  Spreading factor SF5-SF12 (1B)|
+| setTxBW  | 0x6  |   BandWidth 7.81 - 500 kHz (2B)|
+| setRxBW  | 0x7  |   BandWidth 7.81 - 500 kHz (2B)|
+| setTxIQ  | 0x8  |   IQ invert true/false (1B)|
+| setRxIQ  | 0x9  |   IQ invert true/false (1B)|
+| setTxCR  | 10  |   CodeRate 4/5-4/8 (1B)|
+| setRxCR  | 11  |   CodeRate 4/5-4/8 (1B)|
+| setStandby  | 12  |  |
+| startTXCW  | 13  |  |
+| preparePacket  | 14  | data[0] - nasledna velikost,  data[N] (N B)|
+| setAutoRepeating  | 15  |   true/false (1 B)|
+| setRepeatingPeriod  | 16  |   Period (ms) (4 B)|
+| setRxCRCCheck  | 17  |   Crc check true/false (1 B)|
+| setHeaderMode Rx & TX | 18  |   Enable header mode true/false (1 B)|
+| sendPacket  | 19 |   empty |
+| sendLastPacketAgain  | 20  |   empty |
+| startRx  | 21  |   Timeout (ms) (4 B) |
 
 **Table of commands for packet**
 | **cmd**  | **opCode**  | **parameters**| 
