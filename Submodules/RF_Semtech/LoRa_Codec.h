@@ -30,10 +30,16 @@ typedef enum
  */
 typedef enum
 {
-	DR_BW_62_5_KHZ=0,
-	DR_BW_125_KHZ=1,
-	DR_BW_250_KHZ=2,
-	DR_BW_500_KHZ=3,
+	DR_BW_7_81_KHZ=0,
+	DR_BW_10_42_KHZ=1,
+	DR_BW_15_63_KHZ=2,
+	DR_BW_20_83_KHZ=3,
+	DR_BW_31_25_KHZ=4,
+	DR_BW_41_67_KHZ=5,
+	DR_BW_62_5_KHZ=6,
+	DR_BW_125_KHZ=7,
+	DR_BW_250_KHZ=8,
+	DR_BW_500_KHZ=9,
 
 }ENUM_DR_BW;
 
@@ -52,18 +58,34 @@ typedef enum
 
 }ENUM_DR_SF;
 
+/**
+ *
+ */
+typedef enum
+{
+	DR_CR_45=0,//!< DR_CR_45
+	DR_CR_46=1,//!< DR_CR_46
+	DR_CR_47=2,//!< DR_CR_47
+	DR_CR_48=3,//!< DR_CR_48
 
+}ENUM_DR_CR;
+
+/**
+ *
+ */
 typedef union
 {
-	uint8_t Value;
+	uint16_t Value;
 
 	struct sDrBits{
 
 	ENUM_DR_SF SF: 3;
 
-	ENUM_DR_BW BW:2;
+	ENUM_DR_BW BW:4;
 
 	ENUM_DR_IQ IqInvert:1;
+
+	ENUM_DR_CR CR:3;
 
 	}Bits;
 

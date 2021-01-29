@@ -11,7 +11,6 @@
 #include "radio.h"
 
 
-
 /**
  *
  */
@@ -48,9 +47,5 @@ typedef struct
 
 }tStaticStructure_RF, *p_tStaticStructure_RF;
 
-
-
-extern tRadioParam RadioParam;
-extern tPacketParam	PacketParam;
 
 #endif /* TASKRF_TASKRF_H_ */

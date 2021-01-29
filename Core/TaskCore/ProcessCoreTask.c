@@ -48,7 +48,7 @@ volatile uint32_t		dmaOverRun=0;
  * @param sizeOfDetectedMsg
  * @return
  */
-eUARTBufferMasg PCT_FindAnyMsg()
+eUARTBufferMasg PCT_FindAnyMsg(uint8_t **rxPacket)
 {
 	DATA_QUEUE SendData;
 	SendData.pointer=NULL;
@@ -197,10 +197,11 @@ eUARTBufferMasg PCT_FindAnyMsg()
 	/*payload jsme nasli s velikosti tempSizeOfRxMsg - tu ted ponizime v hledacim prostoru*/
 	sumArrivalSize-=tempSizeOfRxMsg;
 
-	SendData.Address=ADDR_TO_CORE_UART_RX_NEW_PACKET;
-	SendData.pointer = TxPacket;
-	xQueueSend(QueueCoreHandle,&SendData,portMAX_DELAY);
-
+	//SendData.Address=ADDR_TO_CORE_UART_RX_NEW_PACKET;
+	//SendData.pointer = TxPacket;
+	//xQueueSend(QueueCoreHandle,&SendData,portMAX_DELAY);
+	*rxPacket=TxPacket;
+	return eUART_MSG_OK;
 }
 
 
@@ -235,15 +236,36 @@ bool PCT_FindSyncWord(uint8_t *data, uint8_t sizeToSearch, uint8_t *headerStarts
 	return true;
 }
 
+/**
+ *
+ */
+void PCT_SendRfPacket()
+{
+	DATA_QUEUE SendData;
+	SendData.pointer = NULL;
 
+	if(RC_GetSizeOfSavedPacket()!=0)
+	{
+		SendData.Address=ADDR_TO_RF_CMD;
+		SendData.Data=RF_CMD_SEND_UNIVERSAL_PAYLOAD_NOW;
+		xQueueSend(QueueRFHandle,&SendData,portMAX_DELAY);
+
+		//osTimerStart(TimerRfTxTimeoutHandle,) TODO zvazit jak nastavit timeout  - aby byl spravne platny
+	}
+	else
+	{
+		//todo send error
+	}
+}
 /**
  *
  * @param rxBuffer
  */
 void PCT_DecodeUartRxMsg(uint8_t *rxBuffer)
 {
-	//PCT_RadioSetFunc[rxBuffer[0]]();
-	//return;
+	DATA_QUEUE SendData;
+	SendData.pointer = NULL;
+
 
 	switch((eUartMsgCmds)rxBuffer[0])
 	{
@@ -262,18 +284,34 @@ void PCT_DecodeUartRxMsg(uint8_t *rxBuffer)
 			break;
 
 		case UART_MSG_SET_TX_SF:
+			RC_RadioSetTxSf((uint8_t)rxBuffer[1]);
+			break;
 
+		case UART_MSG_SET_RX_SF:
+			RC_RadioSetRxSf((uint8_t)rxBuffer[1]);
 			break;
 
 		case UART_MSG_SET_TX_BW:
+			RC_RadioSetTxBw((rxBuffer[1]<<24)|(rxBuffer[2]<<16)|(rxBuffer[3]<<8)|(rxBuffer[4]));
+			break;
 
+		case UART_MSG_SET_RX_BW:
+			RC_RadioSetRxBw((rxBuffer[1]<<24)|(rxBuffer[2]<<16)|(rxBuffer[3]<<8)|(rxBuffer[4]));
 			break;
 
 		case UART_MSG_SET_TX_IQ:
 
 			break;
 
+		case UART_MSG_SET_RX_IQ:
+
+				break;
+
 		case UART_MSG_SET_TX_CR:
+
+			break;
+
+		case UART_MSG_SET_RX_CR:
 
 			break;
 
@@ -287,6 +325,10 @@ void PCT_DecodeUartRxMsg(uint8_t *rxBuffer)
 
 		case UART_MSG_PREP_PACKET:
 			RC_SavePacket(rxBuffer);
+			break;
+
+		case UART_MSG_SEND_PACKET:
+			PCT_SendRfPacket();
 			break;
 
 		default:

@@ -44,6 +44,10 @@ typedef struct
 
 }tPacketParam;
 
+
+extern tRadioParam RadioParam;
+extern tPacketParam	PacketParam;
+
 bool RC_RadioSetTxFreq(uint32_t freq);
 bool RC_RadioSetRxFreq(uint32_t freq);
 bool RC_RadioSetTxPower(int8_t power);

@@ -64,6 +64,8 @@ osTimerId TimerRepeateTXHandle;
 osStaticTimerDef_t TimerRepeateTXControlBlock;
 osTimerId TimerUartRxCheckHandle;
 osStaticTimerDef_t TimerUartRxCheckControlBlock;
+osTimerId TimerTxRfTimeoutHandle;
+osStaticTimerDef_t TimerTxRfTimeoutControlBlock;
 
 /* Private function prototypes -----------------------------------------------*/
 /* USER CODE BEGIN FunctionPrototypes */
@@ -74,6 +76,7 @@ void StartTaskCore(void const * argument);
 void StartTaskRF(void const * argument);
 void CallbackRepeateTx(void const * argument);
 void CallbackUartRxCheck(void const * argument);
+void CallbackTxRfTimeout(void const * argument);
 
 void MX_FREERTOS_Init(void); /* (MISRA C 2004 rule 8.1) */
 
@@ -181,6 +184,10 @@ void MX_FREERTOS_Init(void) {
   osTimerStaticDef(TimerUartRxCheck, CallbackUartRxCheck, &TimerUartRxCheckControlBlock);
   TimerUartRxCheckHandle = osTimerCreate(osTimer(TimerUartRxCheck), osTimerOnce, NULL);
 
+  /* definition and creation of TimerTxRfTimeout */
+  osTimerStaticDef(TimerTxRfTimeout, CallbackTxRfTimeout, &TimerTxRfTimeoutControlBlock);
+  TimerTxRfTimeoutHandle = osTimerCreate(osTimer(TimerTxRfTimeout), osTimerOnce, NULL);
+
   /* USER CODE BEGIN RTOS_TIMERS */
   /* start timers, add new ones, ... */
   /* USER CODE END RTOS_TIMERS */
@@ -263,6 +270,14 @@ __weak void CallbackUartRxCheck(void const * argument)
   /* USER CODE BEGIN CallbackUartRxCheck */
 
   /* USER CODE END CallbackUartRxCheck */
+}
+
+/* CallbackTxRfTimeout function */
+__weak void CallbackTxRfTimeout(void const * argument)
+{
+  /* USER CODE BEGIN CallbackTxRfTimeout */
+
+  /* USER CODE END CallbackTxRfTimeout */
 }
 
 /* Private application code --------------------------------------------------*/

@@ -52,20 +52,21 @@ typedef enum
 	UART_MSG_SET_TX_SF=4,
 	UART_MSG_SET_RX_SF=5,
 	UART_MSG_SET_TX_BW=6,
-	UART_MSG_SET_RX_BW,
-	UART_MSG_SET_TX_IQ,
-	UART_MSG_SET_RX_IQ,
-	UART_MSG_SET_TX_CR,
-	UART_MSG_SET_RX_CR,
-	UART_MSG_SET_STANDBY,
-	UART_MSG_SET_TX_CW,
-	UART_MSG_PREP_PACKET,
-	UART_MSG_SET_AUTO_REPEAT,
-	UART_MSG_RX_CRC_CHECK,
-	UART_MSG_SET_HEADER_MODE,
-	UART_MSG_SEND_PACKET,
-	UART_MSG_SEND_LAST_PAKET_AGAIN,
-	UART_MSG_START_RX,
+	UART_MSG_SET_RX_BW=7,
+	UART_MSG_SET_TX_IQ=8,
+	UART_MSG_SET_RX_IQ=9,
+	UART_MSG_SET_TX_CR=10,
+	UART_MSG_SET_RX_CR=11,
+	UART_MSG_SET_STANDBY=12,
+	UART_MSG_SET_TX_CW=13,
+	UART_MSG_PREP_PACKET=14,
+	UART_MSG_SET_AUTO_REPEAT=15,
+	UART_MSG_SET_REPEATING_PERIOD=16,
+	UART_MSG_RX_CRC_CHECK=17,
+	UART_MSG_SET_HEADER_MODE=18,
+	UART_MSG_SEND_PACKET=19,
+	UART_MSG_SEND_LAST_PAKET_AGAIN=20,
+	UART_MSG_START_RX=21,
 
 }eUartMsgCmds;
 
@@ -87,6 +88,7 @@ typedef enum
 typedef enum
 {
 	eUART_MSG_EMPTY=0,
+	eUART_MSG_OK,
 	eUART_MSG_TOO_SHORT,
 	eUART_MSG_WRONG_HEADER,
 	eUART_MSG_WRONG_CRC,
@@ -103,8 +105,10 @@ typedef union
 }eUartMsgs;
 
 
-uint8_t PCT_CalcCRC(uint8_t *data, uint8_t size);
-bool 	PCT_FindSyncWord(uint8_t *data, uint8_t sizeToSearch, uint8_t *headerStarts);
-void 	PCT_DecodeUartRxMsg(uint8_t *rxBuffer);
+uint8_t 		PCT_CalcCRC(uint8_t *data, uint8_t size);
+bool 			PCT_FindSyncWord(uint8_t *data, uint8_t sizeToSearch, uint8_t *headerStarts);
+eUARTBufferMasg PCT_FindAnyMsg(uint8_t **rxPacket);
+void 			PCT_DecodeUartRxMsg(uint8_t *rxBuffer);
+void 			PCT_SendRfPacket();
 
 #endif /* TASKCORE_PROCESSCORETASK_H_ */
