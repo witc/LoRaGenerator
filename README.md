@@ -30,7 +30,7 @@ Every Radio packet sets radio to Standby mode!
 | Sync Word  |Header|  payload |  crc - pocitano z celeho paketu |
 
 **Header**
-| 1B  |  1B | 2B  | 
+| 1B  |  2B | 1B  | 
 |---|---|---|
 | size of payload  |RFU| crc Header  
 
@@ -40,29 +40,35 @@ Every Radio packet sets radio to Standby mode!
 | Command  |Value|   
 
 **Table of commands for radio**
-| **cmd**  | **opCode**  | **parameters**| 
+| **cmd**  | **opCode**  | **parameters**|  **retVal**
+|---|---|--|--|
+| setTxFreq  | 0x1  |   Frequency (4B)| 1 - Succes /0 - failure|
+| setRxFreq  | 0x2  |   Frequency (4B)| 1 - Succes /0 - failure|
+| setTxPower  | 0x3  |   Power (1B)| 1 - Succes /0 - failure|
+| setTxSF  | 0x4  |  Spreading factor SF5-SF12 (1B)| 1 - Succes /0 - failure|
+| setRxSF  | 0x5  |  Spreading factor SF5-SF12 (1B)| 1 - Succes /0 - failure|
+| setTxBW  | 0x6  |   BandWidth 7.81 - 500 kHz (2B)| 1 - Succes /0 - failure|
+| setRxBW  | 0x7  |   BandWidth 7.81 - 500 kHz (2B)| 1 - Succes /0 - failure|
+| setTxIQ  | 0x8  |   IQ invert true/false (1B)| 1 - Succes /0 - failure|
+| setRxIQ  | 0x9  |   IQ invert true/false (1B)| 1 - Succes /0 - failure|
+| setTxCR  | 10  |   CodeRate 4/5-4/8 (1B)| 1 - Succes /0 - failure|
+| setRxCR  | 11  |   CodeRate 4/5-4/8 (1B)| 1 - Succes /0 - failure|
+| setStandby  | 12  |  | 1 - Succes /0 - failure|
+| startTXCW  | 13  |  | 1 - Succes /0 - failure|
+| preparePacket  | 14  | data[0] - nasledna velikost,  data[N] (N B)| 1 - Succes /0 - failure|
+| setAutoRepeating  | 15  |   true/false (1 B)| 1 - Succes /0 - failure|
+| setRepeatingPeriod  | 16  |   Period (ms) (4 B)| 1 - Succes /0 - failure|
+| setRxCRCCheck  | 17  |   Crc check true/false (1 B)| 1 - Succes /0 - failure|
+| setHeaderMode Rx & TX | 18  |   Enable header mode true/false (1 B)| 1 - Succes /0 - failure|
+| sendPacket  | 19 |   empty | 1 - Succes /0 - failure|
+| sendLastPacketAgain  | 20  |   empty | 1 - Succes /0 - failure|
+| startRx  | 21  |   Timeout (ms) (4 B) | 1 - Succes /0 - failure|
+
+
+| **cmd**  | **Return value**  | **parameters**| 
 |---|---|--|
-| setTxFreq  | 0x1  |   Frequency (4B)|
-| setRxFreq  | 0x2  |   Frequency (4B)|
-| setTxPower  | 0x3  |   Power (1B)|
-| setTxSF  | 0x4  |  Spreading factor SF5-SF12 (1B)|
-| setRxSF  | 0x5  |  Spreading factor SF5-SF12 (1B)|
-| setTxBW  | 0x6  |   BandWidth 7.81 - 500 kHz (2B)|
-| setRxBW  | 0x7  |   BandWidth 7.81 - 500 kHz (2B)|
-| setTxIQ  | 0x8  |   IQ invert true/false (1B)|
-| setRxIQ  | 0x9  |   IQ invert true/false (1B)|
-| setTxCR  | 10  |   CodeRate 4/5-4/8 (1B)|
-| setRxCR  | 11  |   CodeRate 4/5-4/8 (1B)|
-| setStandby  | 12  |  |
-| startTXCW  | 13  |  |
-| preparePacket  | 14  | data[0] - nasledna velikost,  data[N] (N B)|
-| setAutoRepeating  | 15  |   true/false (1 B)|
-| setRepeatingPeriod  | 16  |   Period (ms) (4 B)|
-| setRxCRCCheck  | 17  |   Crc check true/false (1 B)|
-| setHeaderMode Rx & TX | 18  |   Enable header mode true/false (1 B)|
-| sendPacket  | 19 |   empty |
-| sendLastPacketAgain  | 20  |   empty |
-| startRx  | 21  |   Timeout (ms) (4 B) |
+| setTxFreq  | opCode  |  |
+
 
 **Table of commands for packet**
 | **cmd**  | **opCode**  | **parameters**| 
