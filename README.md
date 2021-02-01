@@ -65,24 +65,24 @@ Every Radio packet sets radio to Standby mode!
 | startRx  | 21  |   Timeout (ms) (4 B) | 1 - Succes /0 - failure|
 
 **Table of reading commands for radio**
-| **cmd**  | **opCode**  | **parameters**|  **retVal**
+| **cmd**  | **opCode**  | **return**| 
 |---|---|--|--|
-| getTxFreq  |(0x81) 129  |   Frequency (4B)| 1 - Succes /0 - failure|
-| getRxFreq  | 130  |   Frequency (4B)| 1 - Succes /0 - failure|
-| getTxPower  | 131  |   Power (1B)| 1 - Succes /0 - failure|
-| getTxSF  |  132 |  Spreading factor SF5-SF12 (1B)| 1 - Succes /0 - failure|
-| getRxSF  | 133  |  Spreading factor SF5-SF12 (1B)| 1 - Succes /0 - failure|
-| getTxBW  | 134  |   BandWidth 7.81 - 500 kHz (2B)| 1 - Succes /0 - failure|
-| getRxBW  | 135  |   BandWidth 7.81 - 500 kHz (2B)| 1 - Succes /0 - failure|
-| getTxIQ  | 136  |   IQ invert true/false (1B)| 1 - Succes /0 - failure|
-| getRxIQ  | 137  |   IQ invert true/false (1B)| 1 - Succes /0 - failure|
-| getTxCR  | 138  |   CodeRate 4/5-4/8 (1B)| 1 - Succes /0 - failure|
-| getRxCR  | 139  |   CodeRate 4/5-4/8 (1B)| 1 - Succes /0 - failure|
-| getreparedPacket  | 140  | data[0] - nasledna velikost,  data[N] (N B)| 1 - Succes /0 - failure|
-| getAutoRepeating  | 141  |   true/false (1 B)| 1 - Succes /0 - failure|
-| getRepeatingPeriod  | 142  |   Period (ms) (4 B)| 1 - Succes /0 - failure|
-| getRxCRCCheck  | 143  |   Crc check true/false (1 B)| 1 - Succes /0 - failure|
-| getHeaderMode Rx & TX | 144  |   Enable header mode true/false (1 B)| 1 - Succes /0 - failure|
+| getTxFreq  |(0x81) 129  |   Frequency (4B)|
+| getRxFreq  | 130  |   Frequency (4B)| 
+| getTxPower  | 131  |   Power (1B)|
+| getTxSF  |  132 |  Spreading factor SF5-SF12 (1B)| 
+| getRxSF  | 133  |  Spreading factor SF5-SF12 (1B)| 
+| getTxBW  | 134  |   BandWidth 7.81 - 500 kHz (2B)| 
+| getRxBW  | 135  |   BandWidth 7.81 - 500 kHz (2B)| 
+| getTxIQ  | 136  |   IQ invert true/false (1B)| 
+| getRxIQ  | 137  |   IQ invert true/false (1B)| 
+| getTxCR  | 138  |   CodeRate 4/5-4/8 (1B)| 
+| getRxCR  | 139  |   CodeRate 4/5-4/8 (1B)| 
+| getreparedPacket  | 140  | data[0] - nasledna velikost,  data[N] (N B)| 
+| getAutoRepeating  | 141  |   true/false (1 B)| 
+| getRepeatingPeriod  | 142  |   Period (ms) (4 B)| 
+| getRxCRCCheck  | 143  |   Crc check true/false (1 B)|
+| getHeaderMode Rx & TX | 144  |   Enable header mode true/false (1 B)| 
 
 
 
