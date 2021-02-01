@@ -265,13 +265,13 @@ void PCT_DecodeUartRxMsg(uint8_t *rxBuffer)
 {
 	DATA_QUEUE SendData;
 	SendData.pointer = NULL;
-
+	uint8_t retTemp=0xff;
 
 	switch((eUartMsgCmds)rxBuffer[0])
 	{
 		case UART_MSG_SET_TX_FREQ:
 
-			RC_RadioSetTxFreq((rxBuffer[1]<<24)|(rxBuffer[2]<<16)|(rxBuffer[3]<<8)|(rxBuffer[4]));
+			retTemp = RC_RadioSetTxFreq((rxBuffer[1]<<24)|(rxBuffer[2]<<16)|(rxBuffer[3]<<8)|(rxBuffer[4]));
 
 			break;
 
@@ -280,23 +280,23 @@ void PCT_DecodeUartRxMsg(uint8_t *rxBuffer)
 			break;
 
 		case UART_MSG_SET_TX_POWER:
-			RC_RadioSetTxPower((int8_t)rxBuffer[1]);
+			retTemp = RC_RadioSetTxPower((int8_t)rxBuffer[1]);
 			break;
 
 		case UART_MSG_SET_TX_SF:
-			RC_RadioSetTxSf((uint8_t)rxBuffer[1]);
+			retTemp = RC_RadioSetTxSf((uint8_t)rxBuffer[1]);
 			break;
 
 		case UART_MSG_SET_RX_SF:
-			RC_RadioSetRxSf((uint8_t)rxBuffer[1]);
+			retTemp = RC_RadioSetRxSf((uint8_t)rxBuffer[1]);
 			break;
 
 		case UART_MSG_SET_TX_BW:
-			RC_RadioSetTxBw((rxBuffer[1]<<24)|(rxBuffer[2]<<16)|(rxBuffer[3]<<8)|(rxBuffer[4]));
+			retTemp = RC_RadioSetTxBw((rxBuffer[1]<<24)|(rxBuffer[2]<<16)|(rxBuffer[3]<<8)|(rxBuffer[4]));
 			break;
 
 		case UART_MSG_SET_RX_BW:
-			RC_RadioSetRxBw((rxBuffer[1]<<24)|(rxBuffer[2]<<16)|(rxBuffer[3]<<8)|(rxBuffer[4]));
+			retTemp = RC_RadioSetRxBw((rxBuffer[1]<<24)|(rxBuffer[2]<<16)|(rxBuffer[3]<<8)|(rxBuffer[4]));
 			break;
 
 		case UART_MSG_SET_TX_IQ:
@@ -316,23 +316,28 @@ void PCT_DecodeUartRxMsg(uint8_t *rxBuffer)
 			break;
 
 		case UART_MSG_SET_STANDBY:
-			RC_RadioSetStandby();
+			retTemp = RC_RadioSetStandby();
 			break;
 
 		case UART_MSG_SET_TX_CW:
-			RC_RadioSetTxCW();
+			retTemp = RC_RadioSetTxCW();
 			break;
 
 		case UART_MSG_PREP_PACKET:
-			RC_SavePacket(rxBuffer);
+			retTemp = RC_SavePacket(rxBuffer);
 			break;
 
 		case UART_MSG_SEND_PACKET:
-			PCT_SendRfPacket();
+			retTemp = PCT_SendRfPacket();
 			break;
 
 		default:
 			break;
+	}
+
+	if(retTemp != 0xff)
+	{
+		PCT_UartSendAnswer(retTemp);
 	}
 }
 
