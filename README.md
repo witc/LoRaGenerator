@@ -66,7 +66,7 @@ Every Radio packet sets radio to Standby mode!
 
 **Table of reading commands for radio**
 | **cmd**  | **opCode**  | **return**| 
-|---|---|--|--|
+|---|---|--|
 | getTxFreq  |(0x81) 129  |   Frequency (4B)|
 | getRxFreq  | 130  |   Frequency (4B)| 
 | getTxPower  | 131  |   Power (1B)|
