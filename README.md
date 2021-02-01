@@ -64,6 +64,27 @@ Every Radio packet sets radio to Standby mode!
 | sendLastPacketAgain  | 20  |   empty | 1 - Succes /0 - failure|
 | startRx  | 21  |   Timeout (ms) (4 B) | 1 - Succes /0 - failure|
 
+**Table of reading commands for radio**
+| **cmd**  | **opCode**  | **parameters**|  **retVal**
+|---|---|--|--|
+| getTxFreq  |(0x81) 129  |   Frequency (4B)| 1 - Succes /0 - failure|
+| getRxFreq  | 130  |   Frequency (4B)| 1 - Succes /0 - failure|
+| getTxPower  | 131  |   Power (1B)| 1 - Succes /0 - failure|
+| getTxSF  |  132 |  Spreading factor SF5-SF12 (1B)| 1 - Succes /0 - failure|
+| getRxSF  | 133  |  Spreading factor SF5-SF12 (1B)| 1 - Succes /0 - failure|
+| getTxBW  | 134  |   BandWidth 7.81 - 500 kHz (2B)| 1 - Succes /0 - failure|
+| getRxBW  | 135  |   BandWidth 7.81 - 500 kHz (2B)| 1 - Succes /0 - failure|
+| getTxIQ  | 136  |   IQ invert true/false (1B)| 1 - Succes /0 - failure|
+| getRxIQ  | 137  |   IQ invert true/false (1B)| 1 - Succes /0 - failure|
+| getTxCR  | 138  |   CodeRate 4/5-4/8 (1B)| 1 - Succes /0 - failure|
+| getRxCR  | 139  |   CodeRate 4/5-4/8 (1B)| 1 - Succes /0 - failure|
+| getreparedPacket  | 140  | data[0] - nasledna velikost,  data[N] (N B)| 1 - Succes /0 - failure|
+| getAutoRepeating  | 141  |   true/false (1 B)| 1 - Succes /0 - failure|
+| getRepeatingPeriod  | 142  |   Period (ms) (4 B)| 1 - Succes /0 - failure|
+| getRxCRCCheck  | 143  |   Crc check true/false (1 B)| 1 - Succes /0 - failure|
+| getHeaderMode Rx & TX | 144  |   Enable header mode true/false (1 B)| 1 - Succes /0 - failure|
+
+
 
 | **cmd**  | **Return value**  | **parameters**| 
 |---|---|--|
