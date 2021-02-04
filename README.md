@@ -25,9 +25,9 @@ Every Radio packet sets radio to Standby mode!
 
 # USART Packet:
 
-| 2B  |  4B  |  n |  2B |
+| 2B  |  4B  |  n |  1B |
 |---|---|---|---|
-| Sync Word  - 0x2DD4  |Header|  payload |  crc - pocitano z celeho paketu |
+| Sync Word  - 0x2DD4  |Header|  payload |  crc - from whole packet |
 
 **Header**
 | 1B  |  2B | 1B  | 
@@ -35,10 +35,12 @@ Every Radio packet sets radio to Standby mode!
 | size of payload  |RFU| crc Header  
 
 **Payload**
-| 1B  | 1B   | 1B|
+| 1B  | 1B   | NB|
 |---|---|--|
 | Command| Action flags (only for way from LoRaGenerator to PC)  |Values|   
 
+**CRC8 implementation with polynom = x7+ x6+ x4+ x2+ x0 (0xD5)**
+CRC is the same for header and all packet
 **Table of commands for radio**
 | **cmd**  | **opCode** 1B  |**action flags** 1B |**parameters** NB|  **retVal** 1B
 |---|---|--|--|--|
