@@ -14,10 +14,9 @@
 #define UART_BUFF_HEADER_SIZE			(4)
 #define MINIMAL_SIZE_USART_RX_MSG		(sizeof(SyncUartMsg)+UART_BUFF_HEADER_SIZE+1/*payload*/+UART_BUFF_CRC_SIZE/*crc*/)
 #define MAXIMAL_SIZE_USART_RX_MSG		(sizeof(SyncUartMsg)+UART_BUFF_HEADER_SIZE+60/*payload*/+UART_BUFF_CRC_SIZE/*crc*/)
-#define UART_CIRCLE_MAX_BUFFER_SIZE		(200)	//musi byt > 2= MAximal RX msg ?!?
-#define TIME_TO_CHECK_UART_RX_BUFFER	(1)// // pri 9600 Baud => 1200B/sec
+#define UART_CIRCLE_MAX_BUFFER_SIZE		(40)	//musi byt > 2= MAximal RX msg ?!?
 #define MAX_SIZE_FOR_PAYLOAD			(100)
-#define UART_CHECK_FREQUENCY			(3600)
+#define UART_CHECK_FREQUENCY			(5000)	//(115200 = 14,4 B/ms => za 2ms = < 30 Byte)
 
 
 /**
@@ -50,5 +49,6 @@ uint8_t 		UP_CalcCRC(uint8_t *data, uint8_t size);
 bool 			UP_FindSyncWord(uint8_t *data, uint8_t sizeToSearch, uint8_t *headerStarts);
 eUARTBufferMasg UP_FindAnyMsg(uint8_t **rxPacket);
 void 			UP_UartSendData(uint8_t opCode, uint8_t *answer,uint8_t size);
+void 			UP_UartTransmitRawData(uint8_t *buffer, uint8_t size);
 
 #endif /* SERIALPORT_UARTPROCESS_H_ */

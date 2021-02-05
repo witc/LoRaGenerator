@@ -28,6 +28,8 @@ extern osTimerId TimerUartRxCheckHandle;
 extern osTimerId TimerRepeateTXHandle;
 extern osTimerId TimerTxRfTimeoutHandle;
 
+TaskHandle_t UartTxDoneNotify = NULL;
+
 /*  						*/
 size_t volatile Gl_HeapFree;
 uint8_t GlUartRxBugger[UART_CIRCLE_MAX_BUFFER_SIZE];
@@ -98,6 +100,28 @@ static void (*StateCORE[])(DATA_QUEUE, tCoreGlobalData*,	tStateCoreAutomat*) =
 		{	CORE_StateINIT, CORE_StateOFF, CORE_StateStartON,  CORE_StateON, CORE_StateStartOFF };
 
 
+/**
+ *
+ * @param huart
+ */
+void HAL_UART_TxCpltCallback(UART_HandleTypeDef *huart)
+{
+	BaseType_t xHigherPriorityTaskWoken = pdFALSE;
+
+	if(UartTxDoneNotify!=NULL)
+	{
+		/* Notify the task that the transfer is complete. */
+		vTaskNotifyGiveFromISR( UartTxDoneNotify, &xHigherPriorityTaskWoken );
+		/* There are no ADC in progress, so no tasks to notify. */
+		UartTxDoneNotify = NULL;
+	}
+	else
+	{
+
+	}
+
+	portYIELD_FROM_ISR( xHigherPriorityTaskWoken );
+}
 
 /**
  *
@@ -320,6 +344,7 @@ static void CORE_StateON(DATA_QUEUE ReceiveData,tCoreGlobalData* GlobalData, tSt
 				vPortFree(RxUartMsg);
 				RxUartMsg = NULL;
 				LL_GPIO_ResetOutputPin(LED_RED_GPIO_Port,LED_RED_Pin);
+				//LL_GPIO_ResetOutputPin(LED_GREEN_GPIO_Port,LED_GREEN_Pin);
 			}
 
 			break;

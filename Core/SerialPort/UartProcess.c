@@ -11,9 +11,10 @@
 
 
 uint8_t SyncUartMsg[2] = {0xaa,0xbb};
-uint8_t UartTxDMABuffer[MAX_SIZE_FOR_PAYLOAD];
+uint8_t UartTxDMABuffer[UART_CIRCLE_MAX_BUFFER_SIZE];
 
 extern UART_HandleTypeDef huart1;
+extern TaskHandle_t UartTxDoneNotify;
 
 /* CRC8 from CRSF crossfire */
 static unsigned char crc8tab[256] = {
@@ -36,7 +37,7 @@ static unsigned char crc8tab[256] = {
 
 
 volatile uint32_t		dmaOverRun=0;
-
+volatile uint32_t		counterOFRxByteSmazat = 0;
 
 /**
  *
@@ -94,9 +95,9 @@ eUARTBufferMasg UP_FindAnyMsg(uint8_t **rxPacket)
 	sumArrivalSize+=actualArrivalSize;
 
 	remainsToZero = tempCntDma;
-
+	counterOFRxByteSmazat+=actualArrivalSize;
 	/* pokud ted nic neprislo*/
-	if(actualArrivalSize == 0)	return eUART_MSG_EMPTY;	//neprislo nic
+	//if(actualArrivalSize == 0)	return eUART_MSG_EMPTY;	//neprislo nic
 
 	/* data budeme hledat od startToFind az po sumArrivalSize */
 /********************************************************************************/
@@ -107,14 +108,10 @@ eUARTBufferMasg UP_FindAnyMsg(uint8_t **rxPacket)
 	memcpy(&workingBuffer[0],&GlUartRxBugger[startToFind],UART_CIRCLE_MAX_BUFFER_SIZE-startToFind);
 	if(startToFind!=0)
 	{
-		//if(dmaOverRun)
-		{
-			memcpy(&workingBuffer[UART_CIRCLE_MAX_BUFFER_SIZE-startToFind],&GlUartRxBugger[0],startToFind);
-		}
+		memcpy(&workingBuffer[UART_CIRCLE_MAX_BUFFER_SIZE-startToFind],&GlUartRxBugger[0],startToFind);
 	}
 
 	/* hledame validni zpravu*/
-
 	uint8_t	workinkgStart=0;
 	do
 	{
@@ -124,7 +121,14 @@ eUARTBufferMasg UP_FindAnyMsg(uint8_t **rxPacket)
 			startHeader+=workinkgStart;
 			/* nasleduje mozny header zacinajici indexem startHeader */ 		//TODO kontorla crc header
 			payloadSizeFromHeader = workingBuffer[startHeader];
-			if((payloadSizeFromHeader>MAX_SIZE_FOR_PAYLOAD)||(payloadSizeFromHeader==0))
+			if(UP_CalcCRC(&workingBuffer[startHeader],3)!=workingBuffer[startHeader+3])
+			{
+				/* mame bulshitni zacatek takze to zahod */
+				workinkgStart++;
+				sumArrivalSize--;
+			//	LL_GPIO_SetOutputPin(LED_RED_GPIO_Port,LED_RED_Pin);
+			}
+			else if((payloadSizeFromHeader>MAX_SIZE_FOR_PAYLOAD)||(payloadSizeFromHeader==0))
 			{
 				/* mame bulshitni zacatek takze to zahod */
 				workinkgStart++;
@@ -267,8 +271,39 @@ void UP_UartSendData(uint8_t opCode, uint8_t *answer,uint8_t size)
 	/* crc payload */
 	UartTxDMABuffer[actualSize-UART_BUFF_CRC_SIZE]  = UP_CalcCRC(&UartTxDMABuffer[0], actualSize-UART_BUFF_CRC_SIZE);
 
-	//HAL_UART_Transmit(&huart1,UartTxDMABuffer,actualSize,100000);
-	HAL_UART_Transmit_DMA(&huart1,UartTxDMABuffer,actualSize);
+	HAL_UART_Transmit(&huart1,UartTxDMABuffer,actualSize,100000);
+	//UP_UartTransmitRawData(UartTxDMABuffer,actualSize);
+}
+
+/**
+ *
+ * @param buffer
+ * @param size
+ */
+void UP_UartTransmitRawData(uint8_t *buffer, uint8_t size)
+{
+	uint32_t ulNotificationValue;
+
+	if(UartTxDoneNotify!=NULL)
+	{
+		/* wait for previous TX is done */
+		ulNotificationValue = ulTaskNotifyTake(pdTRUE,200);
+		if( ulNotificationValue == 1 )
+		{
+			/* The transmission ended as expected. */
+		}
+		else
+		{
+			xTaskNotify(UartTxDoneNotify,0, eNoAction );
+			/* There are no ADC in progress, so no tasks to notify. */
+			UartTxDoneNotify = NULL;
+		}
+	}
+
+	UartTxDoneNotify=xTaskGetCurrentTaskHandle();
+
+	HAL_UART_Transmit_DMA(&huart1,buffer,size);
+
 }
 
 /**
