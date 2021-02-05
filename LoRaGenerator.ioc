@@ -287,6 +287,7 @@ Mcu.Pin18=PB9
 Mcu.Pin11=PA8
 Mcu.Pin12=PA9
 Mcu.Pin10=PB15
+NVIC.DMA1_Channel2_3_IRQn=true\:0\:0\:false\:false\:true\:true\:true\:true
 PB7.Locked=true
 RCC.PWRFreq_Value=32000000
 RCC.APB1Freq_Value=32000000
