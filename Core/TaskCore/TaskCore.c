@@ -13,6 +13,7 @@
 #include "SignalProcessing.h"
 #include "TemplateRadioUser.h"
 #include "RadioCommands.h"
+#include "UartProcess.h"
 
 
 const uint8_t	defaultTxPacket[]={160,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,35,35,35,35,35,35,35,35,84,101,115,116,111,118,97,99,105,32,112,97,107,101,116,0,228,189};
@@ -312,7 +313,7 @@ static void CORE_StateON(DATA_QUEUE ReceiveData,tCoreGlobalData* GlobalData, tSt
 
 		case ADDR_TO_CORE_UART_READ_RX_BUFFER:
 			/* periodic scanning circular uart buffer*/
-			if(PCT_FindAnyMsg(&RxUartMsg)==eUART_MSG_OK)
+			if(UP_FindAnyMsg(&RxUartMsg)==eUART_MSG_OK)
 			{
 				LL_GPIO_SetOutputPin(LED_RED_GPIO_Port,LED_RED_Pin);
 				PCT_DecodeUartRxMsg(RxUartMsg);

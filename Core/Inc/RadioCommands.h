@@ -49,8 +49,28 @@ extern tRadioParam RadioParam;
 extern tPacketParam	PacketParam;
 
 bool RC_RadioSetTxFreq(uint32_t freq);
+uint32_t RC_RadioGetTxFreq(void);
 bool RC_RadioSetRxFreq(uint32_t freq);
+uint32_t RC_RadioGetRxFreq(void);
 bool RC_RadioSetTxPower(int8_t power);
+int8_t RC_RadioGetTxPower(void);
+bool RC_RadioSetTxSf(uint8_t sf);
+uint32_t RC_RadioGetTxSf(void);
+bool RC_RadioSetRxSf(uint8_t sf);
+uint32_t RC_RadioGetRxSf();
+bool RC_RadioSetTxBw(uint32_t bw);
+uint32_t RC_RadioGetTxBw();
+bool RC_RadioSetRxBw(uint32_t bw);
+uint32_t RC_RadioGetRxBw(void);
+bool RC_RadioSetTxIq(uint8_t Iq);
+uint32_t RC_RadioGetTxIq(void);
+bool RC_RadioSetRxIq(uint8_t Iq);
+uint32_t RC_RadioGetRxIq(void);
+bool RC_RadioSetTxCr(uint8_t Cr);
+uint32_t RC_RadioGetTxCr(void);
+bool RC_RadioSetRxCr(uint8_t Cr);
+uint32_t RC_RadioGetRxCr(void);
+
 bool RC_RadioSetStandby();
 bool RC__RadioSetTxCW();
 bool RC_SavePacket(uint8_t *data);

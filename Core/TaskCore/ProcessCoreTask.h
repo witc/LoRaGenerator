@@ -11,34 +11,6 @@
 #include "main.h"
 #include "TaskCore.h"
 
-#define UART_BUFF_CRC_SIZE				(1)
-#define UART_BUFF_HEADER_SIZE			(1)
-#define MINIMAL_SIZE_USART_RX_MSG		(sizeof(SyncUartMsg)+UART_BUFF_HEADER_SIZE+1/*payload*/+UART_BUFF_CRC_SIZE/*crc*/)
-#define MAXIMAL_SIZE_USART_RX_MSG		(sizeof(SyncUartMsg)+UART_BUFF_HEADER_SIZE+60/*payload*/+UART_BUFF_CRC_SIZE/*crc*/)
-#define UART_CIRCLE_MAX_BUFFER_SIZE		(200)	//musi byt > 2= MAximal RX msg ?!?
-#define TIME_TO_CHECK_UART_RX_BUFFER	(1)// // pri 9600 Baud => 1200B/sec
-#define MAX_SIZE_FOR_PAYLOAD			(100)
-#define UART_CHECK_FREQUENCY			(3600)
-
-extern uint8_t GlUartRxBugger[UART_CIRCLE_MAX_BUFFER_SIZE];
-
-
-
-
-
-/**
- *
- */
-typedef enum
-{
-	SOUND_NONE=0,     //!< SOUND_NONE
-	SOUND_SHORT_PRESS,//!< SOUND_SHORT_PRESS
-	SOUND_LONG_PRESS, //!< SOUND_LONG_PRESS
-	SOUND_START_ON,
-	SOUND_START_OFF,
-	SOUND_START_PAIR
-
-}eSoundSType;
 
 /*
  *
@@ -46,29 +18,67 @@ typedef enum
 typedef enum
 {
 	UART_MSG_NONE=0,
-	UART_MSG_SET_TX_FREQ=1,
-	UART_MSG_SET_RX_FREQ=2,
-	UART_MSG_SET_TX_POWER=3,
-	UART_MSG_SET_TX_SF=4,
-	UART_MSG_SET_RX_SF=5,
-	UART_MSG_SET_TX_BW=6,
-	UART_MSG_SET_RX_BW=7,
-	UART_MSG_SET_TX_IQ=8,
-	UART_MSG_SET_RX_IQ=9,
-	UART_MSG_SET_TX_CR=10,
-	UART_MSG_SET_RX_CR=11,
-	UART_MSG_SET_STANDBY=12,
-	UART_MSG_SET_TX_CW=13,
-	UART_MSG_PREP_PACKET=14,
-	UART_MSG_SET_AUTO_REPEAT=15,
-	UART_MSG_SET_REPEATING_PERIOD=16,
-	UART_MSG_RX_CRC_CHECK=17,
-	UART_MSG_SET_HEADER_MODE=18,
-	UART_MSG_SEND_PACKET=19,
-	UART_MSG_SEND_LAST_PAKET_AGAIN=20,
-	UART_MSG_START_RX=21,
+	UART_MSG_TX_FREQ=1,
+	UART_MSG_RX_FREQ=2,
+	UART_MSG_TX_POWER=3,
+	UART_MSG_TX_SF=4,
+	UART_MSG_RX_SF=5,
+	UART_MSG_TX_BW=6,
+	UART_MSG_RX_BW=7,
+	UART_MSG_TX_IQ=8,
+	UART_MSG_RX_IQ=9,
+	UART_MSG_TX_CR=10,
+	UART_MSG_RX_CR=11,
+	UART_MSG_HEADER_MODE_TX=12,
+	UART_MSG_HEADER_MODE_RX=13,
+	UART_MSG_CRC_TX=14,
+	UART_MSG_CRC_RX=15,
+	UART_MSG_SET_STANDBY=16,
+	UART_MSG_SET_TX_CW=17,
+	UART_MSG_PREP_PACKET=18,
+	UART_MSG_SET_AUTO_REPEAT=19,
+	UART_MSG_SET_REPEATING_PERIOD=20,
+	UART_MSG_SEND_PACKET=21,
+	UART_MSG_SEND_LAST_PAKET_AGAIN=22,
+	UART_MSG_START_RX=23,
 
-}eUartMsgCmds;
+}eUartMsgSetCmds;
+
+
+/**
+ *
+ */
+typedef enum
+{
+	ACTION_FLAG_NONE = 0,   //!< ACTION_FLAG_NONE
+	ACTION_FLAG_SET = 1,    //!< ACTION_FLAG_SET
+	ACTION_FLAG_SET_GET = 2,//!< ACTION_FLAG_SET_GET
+	ACTION_FLAG_GET = 3     //!< ACTION_FLAG_GET
+
+}eActionFlags;
+
+
+typedef enum
+{
+	UART_MSG_GET_NONE=0x81,
+	UART_MSG_GET_TX_FREQ=129,
+	UART_MSG_GET_RX_FREQ=130,
+	UART_MSG_GET_TX_POWER=131,
+	UART_MSG_GET_TX_SF=132,
+	UART_MSG_GET_RX_SF=133,
+	UART_MSG_GET_TX_BW=134,
+	UART_MSG_GET_RX_BW=135,
+	UART_MSG_GET_TX_IQ=136,
+	UART_MSG_GET_RX_IQ=137,
+	UART_MSG_GET_TX_CR=138,
+	UART_MSG_GET_RX_CR=139,
+	UART_MSG_GET_PREPARED_PACKET=140,
+	UART_MSG_GET_AUTO_REPEATING=141,
+	UART_MSG_GET_REPEATING_PERIOD=142,
+	UART_MSG_GET_RX_CRC_CHECK=143,
+	UART_MSG_GET_HEADER_MODE=144,
+
+}eUartMsgGetCmds;
 
 /**
  *
@@ -85,30 +95,14 @@ typedef enum
 }eColorLed;
 
 
-typedef enum
-{
-	eUART_MSG_EMPTY=0,
-	eUART_MSG_OK,
-	eUART_MSG_TOO_SHORT,
-	eUART_MSG_WRONG_HEADER,
-	eUART_MSG_WRONG_CRC,
-}eUARTBufferMasg;
 
 
-/**
- *
- */
-typedef union
-{
-	uint8_t		payload[250];
-
-}eUartMsgs;
 
 
-uint8_t 		PCT_CalcCRC(uint8_t *data, uint8_t size);
-bool 			PCT_FindSyncWord(uint8_t *data, uint8_t sizeToSearch, uint8_t *headerStarts);
-eUARTBufferMasg PCT_FindAnyMsg(uint8_t **rxPacket);
-void 			PCT_DecodeUartRxMsg(uint8_t *rxBuffer);
+uint8_t			PCT_DecodeUartRxMsg(uint8_t *rxBuffer);
+void 			PCT_ProcessSetCommands(uint8_t *rxBuffer);
+void 			PCT_ProcessGetCommands(uint8_t *rxBuffer);
+void 			PCT_SendMyParam(uint8_t *rxBuffer);
 void 			PCT_SendRfPacket();
 
 #endif /* TASKCORE_PROCESSCORETASK_H_ */

@@ -52,6 +52,20 @@ bool RC_RadioSetTxFreq(uint32_t freq)
 
 /**
  *
+ * @return
+ */
+uint32_t RC_RadioGetTxFreq()
+{
+	uint32_t ret;
+	taskENTER_CRITICAL();
+	ret = RadioParam.TxConfig.freq;
+	taskEXIT_CRITICAL();
+
+	return ret;
+}
+
+/**
+ *
  */
 bool RC_RadioSetRxFreq(uint32_t freq)
 {
@@ -60,6 +74,22 @@ bool RC_RadioSetRxFreq(uint32_t freq)
 	taskEXIT_CRITICAL();
 
 	return true;
+}
+
+
+/**
+ *
+ * @return
+ */
+uint32_t RC_RadioGetRxFreq()
+{
+	uint32_t ret;
+
+	taskENTER_CRITICAL();
+	ret	= RadioParam.RxConfig.freq;
+	taskEXIT_CRITICAL();
+
+	return ret;
 }
 
 /**
@@ -80,6 +110,21 @@ bool RC_RadioSetTxPower(int8_t power)
 	return true;
 }
 
+
+/**
+ *
+ * @return
+ */
+int8_t RC_RadioGetTxPower()
+{
+	int8_t ret;
+	taskENTER_CRITICAL();
+	ret = RadioParam.Power;
+	taskEXIT_CRITICAL();
+
+	return ret;
+}
+
 /**
  *
  */
@@ -98,6 +143,20 @@ bool RC_RadioSetTxSf(uint8_t sf)
 	return false;
 }
 
+
+/**
+ *
+ * @return
+ */
+uint32_t RC_RadioGetTxSf()
+{
+	uint32_t ret;
+	taskENTER_CRITICAL();
+	ret = RadioParam.TxConfig.SfBqIq.Bits.SF;
+	taskEXIT_CRITICAL();
+
+	return ret;
+}
 /**
  *
  */
@@ -118,6 +177,21 @@ bool RC_RadioSetRxSf(uint8_t sf)
 
 /**
  *
+ * @return
+ */
+uint32_t RC_RadioGetRxSf()
+{
+	uint32_t ret;
+
+	taskENTER_CRITICAL();
+	ret = RadioParam.RxConfig.SfBqIq.Bits.SF;
+	taskEXIT_CRITICAL();
+
+	return ret;
+}
+
+/**
+ *
  */
 bool RC_RadioSetTxBw(uint32_t bw)
 {
@@ -134,6 +208,21 @@ bool RC_RadioSetTxBw(uint32_t bw)
 	}
 
 	return false;
+}
+
+/**
+ *
+ * @return
+ */
+uint32_t RC_RadioGetTxBw()
+{
+	uint32_t ret;
+
+	taskENTER_CRITICAL();
+	ret = RadioParam.TxConfig.SfBqIq.Bits.BW;
+	taskEXIT_CRITICAL();
+
+	return ret;
 }
 
 /**
@@ -159,6 +248,24 @@ bool RC_RadioSetRxBw(uint32_t bw)
 
 /**
  *
+ * @param bw
+ * @return
+ */
+uint32_t RC_RadioGetRxBw()
+{
+	uint32_t ret;
+
+	taskENTER_CRITICAL();
+	ret = RadioParam.RxConfig.SfBqIq.Bits.BW;
+	taskEXIT_CRITICAL();
+
+	return ret;
+
+}
+
+
+/**
+ *
  * @param iq
  * @return
  */
@@ -174,6 +281,21 @@ bool RC_RadioSetTxIq(uint8_t Iq)
 	taskEXIT_CRITICAL();
 
 	return true;
+}
+
+/**
+ *
+ * @return
+ */
+uint32_t RC_RadioGetTxIq()
+{
+	uint32_t ret;
+
+	taskENTER_CRITICAL();
+	ret = RadioParam.TxConfig.SfBqIq.Bits.IqInvert;
+	taskEXIT_CRITICAL();
+
+	return ret;
 }
 
 /**
@@ -195,6 +317,17 @@ bool RC_RadioSetRxIq(uint8_t Iq)
 	return true;
 }
 
+uint32_t RC_RadioGetRxIq()
+{
+	uint32_t ret;
+
+	taskENTER_CRITICAL();
+	ret = RadioParam.RxConfig.SfBqIq.Bits.IqInvert;
+	taskEXIT_CRITICAL();
+
+	return ret;
+
+}
 
 /**
  *
@@ -218,6 +351,23 @@ bool RC_RadioSetTxCr(uint8_t Cr)
 
 /**
  *
+ * @return
+ */
+uint32_t RC_RadioGetTxCr()
+{
+	uint32_t ret;
+
+	taskENTER_CRITICAL();
+	ret = RadioParam.TxConfig.SfBqIq.Bits.CR;
+	taskEXIT_CRITICAL();
+
+	return ret;
+}
+
+
+
+/**
+ *
  * @param iq
  * @return
  */
@@ -234,6 +384,21 @@ bool RC_RadioSetRxCr(uint8_t Cr)
 	}
 
 	return false;
+}
+
+/**
+ *
+ * @return
+ */
+uint32_t RC_RadioGetRxCr()
+{
+	uint32_t ret;
+
+	taskENTER_CRITICAL();
+	ret = RadioParam.RxConfig.SfBqIq.Bits.CR;
+	taskEXIT_CRITICAL();
+
+	return ret;
 }
 
 /**
