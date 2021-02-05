@@ -25,58 +25,54 @@ Every Radio packet sets radio to Standby mode!
 
 # USART Packet:
 
-| 4B  |  4B  |  n |  2B |
+| 2B  |  4B  |  n |  1B |
 |---|---|---|---|
-| Sync Word  |Header|  payload |  crc - pocitano z celeho paketu |
+| Sync Word  - 0x2DD4  |Header|  payload |  crc - from whole packet |
 
 **Header**
-| 1B  |  1B | 2B  | 
+| 1B  |  2B | 1B  | 
 |---|---|---|
 | size of payload  |RFU| crc Header  
 
 **Payload**
-| 1B  |   | 
-|---|---|
-| Command  |Value|   
+| 1B  | 1B   | NB|
+|---|---|--|
+| Command| Action flags (only for way from PC to Generator)  |data|   
 
+**CRC8 implementation with polynom = x7+ x6+ x4+ x2+ x0 (0xD5)**
+CRC is the same for header and whole packet
 **Table of commands for radio**
-| **cmd**  | **opCode**  | **parameters**| 
-|---|---|--|
-| setTxFreq  | 0x1  |   Frequency (4B)|
-| setRxFreq  | 0x2  |   Frequency (4B)|
-| setTxPower  | 0x3  |   Power (1B)|
-| setTxSF  | 0x4  |  Spreading factor SF5-SF12 (1B)|
-| setRxSF  | 0x5  |  Spreading factor SF5-SF12 (1B)|
-| setTxBW  | 0x6  |   BandWidth 7.81 - 500 kHz (2B)|
-| setRxBW  | 0x7  |   BandWidth 7.81 - 500 kHz (2B)|
-| setTxIQ  | 0x8  |   IQ invert true/false (1B)|
-| setRxIQ  | 0x9  |   IQ invert true/false (1B)|
-| setTxCR  | 10  |   CodeRate 4/5-4/8 (1B)|
-| setRxCR  | 11  |   CodeRate 4/5-4/8 (1B)|
-| setStandby  | 12  |  |
-| startTXCW  | 13  |  |
-| preparePacket  | 14  | data[0] - nasledna velikost,  data[N] (N B)|
-| setAutoRepeating  | 15  |   true/false (1 B)|
-| setRepeatingPeriod  | 16  |   Period (ms) (4 B)|
-| setRxCRCCheck  | 17  |   Crc check true/false (1 B)|
-| setHeaderMode Rx & TX | 18  |   Enable header mode true/false (1 B)|
-| sendPacket  | 19 |   empty |
-| sendLastPacketAgain  | 20  |   empty |
-| startRx  | 21  |   Timeout (ms) (4 B) |
+| **cmd**  | **opCode** 1B  |**action flags** 1B |**parameters** NB|  **retVal** 1B
+|---|---|--|--|--|
+| TxFreq  | 1  | yes | Frequency (4B)| 1 - Succes /0 - failure|
+| RxFreq  | 2  | yes |  Frequency (4B)| 1 - Succes /0 - failure|
+| TxPower  | 3  | yes | Power (1B)| 1 - Succes /0 - failure|
+| TxSF  | 4  | yes | Spreading factor SF5-SF12 (1B)| 1 - Succes /0 - failure|
+| RxSF  | 5  |yes  | Spreading factor SF5-SF12 (1B)| 1 - Succes /0 - failure|
+| TxBW  | 6  |yes |  BandWidth 7.81 - 500 kHz (2B)| 1 - Succes /0 - failure|
+| RxBW  | 7  |yes  |  BandWidth 7.81 - 500 kHz (2B)| 1 - Succes /0 - failure|
+| TxIQ  | 8  |yes |  IQ invert true/false (1B)| 1 - Succes /0 - failure|
+| RxIQ  | 9  |yes |  IQ invert true/false (1B)| 1 - Succes /0 - failure|
+| TxCR  | 10  |yes |  CodeRate 4/5-4/8 (1B)| 1 - Succes /0 - failure|
+| RxCR  | 11  |yes  |  CodeRate 4/5-4/8 (1B)| 1 - Succes /0 - failure|
+| HeaderMode  TX | 12  | yes|   Enable header mode true/false (1 B)| 1 - Succes /0 - failure|
+| HeaderMode  RX | 13  | yes|   Enable header mode true/false (1 B)| 1 - Succes /0 - failure|
+| CRC TX  | 14  | yes |  Crc check true/false (1 B)| 1 - Succes /0 - failure|
+| CRC RX  | 15  | yes |  Crc check true/false (1 B)| 1 - Succes /0 - failure|
+| setStandby  | 16  | yes || 1 - Succes /0 - failure|
+| startTXCW  | 17  | yes || 1 - Succes /0 - failure|
+| preparePacket  | 18  |yes | data[0] - nasledna velikost,  data[N] (N B)| 1 - Succes /0 - failure|
+| AutoRepeating  | 19  | yes |  true/false (1 B)| 1 - Succes /0 - failure|
+| RepeatingPeriod  | 20  | yes |  Period (ms) (4 B)| 1 - Succes /0 - failure|
+| sendPacket  | 21 | no |  empty | 1 - Succes /0 - failure|
+| sendLastPacketAgain  | 22  |no| no |  empty | 1 - Succes /0 - failure|
+| startRx  | 23  |  yes|  Timeout (ms) (4 B) | 1 - Succes /0 - failure|
 
-**Table of commands for packet**
-| **cmd**  | **opCode**  | **parameters**| 
-|---|---|--|
-| preparePacket  | 0x21  |   data[N] (N B)|
-| setAutoRepeating  | 0x22  |   true/false (1 B)|
-| setRepeatingPeriod  | 0x23  |   Period (ms) (4 B)|
-| setRxCRCCheck  | 0x24  |   Crc check true/false (1 B)|
-| setHeaderMode Rx & TX | 0x25  |   Enable header mode true/false (1 B)|
+**Action Flags**
+1 = only set the value
+2 = set and get answer back
+3 = only get value from LoRaGenerator
 
-**Table of commands for actions**
-| **cmd**  | **opCode**  | **parameters**| 
-|---|---|--|
-| sendPacket  | 0x41  |   empty |
-| sendLastPacketAgain  | 0x42  |   empty |
-| startRx  | 0x43  |   Timeout (ms) (4 B) |
+**Odpovedi od LoRaGeneratoru maji stejny tvar paketu az na chybejici Byte action flags**
+
 
