@@ -62,11 +62,9 @@ CRC is the same for header and whole packet
 | setStandby  | 16  | yes || 1 - Succes /0 - failure|
 | startTXCW  | 17  | yes || 1 - Succes /0 - failure|
 | preparePacket  | 18  |yes | data[0] - nasledna velikost,  data[N] (N B)| 1 - Succes /0 - failure|
-| AutoRepeating  | 19  | yes |  true/false (1 B)| 1 - Succes /0 - failure|
-| RepeatingPeriod  | 20  | yes |  Period (ms) (4 B)| 1 - Succes /0 - failure|
-| sendPacket  | 21 | no |  empty | 1 - Succes /0 - failure|
-| sendLastPacketAgain  | 22  |no| no |  empty | 1 - Succes /0 - failure|
-| startRx  | 23  |  yes|  Timeout (ms) (4 B) | 1 - Succes /0 - failure|
+| AutoRepeating  | 19  | yes |  true/false (4 B) (max = never repeat)| 1 - Succes /0 - failure|
+| sendPacket  | 20 | no |  empty | 1 - Succes /0 - failure|
+| startRx  | 21  |  yes|  Timeout (ms) (4 B) | 1 - Succes /0 - failure|
 
 **Action Flags**
 1 = only set the value
