@@ -49,8 +49,8 @@ CRC is the same for header and whole packet
 | TxPower  | 3  | yes | Power (1B)| 1 - Succes /0 - failure|
 | TxSF  | 4  | yes | Spreading factor SF5-SF12 (1B)| 1 - Succes /0 - failure|
 | RxSF  | 5  |yes  | Spreading factor SF5-SF12 (1B)| 1 - Succes /0 - failure|
-| TxBW  | 6  |yes |  BandWidth 7.81 - 500 kHz (2B)| 1 - Succes /0 - failure|
-| RxBW  | 7  |yes  |  BandWidth 7.81 - 500 kHz (2B)| 1 - Succes /0 - failure|
+| TxBW  | 6  |yes |  BandWidth 7.81 - 500 kHz (4B)| 1 - Succes /0 - failure|
+| RxBW  | 7  |yes  |  BandWidth 7.81 - 500 kHz (4B)| 1 - Succes /0 - failure|
 | TxIQ  | 8  |yes |  IQ invert true/false (1B)| 1 - Succes /0 - failure|
 | RxIQ  | 9  |yes |  IQ invert true/false (1B)| 1 - Succes /0 - failure|
 | TxCR  | 10  |yes |  CodeRate 4/5-4/8 (1B)| 1 - Succes /0 - failure|
@@ -70,6 +70,16 @@ CRC is the same for header and whole packet
 1 = only set the value
 2 = set and get answer back
 3 = only get value from LoRaGenerator
+
+**Table of system commands**
+| **cmd**  | **opCode** 1B  |**action flags** 1B |**parameters** NB|  **retVal** 1B
+|---|---|--|--|--|
+| WhoAreYou  | 254  | no | type for generator 2 B +systemInfo (NB)| 1 - Succes /0 - failure|
+| WhatIsYourName  | 253  | no | String with name| 1 - Succes /0 - failure|
+
+
+**system info**
+-MCU, radio chip, max output power, min output power,
 
 **Odpovedi od LoRaGeneratoru maji stejny tvar paketu az na chybejici Byte action flags**
 
