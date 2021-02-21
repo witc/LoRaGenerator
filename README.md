@@ -63,7 +63,6 @@ CRC is the same for header and whole packet
 | startTXCW  | 17  | yes || 1 - Succes /0 - failure|
 | preparePacket  | 18  |yes | data[0] - nasledna velikost,  data[N] (N B)| 1 - Succes /0 - failure|
 | AutoRepeating  | 19  | yes |  true/false (4 B) (max = never repeat)| 1 - Succes /0 - failure|
-| sendPacket  | 20 | no |  empty | 1 - Succes /0 - failure|
 | startRx  | 21  |  yes|  Timeout (ms) (4 B) | 1 - Succes /0 - failure|
 
 **Action Flags**
@@ -71,11 +70,12 @@ CRC is the same for header and whole packet
 2 = set and get answer back
 3 = only get value from LoRaGenerator
 
-**Table of system commands**
+**Table of commands with no actions flag**
 | **cmd**  | **opCode** 1B  |**action flags** 1B |**parameters** NB|  **retVal** 1B
 |---|---|--|--|--|
 | WhoAreYou  | 254  | no | type for generator 2 B +systemInfo (NB)| 1 - Succes /0 - failure|
 | WhatIsYourName  | 253  | no | String with name| 1 - Succes /0 - failure|
+| sendPacket  | 252 | no |  empty | 1 - Succes /0 - failure|
 
 
 **system info**
