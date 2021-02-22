@@ -59,10 +59,8 @@ CRC is the same for header and whole packet
 | HeaderMode  RX | 13  | yes|   Enable header mode true/false (1 B)| 1 - Succes /0 - failure|
 | CRC TX  | 14  | yes |  Crc check true/false (1 B)| 1 - Succes /0 - failure|
 | CRC RX  | 15  | yes |  Crc check true/false (1 B)| 1 - Succes /0 - failure|
-| setStandby  | 16  | yes || 1 - Succes /0 - failure|
-
-| preparePacket  | 18  |yes | data[0] - nasledna velikost,  data[N] (N B)| 1 - Succes /0 - failure|
-| AutoRepeating  | 19  | yes |  true/false (4 B) (max = never repeat)| 1 - Succes /0 - failure|
+| preparePacket  | 16  |yes | data[0] - nasledna velikost,  data[N] (N B)| 1 - Succes /0 - failure|
+| AutoRepeating  | 17  | yes |  true/false (4 B) (max = never repeat)| 1 - Succes /0 - failure|
 | startRx  | 21  |  yes|  Timeout (ms) (4 B) | 1 - Succes /0 - failure|
 
 **Action Flags**
@@ -77,6 +75,7 @@ CRC is the same for header and whole packet
 | WhatIsYourName  | 253  | no | String with name| 1 - Succes /0 - failure|
 | sendPacket  | 252 | no |  empty | 1 - Succes /0 - failure|
 | startTXCW  | 251  | no || 1 - Succes /0 - failure|
+| setStandby  | 250  | no || 1 - Succes /0 - failure|
 
 **system info**
 -MCU, radio chip, max output power, min output power,
