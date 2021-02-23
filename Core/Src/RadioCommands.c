@@ -46,7 +46,6 @@ bool RC_RadioSetTxFreq(uint32_t freq)
 	taskENTER_CRITICAL();
 	RadioParam.TxConfig.freq = freq;
 	taskEXIT_CRITICAL();
-
 	return true;
 }
 
@@ -401,6 +400,82 @@ uint32_t RC_RadioGetRxCr()
 	return ret;
 }
 
+/**
+ *
+ * @return
+ */
+uint32_t RC_RadioGetTXHeaderMode()
+{
+	uint32_t ret;
+
+	taskENTER_CRITICAL();
+	ret = RadioParam.TxConfig.headerMode;
+	taskEXIT_CRITICAL();
+
+	return ret;
+}
+
+/**
+ *
+ * @return
+ */
+uint32_t RC_RadioGetRXHeaderMode()
+{
+	uint32_t ret;
+
+	taskENTER_CRITICAL();
+	ret = RadioParam.RxConfig.headerMode;
+	taskEXIT_CRITICAL();
+
+	return ret;
+}
+
+
+/**
+ *
+ * @return
+ */
+uint32_t RC_RadioGetTXCRC()
+{
+	uint32_t ret;
+
+	taskENTER_CRITICAL();
+	ret = RadioParam.TxConfig.crcCheck;
+	taskEXIT_CRITICAL();
+
+	return ret;
+}
+
+/**
+ *
+ * @return
+ */
+uint32_t RC_RadioGetRXCRC()
+{
+	uint32_t ret;
+
+	taskENTER_CRITICAL();
+	ret = RadioParam.RxConfig.crcCheck;
+	taskEXIT_CRITICAL();
+
+	return ret;
+}
+
+
+/**
+ *
+ * @return
+ */
+uint32_t RC_RadioGetRadioStatus()
+{
+	uint32_t ret;
+
+	taskENTER_CRITICAL();
+	//ret = RadioParam.TxConfig.crcCheck;	TODO
+	taskEXIT_CRITICAL();
+
+	return ret;
+}
 /**
  *
  * @return

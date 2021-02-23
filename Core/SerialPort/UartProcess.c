@@ -46,27 +46,27 @@ volatile uint32_t		counterOFRxByteSmazat = 0;
  * @param sizeOfDetectedMsg
  * @return
  */
-eUARTBufferMasg UP_FindAnyMsg(uint8_t **rxPacket)
+eUARTBufferMasg UP_FindAnyMsg(uint8_t **rxPacket,uint8_t *doCheckAgain)
 {
 	DATA_QUEUE SendData;
 	SendData.pointer=NULL;
 
-	static uint8_t 	startToFind=0;
-	static uint8_t  lastRxed=0;
-	uint8_t			actualArrivalSize=0;
-	uint8_t 		startHeader;
-	uint8_t			startPayload;
+	static uint16_t 	startToFind=0;
+	static uint16_t  lastRxed=0;
+	uint16_t			actualArrivalSize=0;
+	uint16_t 		startHeader;
+	uint16_t			startPayload;
 	uint16_t 		payloadSizeFromHeader;
 	uint8_t 		workingBuffer[UART_CIRCLE_MAX_BUFFER_SIZE];
 	eUartMsgs		UartPayload;
 	uint8_t			*TxPacket;
-	uint8_t 		tempCntDma;
+	uint16_t 		tempCntDma;
 
-	static uint8_t	remainsToZero=UART_CIRCLE_MAX_BUFFER_SIZE;
-	static uint8_t  sumArrivalSize=0;
-	uint8_t			tempSizeOfRxMsg;
+	static uint16_t	remainsToZero=UART_CIRCLE_MAX_BUFFER_SIZE;
+	static uint16_t  sumArrivalSize=0;
+	uint16_t			tempSizeOfRxMsg;
 
-	static uint8_t	sizeToCheck;
+	static uint16_t	sizeToCheck;
 
 	//memset(workingBuffer,0,UART_CIRCLE_MAX_BUFFER_SIZE);
 	/* read DMA status */
@@ -95,16 +95,21 @@ eUARTBufferMasg UP_FindAnyMsg(uint8_t **rxPacket)
 	sumArrivalSize+=actualArrivalSize;
 
 	remainsToZero = tempCntDma;
-	counterOFRxByteSmazat+=actualArrivalSize;
+
 	/* pokud ted nic neprislo*/
 	//if(actualArrivalSize == 0)	return eUART_MSG_EMPTY;	//neprislo nic
 
 	/* data budeme hledat od startToFind az po sumArrivalSize */
 /********************************************************************************/
 
-	if(sumArrivalSize<MINIMAL_SIZE_USART_RX_MSG)	return eUART_MSG_TOO_SHORT;
+	if(sumArrivalSize<MINIMAL_SIZE_USART_RX_MSG)
+	{
+		*doCheckAgain = 0;
+		return eUART_MSG_TOO_SHORT;
+	}
 
 	/* seradime si buffer vzdy od nuly */	//TODO odstranit zbytecne kopirovani - bere cpu cas
+
 	memcpy(&workingBuffer[0],&GlUartRxBugger[startToFind],UART_CIRCLE_MAX_BUFFER_SIZE-startToFind);
 	if(startToFind!=0)
 	{
@@ -112,7 +117,7 @@ eUARTBufferMasg UP_FindAnyMsg(uint8_t **rxPacket)
 	}
 
 	/* hledame validni zpravu*/
-	uint8_t	workinkgStart=0;
+	uint16_t	workinkgStart=0;
 	do
 	{
 		/* 1) hledani sync wordu */
@@ -124,8 +129,10 @@ eUARTBufferMasg UP_FindAnyMsg(uint8_t **rxPacket)
 			if(UP_CalcCRC(&workingBuffer[startHeader],3)!=workingBuffer[startHeader+3])
 			{
 				/* mame bulshitni zacatek takze to zahod */
+				LL_GPIO_SetOutputPin(LED_RED_GPIO_Port,LED_RED_Pin);
 				workinkgStart++;
 				sumArrivalSize--;
+				LL_GPIO_ResetOutputPin(LED_RED_GPIO_Port,LED_RED_Pin);
 			//	LL_GPIO_SetOutputPin(LED_RED_GPIO_Port,LED_RED_Pin);
 			}
 			else if((payloadSizeFromHeader>MAX_SIZE_FOR_PAYLOAD)||(payloadSizeFromHeader==0))
@@ -144,6 +151,7 @@ eUARTBufferMasg UP_FindAnyMsg(uint8_t **rxPacket)
 					startToFind+=workinkgStart;
 					/* pokud preteklo velikost bufferu  - protacime buffer zpet na zacatek*/
 					startToFind%=UART_CIRCLE_MAX_BUFFER_SIZE;
+					*doCheckAgain = 0;
 					return eUART_MSG_TOO_SHORT;
 				}
 
@@ -161,7 +169,7 @@ eUARTBufferMasg UP_FindAnyMsg(uint8_t **rxPacket)
 					TxPacket=pvPortMalloc(sizeof(eUartMsgs));
 					if(TxPacket==NULL)
 					{
-						osDelay(10);
+						//osDelay(10);
 						TxPacket=pvPortMalloc(sizeof(eUartMsgs));
 						if(TxPacket==NULL)			LogError(635121);
 					}
@@ -181,14 +189,13 @@ eUARTBufferMasg UP_FindAnyMsg(uint8_t **rxPacket)
 			startToFind%=UART_CIRCLE_MAX_BUFFER_SIZE;
 
 			sumArrivalSize=sizeof(SyncUartMsg);
+			*doCheckAgain = 0;
 			return eUART_MSG_TOO_SHORT;
 		}
 	}
 	while(1);
 
-	//HAL_UART_Transmit(&huart1,&workingBuffer[startHeader-sizeof(SyncUartMsg)],sizeof(SyncUartMsg)+UART_BUFF_HEADER_SIZE+payloadSizeFromHeader+UART_BUFF_CRC_SIZE,10000);
-
-	//LL_GPIO_TogglePin(LED_GREEN_GPIO_Port,LED_GREEN_Pin);
+	counterOFRxByteSmazat+=1;
 	tempSizeOfRxMsg = (sizeof(SyncUartMsg)+UART_BUFF_HEADER_SIZE+payloadSizeFromHeader/*payload*/+UART_BUFF_CRC_SIZE/*crc*/);
 	/* crc ok posun start o prijatou zpravu*/
 	startToFind+=workinkgStart+tempSizeOfRxMsg;
@@ -198,10 +205,10 @@ eUARTBufferMasg UP_FindAnyMsg(uint8_t **rxPacket)
 	/*payload jsme nasli s velikosti tempSizeOfRxMsg - tu ted ponizime v hledacim prostoru*/
 	sumArrivalSize-=tempSizeOfRxMsg;
 
-	//SendData.Address=ADDR_TO_CORE_UART_RX_NEW_PACKET;
-	//SendData.pointer = TxPacket;
-	//xQueueSend(QueueCoreHandle,&SendData,portMAX_DELAY);
 	*rxPacket=TxPacket;
+
+	if(sumArrivalSize>=MINIMAL_SIZE_USART_RX_MSG)	*doCheckAgain = 1;
+	else											*doCheckAgain = 0;
 	return eUART_MSG_OK;
 }
 
@@ -213,9 +220,9 @@ eUARTBufferMasg UP_FindAnyMsg(uint8_t **rxPacket)
  * @param headerStarts
  * @return
  */
-bool UP_FindSyncWord(uint8_t *data, uint8_t sizeToSearch, uint8_t *headerStarts)
+bool UP_FindSyncWord(uint8_t *data, uint16_t sizeToSearch, uint16_t *headerStarts)
 {
-	uint8_t cnt=0;
+	uint16_t cnt=0;
 
 	if(sizeof(SyncUartMsg)>sizeToSearch)	return false;
 
@@ -271,8 +278,8 @@ void UP_UartSendData(uint8_t opCode, uint8_t *answer,uint8_t size)
 	/* crc payload */
 	UartTxDMABuffer[actualSize-UART_BUFF_CRC_SIZE]  = UP_CalcCRC(&UartTxDMABuffer[0], actualSize-UART_BUFF_CRC_SIZE);
 
-	HAL_UART_Transmit(&huart1,UartTxDMABuffer,actualSize,100000);
-	//UP_UartTransmitRawData(UartTxDMABuffer,actualSize);
+	//HAL_UART_Transmit(&huart1,UartTxDMABuffer,actualSize,100000);
+	UP_UartTransmitRawData(UartTxDMABuffer,actualSize);
 }
 
 /**

@@ -166,6 +166,7 @@ void CallbackTxRfTimeout(void const * argument)
  */
 void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 {
+
 	DATA_QUEUE SendData;
 	SendData.pointer = NULL;
 	portBASE_TYPE xHigherPriorityTaskWoken = pdFALSE;
@@ -302,6 +303,7 @@ static void CORE_StateON(DATA_QUEUE ReceiveData,tCoreGlobalData* GlobalData, tSt
 	static uint8_t			localTxPacketSize=0;
 	uint8_t					*TxBuffer;
 	uint8_t					*RxUartMsg = NULL;
+	uint8_t					doCheckAgain = 0;
 
 	Gl_HeapFree=xPortGetMinimumEverFreeHeapSize();
 
@@ -337,15 +339,19 @@ static void CORE_StateON(DATA_QUEUE ReceiveData,tCoreGlobalData* GlobalData, tSt
 
 		case ADDR_TO_CORE_UART_READ_RX_BUFFER:
 			/* periodic scanning circular uart buffer*/
-			if(UP_FindAnyMsg(&RxUartMsg)==eUART_MSG_OK)
+			do
 			{
-				LL_GPIO_SetOutputPin(LED_RED_GPIO_Port,LED_RED_Pin);
-				PCT_DecodeUartRxMsg(RxUartMsg);
-				vPortFree(RxUartMsg);
-				RxUartMsg = NULL;
-				LL_GPIO_ResetOutputPin(LED_RED_GPIO_Port,LED_RED_Pin);
-				//LL_GPIO_ResetOutputPin(LED_GREEN_GPIO_Port,LED_GREEN_Pin);
+				if(UP_FindAnyMsg(&RxUartMsg,&doCheckAgain)==eUART_MSG_OK)
+				{
+					PCT_DecodeUartRxMsg(RxUartMsg);
+					vPortFree(RxUartMsg);
+					RxUartMsg = NULL;
+					//LL_GPIO_ResetOutputPin(LED_RED_GPIO_Port,LED_RED_Pin);
+					//LL_GPIO_ResetOutputPin(LED_GREEN_GPIO_Port,LED_GREEN_Pin);
+				}
 			}
+			while(doCheckAgain == 1 );
+
 
 			break;
 

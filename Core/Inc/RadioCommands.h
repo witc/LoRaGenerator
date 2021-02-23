@@ -70,6 +70,15 @@ bool RC_RadioSetTxCr(uint8_t Cr);
 uint32_t RC_RadioGetTxCr(void);
 bool RC_RadioSetRxCr(uint8_t Cr);
 uint32_t RC_RadioGetRxCr(void);
+bool RC_RadioSetTXHeaderMode();
+uint32_t RC_RadioGetTXHeaderMode();
+bool RC_RadioSetRXHeaderMode();
+uint32_t RC_RadioGetRXHeaderMode();
+bool RC_RadioSetTXCRC();
+uint32_t RC_RadioGetTXCRC();
+bool RC_RadioSetRXCRC();
+uint32_t RC_RadioGetRXCRC();
+uint32_t RC_RadioGetRadioStatus();
 
 bool RC_RadioSetStandby();
 bool RC__RadioSetTxCW();
