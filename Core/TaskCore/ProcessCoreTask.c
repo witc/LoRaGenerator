@@ -11,6 +11,7 @@
 #include "AuxRfProcess.h"
 #include "RadioCommands.h"
 #include "UartProcess.h"
+#include "LoadConfig.h"
 
 extern UART_HandleTypeDef huart1;
 extern osMessageQId QueueCoreHandle;
@@ -27,7 +28,7 @@ void PCT_SendRfPacket()
 	DATA_QUEUE SendData;
 	SendData.pointer = NULL;
 
-	if(RC_GetSizeOfSavedPacket()!=0)
+	//if(RC_GetSizeOfSavedPacket()!=0)
 	{
 		SendData.Address=ADDR_TO_RF_CMD;
 		SendData.Data=RF_CMD_SEND_UNIVERSAL_PAYLOAD_NOW;
@@ -35,10 +36,24 @@ void PCT_SendRfPacket()
 
 		//osTimerStart(TimerRfTxTimeoutHandle,) TODO zvazit jak nastavit timeout  - aby byl spravne platny
 	}
-	else
-	{
-		//todo send error
-	}
+//	else
+//	{
+//		//todo send error
+//	}
+}
+
+
+/*
+ *
+ */
+void PCT_SetRadioRX()
+{
+	DATA_QUEUE SendData;
+	SendData.pointer = NULL;
+
+	SendData.Address=ADDR_TO_RF_CMD;
+	SendData.Data=RF_CMD_START_RX;
+	xQueueSend(QueueRFHandle,&SendData,portMAX_DELAY);
 }
 
 
@@ -52,6 +67,10 @@ uint8_t PCT_DecodeUartRxMsg(uint8_t *rxBuffer)
 	if(rxBuffer[0] < 0x81)
 	{
 		PCT_ProcessSetCommands(rxBuffer);
+	}
+	else
+	{
+		PCT_ProcessSystemCommands();
 	}
 
 }
@@ -93,43 +112,36 @@ void PCT_ProcessSetCommands(uint8_t *rxBuffer)
 				break;
 
 			case UART_MSG_TX_BW:
-				retTemp = RC_RadioSetTxBw((rxBuffer[2]<<24)|(rxBuffer[3]<<16)|(rxBuffer[4]<<8)|(rxBuffer[4]));
+				retTemp = RC_RadioSetTxBw((rxBuffer[2]<<24)|(rxBuffer[3]<<16)|(rxBuffer[4]<<8)|(rxBuffer[5]));
 				break;
 
 			case UART_MSG_RX_BW:
-				retTemp = RC_RadioSetRxBw((rxBuffer[1]<<24)|(rxBuffer[2]<<16)|(rxBuffer[3]<<8)|(rxBuffer[4]));
+				retTemp = RC_RadioSetRxBw((rxBuffer[2]<<24)|(rxBuffer[3]<<16)|(rxBuffer[4]<<8)|(rxBuffer[5]));
 				break;
 
 			case UART_MSG_TX_IQ:
-
+				retTemp = RC_RadioSetTxIq((uint8_t)rxBuffer[2]);
 				break;
 
 			case UART_MSG_RX_IQ:
-
+				retTemp = RC_RadioSetRxIq((uint8_t)rxBuffer[2]);
 					break;
 
 			case UART_MSG_TX_CR:
-
+				retTemp = RC_RadioSetTxCr((uint8_t)rxBuffer[2]);
 				break;
 
 			case UART_MSG_RX_CR:
-
-				break;
-
-			case UART_MSG_SET_STANDBY:
-				retTemp = RC_RadioSetStandby();
-				break;
-
-			case UART_MSG_SET_TX_CW:
-				retTemp = RC_RadioSetTxCW();
+				retTemp = RC_RadioSetRxCr((uint8_t)rxBuffer[2]);
 				break;
 
 			case UART_MSG_PREP_PACKET:
 				retTemp = RC_SavePacket(rxBuffer);
 				break;
 
-			case UART_MSG_SEND_PACKET:
-				PCT_SendRfPacket();
+			case UART_MSG_START_RX:
+				//PCT_SendRfPacket();
+				osThreadYield();
 				break;
 
 			default:
@@ -137,6 +149,11 @@ void PCT_ProcessSetCommands(uint8_t *rxBuffer)
 		}
 
 	}
+	else if(actionFlags == ACTION_FLAG_GET)
+	{
+		retTemp = true;
+	}
+
 
 	if(retTemp == true)	/* odesilame OK status */
 	{
@@ -144,8 +161,50 @@ void PCT_ProcessSetCommands(uint8_t *rxBuffer)
 		{
 			/*odesilame info o prijatem parametru */
 			PCT_SendMyParam(rxBuffer);
-
 		}
+	}
+
+}
+
+
+void PCT_ProcessSystemCommands(uint8_t *rxBuffer)
+{
+	DATA_QUEUE SendData;
+	SendData.pointer = NULL;
+	uint8_t retTemp=false;
+	uint8_t tempBuffer[100];
+
+	eUartMsgSetCmds cmd = rxBuffer[0];
+
+	switch(cmd)
+	{
+		case UART_MSG_SET_STANDBY:
+			retTemp = RC_RadioSetStandby();
+			osThreadYield();
+			break;
+
+		case UART_MSG_SET_TX_CW:
+			retTemp = RC_RadioSetTxCW();
+			osThreadYield();
+			break;
+
+		case UART_MSG_SEND_PACKET:
+			PCT_SendRfPacket();
+			osThreadYield();
+			break;
+
+		case UART_MSG_WHAT_IS_YOUR_NAME:
+			retTemp = LC_GetMyName(tempBuffer);
+			UP_UartSendData(UART_MSG_WHAT_IS_YOUR_NAME,tempBuffer,retTemp);
+			break;
+
+		case UART_MSG_WHO_ARE_YOU:
+			retTemp = LC_GetSystemIfo(tempBuffer);
+			UP_UartSendData(UART_MSG_WHO_ARE_YOU,tempBuffer,retTemp);
+			break;
+
+		default:
+			break;
 	}
 
 }
@@ -158,7 +217,6 @@ void PCT_SendMyParam(uint8_t *rxBuffer)
 {
 	DATA_QUEUE SendData;
 	SendData.pointer = NULL;
-	uint8_t retTemp=0xff;
 	uint32_t tempData;
 
 	eUartMsgSetCmds cmd = rxBuffer[0];
@@ -193,12 +251,12 @@ void PCT_SendMyParam(uint8_t *rxBuffer)
 
 		case UART_MSG_TX_BW:
 			tempData =(uint32_t) RC_RadioGetTxBw();			//retTemp = RC_RadioSetTxFreq((rxBuffer[1]<<24)|(rxBuffer[2]<<16)|(rxBuffer[3]<<8)|(rxBuffer[4]));
-			UP_UartSendData(UART_MSG_TX_BW,(uint8_t*)&tempData,2);
+			UP_UartSendData(UART_MSG_TX_BW,(uint8_t*)&tempData,4);
 			break;
 
 		case UART_MSG_RX_BW:
 			tempData =(uint32_t) RC_RadioGetRxBw();			//retTemp = RC_RadioSetTxFreq((rxBuffer[1]<<24)|(rxBuffer[2]<<16)|(rxBuffer[3]<<8)|(rxBuffer[4]));
-			UP_UartSendData(UART_MSG_RX_BW,(uint8_t*)&tempData,2);
+			UP_UartSendData(UART_MSG_RX_BW,(uint8_t*)&tempData,4);
 			break;
 
 		case UART_MSG_TX_IQ:
@@ -220,6 +278,35 @@ void PCT_SendMyParam(uint8_t *rxBuffer)
 			tempData =(uint32_t) RC_RadioGetRxCr();			//retTemp = RC_RadioSetTxFreq((rxBuffer[1]<<24)|(rxBuffer[2]<<16)|(rxBuffer[3]<<8)|(rxBuffer[4]));
 			UP_UartSendData(UART_MSG_RX_CR,(uint8_t*)&tempData,1);
 			break;
+
+		case UART_MSG_HEADER_MODE_TX:
+			tempData =(uint32_t) RC_RadioGetTXHeaderMode();			//retTemp = RC_RadioSetTxFreq((rxBuffer[1]<<24)|(rxBuffer[2]<<16)|(rxBuffer[3]<<8)|(rxBuffer[4]));
+			UP_UartSendData(UART_MSG_HEADER_MODE_TX,(uint8_t*)&tempData,1);
+			break;
+
+		case UART_MSG_HEADER_MODE_RX:
+			tempData =(uint32_t) RC_RadioGetRXHeaderMode();			//retTemp = RC_RadioSetTxFreq((rxBuffer[1]<<24)|(rxBuffer[2]<<16)|(rxBuffer[3]<<8)|(rxBuffer[4]));
+			UP_UartSendData(UART_MSG_HEADER_MODE_RX,(uint8_t*)&tempData,1);
+			break;
+
+		case UART_MSG_TX_CRC:
+			tempData =(uint32_t) RC_RadioGetTXCRC();			//retTemp = RC_RadioSetTxFreq((rxBuffer[1]<<24)|(rxBuffer[2]<<16)|(rxBuffer[3]<<8)|(rxBuffer[4]));
+			UP_UartSendData(UART_MSG_TX_CRC,(uint8_t*)&tempData,1);
+			break;
+
+		case UART_MSG_RX_CRC:
+			tempData =(uint32_t) RC_RadioGetRXCRC();			//retTemp = RC_RadioSetTxFreq((rxBuffer[1]<<24)|(rxBuffer[2]<<16)|(rxBuffer[3]<<8)|(rxBuffer[4]));
+			UP_UartSendData(UART_MSG_RX_CRC,(uint8_t*)&tempData,1);
+			break;
+
+		case UART_MSG_SET_STANDBY:
+		case UART_MSG_SET_TX_CW:
+		case UART_MSG_SEND_PACKET:
+		case UART_MSG_START_RX:
+			tempData =(uint32_t) RC_RadioGetRadioStatus();			//retTemp = RC_RadioSetTxFreq((rxBuffer[1]<<24)|(rxBuffer[2]<<16)|(rxBuffer[3]<<8)|(rxBuffer[4]));
+			//UP_UartSendData(UART_MSG_RX_CR,(uint8_t*)&tempData,1);
+			break;
+
 
 //		case UART_MSG_PREP_PACKET:
 //			tempData = RC_RadioGetTxFreq();			//retTemp = RC_RadioSetTxFreq((rxBuffer[1]<<24)|(rxBuffer[2]<<16)|(rxBuffer[3]<<8)|(rxBuffer[4]));

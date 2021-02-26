@@ -65,7 +65,7 @@ const FskBandwidth_t FskBandwidths[] =
     { 500000, 0x00 }, // Invalid Bandwidth
 };
 
-const RadioLoRaBandwidths_t Bandwidths[] = { LORA_BW_125, LORA_BW_250, LORA_BW_500 };
+const RadioLoRaBandwidths_t Bandwidths[] = {LORA_BW_007,LORA_BW_010,LORA_BW_015,LORA_BW_020,LORA_BW_031,LORA_BW_041, LORA_BW_062,LORA_BW_125, LORA_BW_250, LORA_BW_500 };
 
 //                                          SF12    SF11    SF10    SF9    SF8    SF7
 static double RadioLoRaSymbTime[3][6] = {{ 32.768, 16.384, 8.192, 4.096, 2.048, 1.024 },  // 125 KHz
@@ -207,7 +207,7 @@ void RadioSetRxConfig( uint32_t frequency, RadioModems_t modem, uint32_t bandwid
 {
 
 	RadioSetChannel(frequency );
-	bandwidth-=7;
+	//bandwidth-=7;
     RxContinuous = rxContinuous;
 
     if( fixLen == true )
@@ -287,7 +287,7 @@ void RadioSetTxConfig(uint32_t frequency, RadioModems_t modem, int8_t power, uin
 {
 
 	RadioSetChannel(frequency);
-	bandwidth-=7;
+	//bandwidth-=7;
 
     switch( modem )
     {
@@ -392,6 +392,7 @@ uint32_t RadioTimeOnAir( RadioModems_t modem, uint8_t pktLen  )
 
 void RadioSend (uint8_t *buffer, uint8_t size )
 {
+	LedRadioTXActive(true);
     SX126xSetDioIrqParams (IRQ_TX_DONE | IRQ_RX_TX_TIMEOUT,
 			 IRQ_TX_DONE | IRQ_RX_TX_TIMEOUT, IRQ_RADIO_NONE,
 			 IRQ_RADIO_NONE );
@@ -424,6 +425,8 @@ void RadioSleep(void)
 
 void RadioStandby(void )
 {
+	LedRadioRXActive(false);
+	LedRadioTXActive(false);
 	RG_RFSwitch(SWITCH_RX);
 
     SX126xSetStandby( STDBY_RC  );
@@ -431,6 +434,7 @@ void RadioStandby(void )
 
 void RadioCleanAndStandby(void)
 {
+
 	RadioStandby();
 	(void) SX126xGetIrqStatus();
 	SX126xClearIrqStatus(IRQ_RADIO_ALL);
@@ -458,6 +462,7 @@ void RadioRx( uint32_t timeout  )	//timeout je v ms - posunuti o 6 krat doleva j
 
 void RadioRxBoosted(  uint32_t timeout   ) //timeout je v ms- posunuti o 6 krat doleva je prepocet na ms..
 {
+	LedRadioRXActive(true);
 	RG_RFSwitch(SWITCH_RX);
 
 	SX126xSetDioIrqParams( IRQ_RX_DONE|IRQ_CRC_ERROR |IRQ_RX_TX_TIMEOUT, // "1" - ulozi se do registru
@@ -494,9 +499,11 @@ void RadioTx( uint32_t timeout  )
 
 void RadioSetTxContinuousWave( uint32_t freq, int8_t power, uint16_t time  )
 {
+	LedRadioTXActive(true);
     SX126xSetRfFrequency( freq  );
     SX126xSetRfTxPower( power  );
     SX126xSetTxContinuousWave();
+    //SX126xSetTxInfinitePreamble();
 }
 
 int16_t RadioRssi( RadioModems_t modem  )

@@ -20,8 +20,30 @@
 typedef enum
 {
 	DR_IQ_FALSE=0,
-	DR_IQ_TRUE=1
+	DR_IQ_TRUE=1,
+	DR_IQ_SIZE,
 }ENUM_DR_IQ;
+
+
+/**
+ *
+ */
+typedef enum
+{
+	DR_HEADER_FALSE=0,//!< DR_HEADER_FALSE
+	DR_HEADER_TRUE=1, //!< DR_HEADER_TRUE
+	DR_HEADER_SIZE,   //!< DR_HEADER_SIZE
+}ENUM_DR_HEADER;
+
+/**
+ *
+ */
+typedef enum
+{
+	DR_CRC_FALSE=0,
+	DR_CRC_TRUE=1,
+	DR_CRC_SIZE,
+}ENUM_DR_CRC;
 
 
 
@@ -40,6 +62,7 @@ typedef enum
 	DR_BW_125_KHZ=7,
 	DR_BW_250_KHZ=8,
 	DR_BW_500_KHZ=9,
+	DR_BW_SIZE,
 
 }ENUM_DR_BW;
 
@@ -48,13 +71,15 @@ typedef enum
  */
 typedef enum
 {
-	DR_SF6=0,
-	DR_SF7=1,
-	DR_SF8=2,
-	DR_SF9=3,
-	DR_SF10=4,
-	DR_SF11=5,
-	DR_SF12=6,
+	DR_SF5=0,
+	DR_SF6=1,
+	DR_SF7=2,
+	DR_SF8=3,
+	DR_SF9=4,
+	DR_SF10=5,
+	DR_SF11=6,
+	DR_SF12=7,
+	DR_SF_SIZE,
 
 }ENUM_DR_SF;
 
@@ -67,29 +92,11 @@ typedef enum
 	DR_CR_46=1,//!< DR_CR_46
 	DR_CR_47=2,//!< DR_CR_47
 	DR_CR_48=3,//!< DR_CR_48
+	DR_CR_SIZE,
 
 }ENUM_DR_CR;
 
-/**
- *
- */
-typedef union
-{
-	uint16_t Value;
 
-	struct sDrBits{
-
-	ENUM_DR_SF SF: 3;
-
-	ENUM_DR_BW BW:4;
-
-	ENUM_DR_IQ IqInvert:1;
-
-	ENUM_DR_CR CR:3;
-
-	}Bits;
-
-}DrConfig_t;
 
 typedef union
 {

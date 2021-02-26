@@ -32,8 +32,7 @@ Radio_Configuration_Struct 			spiDevice;
  */
 bool RU_SX1262Assign(void)
 {
-	DrConfig_t tempRxDR, tempTxDR;
-	eParentType typeOfParent;
+	RadioPar tempRxDR, tempTxDR;
 	taskENTER_CRITICAL();
 
 	/* init */
@@ -117,9 +116,10 @@ void RU_CommandProcess(RfCommands cmd,tRfGlobalData* GlobalData, DATA_QUEUE *Rec
 
 		case RF_CMD_TX_CW:
 			RadioCleanAndStandby();
-			PRT_SetAtten1To(0);
-			PRT_SetAtten2To(0);
+			//PRT_SetAtten1To(0);
+			//PRT_SetAtten2To(0);
 			RadioSetTxContinuousWave(RadioParam.TxConfig.freq,RadioParam.Power,0);
+			osDelay(1);
 			break;
 
 		case RF_CMD_STOP_TX_AND_DISCARD:
@@ -134,16 +134,17 @@ void RU_CommandProcess(RfCommands cmd,tRfGlobalData* GlobalData, DATA_QUEUE *Rec
 
 		case RF_CMD_SEND_UNIVERSAL_PAYLOAD_NOW:
 			TxPacket=ReceiveData->pointer;
+			RadioCleanAndStandby();
 
 			PRT_PowerDistribution((int8_t)(RadioParam.Power),&tempPower,&atten1,&atten2);
 			PRT_SetAtten1To(atten1);
 			PRT_SetAtten2To(atten2);
 
-			RadioCleanAndStandby();
-			RU_RFSetTXUp(tempPower,RadioParam.TxConfig.freq,RadioParam.TxConfig.SfBqIq);
+			RU_RFSetTXUp(tempPower,RadioParam.TxConfig.freq,RadioParam.TxConfig);
 
 			taskENTER_CRITICAL();
-			RadioSend((uint8_t *)EEPROM_RF_DATA_PACKET,RC_GetSizeOfSavedPacket());
+			RadioSend((uint8_t *)EE_RF_DATA_PACKET,RC_GetSizeOfSavedPacket());
+		//	RadioSend((uin8_t*)"Pokus zda to bude vubec fungovat",RC_GetSizeOfSavedPacket());
 			taskEXIT_CRITICAL();
 
 			break;
@@ -203,13 +204,13 @@ uint8_t RU_IRQProcess(tRfGlobalData* GlobalData)
                  }
 		    }
 
-			RU_LoRaConfigAndStartRX(RadioParam.RxConfig.freq,RadioParam.RxConfig.SfBqIq,true,portMAX_DELAY);
+			//RU_LoRaConfigAndStartRX(RadioParam.RxConfig.freq,RadioParam.RxConfig,true,portMAX_DELAY);
 
 	        break;
 
         case RF_TX_RUNNING:
 
-        	RU_LoRaConfigAndStartRX(RadioParam.RxConfig.freq,RadioParam.RxConfig.SfBqIq,true,portMAX_DELAY);
+        //	RU_LoRaConfigAndStartRX(RadioParam.RxConfig.freq,RadioParam.RxConfig,true,portMAX_DELAY);
            	SendData.Address=ADDR_TO_CORE_TX_PACKET_DONE;
            	xQueueSend(QueueCoreHandle, &SendData, portMAX_DELAY);
 

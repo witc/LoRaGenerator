@@ -54,6 +54,7 @@ extern "C" {
 #include "stm32l0xx_ll_cortex.h"
 #include "stm32l0xx_ll_system.h"
 #include "LoadConfig.h"
+#include "target.h"
 //#include "wwdg.h"
 //#include"stm32l0xx_hal_gpio.h"
 
@@ -330,7 +331,35 @@ typedef struct
 	eStateRfSystem	PreviousState;
 
 } tStateRfAutomat;
-//eStateRfSystem
+
+
+/**
+ *
+ * @param ledOn
+ */
+void inline LedRadioTXActive(bool ledOn)
+{
+	if(ledOn == true)
+	{
+		LL_GPIO_SetOutputPin(greenLEDPort,greenLEDPin);
+	}
+	else
+	{
+		LL_GPIO_ResetOutputPin(greenLEDPort,greenLEDPin);
+	}
+}
+
+void inline LedRadioRXActive(bool ledOn)
+{
+	if(ledOn == true)
+	{
+		LL_GPIO_SetOutputPin(redLEDPort,redLEDPin);
+	}
+	else
+	{
+		LL_GPIO_ResetOutputPin(redLEDPort,redLEDPin);
+	}
+}
 
 //** EEPROM */
 #define EE_ADDR_STATE_OF_SYSTEM			(FLASH_EEPROM_BASE)

@@ -8,16 +8,23 @@
 #ifndef SRC_RADIOCOMMANDS_H_
 #define SRC_RADIOCOMMANDS_H_
 
-#define MAX_ALLOWEDPACKET_SIZE			100
+#define MAX_ALLOWEDPACKET_SIZE			200
+
+
+#define RADIO_CMD_SF_OFFSET		5
+#define RADIO_CMD_CR_OFFSET		45
+
 
 
 typedef struct
 {
-	DrConfig_t	SfBqIq;
+	ENUM_DR_SF	sf;
+	ENUM_DR_BW	bw;
+	ENUM_DR_IQ	iq;
 	uint32_t	freq;
-	uint8_t		cr;
-	bool		headerMode;
-	bool		crcCheck;
+	ENUM_DR_CR	cr;
+	ENUM_DR_HEADER	headerMode;
+	ENUM_DR_CRC		crcCheck;
 
 }RadioPar;
 
@@ -63,13 +70,22 @@ uint32_t RC_RadioGetTxBw();
 bool RC_RadioSetRxBw(uint32_t bw);
 uint32_t RC_RadioGetRxBw(void);
 bool RC_RadioSetTxIq(uint8_t Iq);
-uint32_t RC_RadioGetTxIq(void);
+uint8_t RC_RadioGetTxIq(void);
 bool RC_RadioSetRxIq(uint8_t Iq);
-uint32_t RC_RadioGetRxIq(void);
+uint8_t RC_RadioGetRxIq(void);
 bool RC_RadioSetTxCr(uint8_t Cr);
-uint32_t RC_RadioGetTxCr(void);
+uint8_t RC_RadioGetTxCr(void);
 bool RC_RadioSetRxCr(uint8_t Cr);
-uint32_t RC_RadioGetRxCr(void);
+uint8_t RC_RadioGetRxCr(void);
+bool RC_RadioSetTXHeaderMode();
+uint8_t RC_RadioGetTXHeaderMode();
+bool RC_RadioSetRXHeaderMode();
+uint8_t RC_RadioGetRXHeaderMode();
+bool RC_RadioSetTXCRC();
+uint8_t RC_RadioGetTXCRC();
+bool RC_RadioSetRXCRC();
+uint8_t RC_RadioGetRXCRC();
+uint32_t RC_RadioGetRadioStatus();
 
 bool RC_RadioSetStandby();
 bool RC__RadioSetTxCW();

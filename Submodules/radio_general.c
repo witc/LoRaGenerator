@@ -16,7 +16,7 @@ void RG_SX126xReset( void  )
 {
     osDelay( 10 );
     HAL_GPIO_WritePin(spiDevice.pin_RESET.port,spiDevice.pin_RESET.pin,0);
-    osDelay( 20 );
+    osDelay( 1 );
     HAL_GPIO_WritePin(spiDevice.pin_RESET.port,spiDevice.pin_RESET.pin,1);
     osDelay( 10 );
 }
@@ -58,7 +58,7 @@ void RG_SX126xWakeup(void )
 
 //	spiDevice.AtomicActionEnter();
 	HAL_GPIO_WritePin(spiDevice.pin_NSS.port,spiDevice.pin_NSS.pin,0);
-
+	osDelay(1);
     RG_SX1262WriteSpi(&temp,1);
     temp=0;
     RG_SX1262WriteSpi(&temp,1);

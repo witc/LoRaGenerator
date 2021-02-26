@@ -12,14 +12,15 @@
 #include "TaskRF.h"
 #include "radio.h"
 #include "sx126x.h"
+#include "RadioCommands.h"
 
 /* Calibrate frequency of the your Radio*/
 #define RF_MAX_ENEBALE_FREQ		869525000+500000
 #define RF_MIN_ENEBALE_FREQ		869525000-500000
 
-extern DrConfig_t GlDefaultDrTX;
-extern DrConfig_t GlDefaultDrRX;
-extern DrConfig_t USB_RfLink;
+extern RadioPar GlDefaultDrTX;
+extern RadioPar GlDefaultDrRX;
+extern RadioPar USB_RfLink;
 /*
  * @ Commands for radio
  */
@@ -58,20 +59,20 @@ uint8_t 	RU_IRQProcess				(tRfGlobalData* GlobalData);
 void 		RU_CommandProcess			(RfCommands cmd,tRfGlobalData* GlobalData, DATA_QUEUE *ReceiveData);
 void 		RU_RadioStandby				(void);
 void 		RU_RadioSleep				(void);
-void 		RU_LoRaConfigAndStartRX 	(uint32_t freq,DrConfig_t DR, bool Rx, uint32_t rxTimeout);
-void 		RU_RFSetTXUp				(int8_t power, uint32_t freq, DrConfig_t DrData);
+void 		RU_LoRaConfigAndStartRX 	(uint32_t freq,RadioPar DR, bool Rx, uint32_t rxTimeout);
+void 		RU_RFSetTXUp				(int8_t power, uint32_t freq, RadioPar DR);
 void 		RU_RFSetTXDown				(void);
 void 		RU_GetRfFrequency			(uint32_t *frequency);
 void 		RU_SetRfFrequency			(uint32_t frequency);
 void 		RU_UpdatetMyAESKey			(void);
 void 		RU_UpdatetMyTxEUI			(void);
 uint64_t	RU_GetMyMasterMac			(void);
-DrConfig_t 	RU_GetDrRX					(void);
-DrConfig_t 	RU_GetDrTX					(void);
-void		RU_SetDrTX					(DrConfig_t newDrTx);
-void		RU_SetDrRX					(DrConfig_t newDrRx);
+RadioPar 	RU_GetDrRX					(void);
+RadioPar 	RU_GetDrTX					(void);
+void		RU_SetDrTX					(RadioPar newDrTx);
+void		RU_SetDrRX					(RadioPar newDrRx);
 void 		LoRaScanCAD					(RadioLoRaCadSymbols_t symbols);
-bool 		RU_RunLBTProcedure			(DrConfig_t DrData);
+bool 		RU_RunLBTProcedure			(RadioPar DrData);
 
 
 #endif /* SX1262_TEMPLATERADIOUSER_H_ */

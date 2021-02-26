@@ -14,9 +14,9 @@
 #define UART_BUFF_HEADER_SIZE			(4)
 #define MINIMAL_SIZE_USART_RX_MSG		(sizeof(SyncUartMsg)+UART_BUFF_HEADER_SIZE+1/*payload*/+UART_BUFF_CRC_SIZE/*crc*/)
 #define MAXIMAL_SIZE_USART_RX_MSG		(sizeof(SyncUartMsg)+UART_BUFF_HEADER_SIZE+60/*payload*/+UART_BUFF_CRC_SIZE/*crc*/)
-#define UART_CIRCLE_MAX_BUFFER_SIZE		(40)	//musi byt > 2= MAximal RX msg ?!?
-#define MAX_SIZE_FOR_PAYLOAD			(100)
-#define UART_CHECK_FREQUENCY			(5000)	//(115200 = 14,4 B/ms => za 2ms = < 30 Byte)
+#define UART_CIRCLE_MAX_BUFFER_SIZE		(600)	//musi byt > 2= MAximal RX msg ?!?
+#define MAX_SIZE_FOR_PAYLOAD			(300)
+#define UART_CHECK_FREQUENCY			(20)	//(115200 = 14,4 B/ms => za 2ms = < 30 Byte)
 
 
 /**
@@ -37,7 +37,7 @@ typedef enum
  */
 typedef union
 {
-	uint8_t		payload[250];
+	uint8_t		payload[UART_CIRCLE_MAX_BUFFER_SIZE];
 
 }eUartMsgs;
 
@@ -46,8 +46,8 @@ typedef union
 extern uint8_t GlUartRxBugger[UART_CIRCLE_MAX_BUFFER_SIZE];
 
 uint8_t 		UP_CalcCRC(uint8_t *data, uint8_t size);
-bool 			UP_FindSyncWord(uint8_t *data, uint8_t sizeToSearch, uint8_t *headerStarts);
-eUARTBufferMasg UP_FindAnyMsg(uint8_t **rxPacket);
+bool 			UP_FindSyncWord(uint8_t *data, uint16_t sizeToSearch, uint16_t *headerStarts);
+eUARTBufferMasg UP_FindAnyMsg(uint8_t **rxPacket,uint8_t *doCheckAgain);
 void 			UP_UartSendData(uint8_t opCode, uint8_t *answer,uint8_t size);
 void 			UP_UartTransmitRawData(uint8_t *buffer, uint8_t size);
 

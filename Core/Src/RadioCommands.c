@@ -9,6 +9,8 @@
 #include "TaskRF.h"
 #include "RadioCommands.h"
 #include "TemplateRadioUser.h"
+#include  "SignalProcessing.h"
+#include "LoadConfig.h"
 
 //bool (*PCT_RadioSetFunc[sizeof(eUartMsgCmds)])() = {&PCT_RadioSetTxFreq,
 //													&PCT_RadioSetRxFreq,
@@ -21,18 +23,12 @@
 //													&PCT_RadioSetTxCW,
 //													};
 
-const uint32_t radioDefinedBw[9] ={
-									7810,
-									10420,
-									15630,
-									20830,
-									31250,
-									41670,
-									62500,
-									125000,
-									500000
-								  };
-
+const uint8_t	RadioSF[DR_SF_SIZE] = {5,6,7,8,9,10,11,12};
+const  uint32_t 	RadioBW[DR_BW_SIZE] = {7810,10420,15630,20830,31250,41670,62500,125000,250000,500000};
+const  uint8_t 	RadioIQ[DR_IQ_SIZE] = {0,1};
+const  uint8_t  	RadioCR[DR_CR_SIZE] = {45,46,47,48};
+const  uint8_t 	RadioHeader[DR_HEADER_SIZE] = {0,1};
+const  uint8_t 	RadioCrc[DR_CRC_SIZE] = {0,1};
 
 tRadioParam 	RadioParam;
 tPacketParam	PacketParam;
@@ -47,6 +43,7 @@ bool RC_RadioSetTxFreq(uint32_t freq)
 	RadioParam.TxConfig.freq = freq;
 	taskEXIT_CRITICAL();
 
+	LC_SaveTXFreq(freq);
 	return true;
 }
 
@@ -57,9 +54,10 @@ bool RC_RadioSetTxFreq(uint32_t freq)
 uint32_t RC_RadioGetTxFreq()
 {
 	uint32_t ret;
-	taskENTER_CRITICAL();
+	EepromStart(false);
+	memcpy(&RadioParam.TxConfig.freq,(uint8_t*)EE_RADIO_TX_FREQ,4);
 	ret = RadioParam.TxConfig.freq;
-	taskEXIT_CRITICAL();
+	EepromStop();
 
 	return ret;
 }
@@ -72,7 +70,7 @@ bool RC_RadioSetRxFreq(uint32_t freq)
 	taskENTER_CRITICAL();
 	RadioParam.RxConfig.freq = freq;
 	taskEXIT_CRITICAL();
-
+	LC_SaveRXFreq(freq);
 	return true;
 }
 
@@ -84,11 +82,10 @@ bool RC_RadioSetRxFreq(uint32_t freq)
 uint32_t RC_RadioGetRxFreq()
 {
 	uint32_t ret;
-
-	taskENTER_CRITICAL();
-	ret	= RadioParam.RxConfig.freq;
-	taskEXIT_CRITICAL();
-
+	EepromStart(false);
+	memcpy(&RadioParam.RxConfig.freq,(uint8_t*)EE_RADIO_RX_FREQ,4);
+	ret = RadioParam.RxConfig.freq;
+	EepromStop();
 	return ret;
 }
 
@@ -103,9 +100,7 @@ bool RC_RadioSetTxPower(int8_t power)
 	RadioParam.Power = power;
 	taskEXIT_CRITICAL();
 
-	EepromStart(true);
-	HAL_FLASHEx_DATAEEPROM_Program(FLASH_TYPEPROGRAMDATA_BYTE,EEPROM_RF_TX_POWER,power);
-	EepromStop();
+	LC_SaveTXPower(power);
 
 	return true;
 }
@@ -118,11 +113,12 @@ bool RC_RadioSetTxPower(int8_t power)
 int8_t RC_RadioGetTxPower()
 {
 	int8_t ret;
-	taskENTER_CRITICAL();
+	EepromStart(false);
+	memcpy(&RadioParam.Power,(uint8_t*)EE_RADIO_TX_POWER,1);
 	ret = RadioParam.Power;
-	taskEXIT_CRITICAL();
-
+	EepromStop();
 	return ret;
+
 }
 
 /**
@@ -130,16 +126,17 @@ int8_t RC_RadioGetTxPower()
  */
 bool RC_RadioSetTxSf(uint8_t sf)
 {
-	if((sf >= 6)&&(sf<=12))
+	for(uint8_t i=0; i< (sizeof(RadioSF)); i++)
 	{
-		sf-=6;
-		taskENTER_CRITICAL();
-		RadioParam.TxConfig.SfBqIq.Bits.SF = sf;
-		taskEXIT_CRITICAL();
-
-		return true;
+		if(sf == RadioSF[i])
+		{
+			taskENTER_CRITICAL();
+			RadioParam.TxConfig.sf = i;
+			taskEXIT_CRITICAL();
+			LC_SaveTXSF(i);
+			return true;
+		}
 	}
-
 	return false;
 }
 
@@ -151,10 +148,20 @@ bool RC_RadioSetTxSf(uint8_t sf)
 uint32_t RC_RadioGetTxSf()
 {
 	uint32_t ret;
-	taskENTER_CRITICAL();
-	ret = RadioParam.TxConfig.SfBqIq.Bits.SF;
-	taskEXIT_CRITICAL();
+	EepromStart(false);
+	memcpy(&RadioParam.TxConfig.sf,(uint8_t*)EE_RADIO_TX_SF,1);
+	ret = RadioParam.TxConfig.sf;
+	EepromStop();
+	for(uint8_t i=0; i< (DR_SF_SIZE); i++)
+	{
+		if(RadioParam.TxConfig.sf == i)
+		{
+			ret = RadioSF[i];
+			break;
+		}
+	}
 
+	ret = SP_ConstrainU32(ret,RadioSF[DR_SF5],RadioSF[DR_SF12]);
 	return ret;
 }
 /**
@@ -162,16 +169,17 @@ uint32_t RC_RadioGetTxSf()
  */
 bool RC_RadioSetRxSf(uint8_t sf)
 {
-	if((sf >= 6)&&(sf<=12))
+	for(uint8_t i=0; i< (sizeof(RadioSF)); i++)
 	{
-		sf-=6;
-		taskENTER_CRITICAL();
-		RadioParam.RxConfig.SfBqIq.Bits.SF = sf;
-		taskEXIT_CRITICAL();
-
-		return true;
+		if(sf == RadioSF[i])
+		{
+			taskENTER_CRITICAL();
+			RadioParam.RxConfig.sf = i;
+			taskEXIT_CRITICAL();
+			LC_SaveRXSF(i);
+			return true;
+		}
 	}
-
 	return false;
 }
 
@@ -182,11 +190,21 @@ bool RC_RadioSetRxSf(uint8_t sf)
 uint32_t RC_RadioGetRxSf()
 {
 	uint32_t ret;
+	EepromStart(false);
+	memcpy(&RadioParam.RxConfig.sf,(uint8_t*)EE_RADIO_RX_SF,1);
+	ret = RadioParam.RxConfig.sf;
+	EepromStop();
 
-	taskENTER_CRITICAL();
-	ret = RadioParam.RxConfig.SfBqIq.Bits.SF;
-	taskEXIT_CRITICAL();
+	for(uint8_t i=0; i< (DR_SF_SIZE); i++)
+	{
+		if(RadioParam.RxConfig.sf == i)
+		{
+			ret = RadioSF[i];
+			break;
+		}
+	}
 
+	ret = SP_ConstrainU32(ret,RadioSF[DR_SF5],RadioSF[DR_SF12]);
 	return ret;
 }
 
@@ -195,14 +213,14 @@ uint32_t RC_RadioGetRxSf()
  */
 bool RC_RadioSetTxBw(uint32_t bw)
 {
-	for(uint8_t i=0; i< (sizeof(radioDefinedBw)/4); i++)
+	for(uint8_t i=0; i< (sizeof(RadioBW)/4); i++)
 	{
-		if(bw == radioDefinedBw[i])
+		if(bw == RadioBW[i])
 		{
 			taskENTER_CRITICAL();
-			RadioParam.TxConfig.SfBqIq.Bits.BW = i;
+			RadioParam.TxConfig.bw = i;
 			taskEXIT_CRITICAL();
-
+			LC_SaveTXBW(i);
 			return true;
 		}
 	}
@@ -216,13 +234,25 @@ bool RC_RadioSetTxBw(uint32_t bw)
  */
 uint32_t RC_RadioGetTxBw()
 {
-	uint32_t ret;
+	uint8_t temp;
+	uint32_t ret=0;
+	EepromStart(false);
+	memcpy(&temp,(uint8_t*)EE_RADIO_TX_BW,1);
+	EepromStop();
+	RadioParam.TxConfig.bw = temp;
 
-	taskENTER_CRITICAL();
-	ret = RadioParam.TxConfig.SfBqIq.Bits.BW;
-	taskEXIT_CRITICAL();
+	for(uint8_t i=0; i< (DR_BW_SIZE); i++)
+	{
+		if(temp == i)
+		{
+			ret = RadioBW[i];
+			break;
+		}
+	}
 
+	ret = SP_ConstrainU32(ret,RadioBW[DR_BW_7_81_KHZ],RadioBW[DR_BW_500_KHZ]);
 	return ret;
+
 }
 
 /**
@@ -230,14 +260,14 @@ uint32_t RC_RadioGetTxBw()
  */
 bool RC_RadioSetRxBw(uint32_t bw)
 {
-	for(uint8_t i=0; i< (sizeof(radioDefinedBw)/4); i++)
+	for(uint8_t i=0; i< (sizeof(RadioBW)/4); i++)
 	{
-		if(bw == radioDefinedBw[i])
+		if(bw == RadioBW[i])
 		{
 			taskENTER_CRITICAL();
-			RadioParam.RxConfig.SfBqIq.Bits.BW = i;
+			RadioParam.RxConfig.bw = i;
 			taskEXIT_CRITICAL();
-
+			LC_SaveRXBW(i);
 			return true;
 		}
 	}
@@ -253,12 +283,23 @@ bool RC_RadioSetRxBw(uint32_t bw)
  */
 uint32_t RC_RadioGetRxBw()
 {
-	uint32_t ret;
+	uint8_t temp;
+	uint32_t ret=0;
+	EepromStart(false);
+	memcpy(&temp,(uint8_t*)EE_RADIO_RX_BW,1);
+	EepromStop();
+	RadioParam.RxConfig.bw = temp;
 
-	taskENTER_CRITICAL();
-	ret = RadioParam.RxConfig.SfBqIq.Bits.BW;
-	taskEXIT_CRITICAL();
+	for(uint8_t i=0; i< (DR_BW_SIZE); i++)
+	{
+		if(temp == i)
+		{
+			ret = RadioBW[i];
+			break;
+		}
+	}
 
+	ret = SP_ConstrainU32(ret,RadioBW[DR_BW_7_81_KHZ],RadioBW[DR_BW_500_KHZ]);
 	return ret;
 
 }
@@ -271,30 +312,44 @@ uint32_t RC_RadioGetRxBw()
  */
 bool RC_RadioSetTxIq(uint8_t Iq)
 {
-	if(Iq>1)
+	for(uint8_t i=0; i< (sizeof(RadioIQ)); i++)
 	{
-		return false;
+		if(Iq == RadioIQ[i])
+		{
+			taskENTER_CRITICAL();
+			RadioParam.TxConfig.iq = i;
+			taskEXIT_CRITICAL();
+			LC_SaveTXIQ(i);
+			return true;
+		}
 	}
 
-	taskENTER_CRITICAL();
-	RadioParam.TxConfig.SfBqIq.Bits.IqInvert = Iq;
-	taskEXIT_CRITICAL();
-
-	return true;
+	return false;
 }
 
 /**
  *
  * @return
  */
-uint32_t RC_RadioGetTxIq()
+uint8_t RC_RadioGetTxIq()
 {
-	uint32_t ret;
+	uint8_t temp;
+	uint32_t ret=0;
+	EepromStart(false);
+	memcpy(&temp,(uint8_t*)EE_RADIO_TX_INVERT,1);
+	EepromStop();
+	RadioParam.TxConfig.iq = temp;
 
-	taskENTER_CRITICAL();
-	ret = RadioParam.TxConfig.SfBqIq.Bits.IqInvert;
-	taskEXIT_CRITICAL();
+	for(uint8_t i=0; i< (DR_IQ_SIZE); i++)
+	{
+		if(temp == i)
+		{
+			ret = RadioIQ[i];
+			break;
+		}
+	}
 
+	ret = SP_ConstrainU32(ret,RadioIQ[DR_IQ_FALSE],RadioIQ[DR_IQ_TRUE]);
 	return ret;
 }
 
@@ -305,28 +360,41 @@ uint32_t RC_RadioGetTxIq()
  */
 bool RC_RadioSetRxIq(uint8_t Iq)
 {
-	if(Iq>1)
+	for(uint8_t i=0; i< (sizeof(RadioIQ)); i++)
 	{
-		return false;
+		if(Iq == RadioIQ[i])
+		{
+			taskENTER_CRITICAL();
+			RadioParam.RxConfig.iq = i;
+			taskEXIT_CRITICAL();
+			LC_SaveRXIQ(i);
+			return true;
+		}
 	}
 
-	taskENTER_CRITICAL();
-	RadioParam.RxConfig.SfBqIq.Bits.IqInvert = Iq;
-	taskEXIT_CRITICAL();
-
-	return true;
+	return false;
 }
 
-uint32_t RC_RadioGetRxIq()
+uint8_t RC_RadioGetRxIq()
 {
-	uint32_t ret;
+	uint8_t temp;
+	uint32_t ret=0;
+	EepromStart(false);
+	memcpy(&temp,(uint8_t*)EE_RADIO_RX_INVERT,1);
+	EepromStop();
+	RadioParam.RxConfig.iq = temp;
 
-	taskENTER_CRITICAL();
-	ret = RadioParam.RxConfig.SfBqIq.Bits.IqInvert;
-	taskEXIT_CRITICAL();
+	for(uint8_t i=0; i< (DR_IQ_SIZE); i++)
+	{
+		if(temp == i)
+		{
+			ret = RadioIQ[i];
+			break;
+		}
+	}
 
+	ret = SP_ConstrainU32(ret,RadioIQ[DR_IQ_FALSE],RadioIQ[DR_IQ_TRUE]);
 	return ret;
-
 }
 
 /**
@@ -336,31 +404,45 @@ uint32_t RC_RadioGetRxIq()
  */
 bool RC_RadioSetTxCr(uint8_t Cr)
 {
-	if((Cr>=45)&&(Cr=48))
+	for(uint8_t i=0; i< (sizeof(RadioCR)); i++)
 	{
-		Cr-=45;
-		taskENTER_CRITICAL();
-		RadioParam.TxConfig.SfBqIq.Bits.CR = Cr;
-		taskEXIT_CRITICAL();
-
-		return true;
+		if(Cr == RadioCR[i])
+		{
+			taskENTER_CRITICAL();
+			RadioParam.TxConfig.cr = i;
+			taskEXIT_CRITICAL();
+			LC_SaveTXCR(i);
+			return true;
+		}
 	}
 
 	return false;
+
 }
 
 /**
  *
  * @return
  */
-uint32_t RC_RadioGetTxCr()
+uint8_t RC_RadioGetTxCr()
 {
-	uint32_t ret;
+	uint8_t temp;
+	uint8_t ret=0;
+	EepromStart(false);
+	memcpy(&temp,(uint8_t*)EE_RADIO_TX_CR,1);
+	EepromStop();
+	RadioParam.TxConfig.cr = temp;
 
-	taskENTER_CRITICAL();
-	ret = RadioParam.TxConfig.SfBqIq.Bits.CR;
-	taskEXIT_CRITICAL();
+	for(uint8_t i=0; i< (DR_CR_SIZE); i++)
+	{
+		if(temp == i)
+		{
+			ret = RadioCR[i];
+			break;
+		}
+	}
 
+	ret = SP_ConstrainU32(ret,RadioCR[DR_CR_45],RadioCR[DR_CR_48]);
 	return ret;
 }
 
@@ -373,34 +455,168 @@ uint32_t RC_RadioGetTxCr()
  */
 bool RC_RadioSetRxCr(uint8_t Cr)
 {
-	if((Cr>=45)&&(Cr=48))
+	for(uint8_t i=0; i< (sizeof(RadioCR)); i++)
 	{
-		Cr-=45;
-		taskENTER_CRITICAL();
-		RadioParam.RxConfig.SfBqIq.Bits.CR = Cr;
-		taskEXIT_CRITICAL();
-
-		return true;
+		if(Cr == RadioCR[i])
+		{
+			taskENTER_CRITICAL();
+			RadioParam.RxConfig.cr = i;
+			taskEXIT_CRITICAL();
+			LC_SaveRXCR(i);
+			return true;
+		}
 	}
 
 	return false;
+
 }
 
 /**
  *
  * @return
  */
-uint32_t RC_RadioGetRxCr()
+uint8_t RC_RadioGetRxCr()
+{
+	uint8_t temp;
+	uint8_t ret=0;
+	EepromStart(false);
+	memcpy(&temp,(uint8_t*)EE_RADIO_RX_CR,1);
+	EepromStop();
+	RadioParam.RxConfig.cr = temp;
+
+	for(uint8_t i=0; i< (DR_CR_SIZE); i++)
+	{
+		if(temp == i)
+		{
+			ret = RadioCR[i];
+			break;
+		}
+	}
+
+	ret = SP_ConstrainU32(ret,RadioCR[DR_CR_45],RadioCR[DR_CR_48]);
+	return ret;
+}
+
+/**
+ *
+ * @return
+ */
+uint8_t RC_RadioGetTXHeaderMode()
+{
+	uint8_t temp;
+	uint32_t ret=0;
+	EepromStart(false);
+	memcpy(&temp,(uint8_t*)EE_RADIO_TX_HEADER,1);
+	EepromStop();
+	RadioParam.TxConfig.headerMode = temp;
+
+	for(uint8_t i=0; i< (DR_HEADER_SIZE); i++)
+	{
+		if(temp == i)
+		{
+			ret = RadioHeader[i];
+			break;
+		}
+	}
+
+	ret = SP_ConstrainU32(ret,RadioHeader[DR_HEADER_FALSE],RadioIQ[DR_HEADER_TRUE]);
+	return ret;
+}
+
+/**
+ *
+ * @return
+ */
+uint8_t RC_RadioGetRXHeaderMode()
+{
+	uint8_t temp;
+	uint32_t ret=0;
+	EepromStart(false);
+	memcpy(&temp,(uint8_t*)EE_RADIO_RX_HEADER,1);
+	EepromStop();
+	RadioParam.RxConfig.headerMode = temp;
+
+	for(uint8_t i=0; i< (DR_HEADER_SIZE); i++)
+	{
+		if(temp == i)
+		{
+			ret = RadioHeader[i];
+			break;
+		}
+	}
+
+	ret = SP_ConstrainU32(ret,RadioHeader[DR_HEADER_FALSE],RadioIQ[DR_HEADER_TRUE]);
+	return ret;
+}
+
+
+/**
+ *
+ * @return
+ */
+uint8_t RC_RadioGetTXCRC()
+{
+	uint8_t temp;
+	uint32_t ret=0;
+	EepromStart(false);
+	memcpy(&temp,(uint8_t*)EE_RADIO_TX_CRC,1);
+	EepromStop();
+	RadioParam.TxConfig.crcCheck = temp;
+
+	for(uint8_t i=0; i< (DR_CRC_SIZE); i++)
+	{
+		if(temp == i)
+		{
+			ret = RadioCrc[i];
+			break;
+		}
+	}
+
+	ret = SP_ConstrainU32(ret,RadioCrc[DR_CRC_FALSE],RadioCrc[DR_CRC_TRUE]);
+	return ret;
+}
+
+/**
+ *
+ * @return
+ */
+uint8_t RC_RadioGetRXCRC()
+{
+	uint8_t temp;
+	uint32_t ret=0;
+	EepromStart(false);
+	memcpy(&temp,(uint8_t*)EE_RADIO_RX_CRC,1);
+	EepromStop();
+	RadioParam.RxConfig.crcCheck = temp;
+
+	for(uint8_t i=0; i< (DR_CRC_SIZE); i++)
+	{
+		if(temp == i)
+		{
+			ret = RadioCrc[i];
+			break;
+		}
+	}
+
+	ret = SP_ConstrainU32(ret,RadioCrc[DR_CRC_FALSE],RadioCrc[DR_CRC_TRUE]);
+	return ret;
+}
+
+
+/**
+ *
+ * @return
+ */
+uint32_t RC_RadioGetRadioStatus()
 {
 	uint32_t ret;
 
 	taskENTER_CRITICAL();
-	ret = RadioParam.RxConfig.SfBqIq.Bits.CR;
+	//ret = RadioParam.TxConfig.crcCheck;	TODO
 	taskEXIT_CRITICAL();
 
 	return ret;
 }
-
 /**
  *
  * @return
@@ -433,14 +649,14 @@ bool RC_RadioSetTxCW()
 
 bool RC_SavePacket(uint8_t *data)
 {
-	if(data[1]<=MAX_ALLOWEDPACKET_SIZE)
+	if(data[2]<=MAX_ALLOWEDPACKET_SIZE)
 	{
 		EepromStart(true);
 
-		HAL_FLASHEx_DATAEEPROM_Program(FLASH_TYPEPROGRAMDATA_BYTE,EEPROM_RF_PACKET_SIZE,data[1]);
-		for(uint8_t i=0;i<data[1];i++)
+		HAL_FLASHEx_DATAEEPROM_Program(FLASH_TYPEPROGRAMDATA_BYTE,EE_RF_PACKET_SIZE,data[2]);
+		for(uint8_t i=0;i<data[2];i++)
 		{
-			HAL_FLASHEx_DATAEEPROM_Program(FLASH_TYPEPROGRAMDATA_BYTE,EEPROM_RF_DATA_PACKET+i*sizeof(uint8_t),data[2+i]);
+			HAL_FLASHEx_DATAEEPROM_Program(FLASH_TYPEPROGRAMDATA_BYTE,EE_RF_DATA_PACKET+i*sizeof(uint8_t),data[3+i]);
 		}
 		EepromStop();
 	}
@@ -459,7 +675,7 @@ uint8_t RC_GetSizeOfSavedPacket(void)
 {
 	uint8_t temp;
 	EepromStart(false);
-	memcpy(&temp,(uint8_t *)EEPROM_RF_PACKET_SIZE,1);
+	memcpy(&temp,(uint8_t *)EE_RF_PACKET_SIZE,1);
 	EepromStop();
 
 	return temp;

@@ -152,21 +152,24 @@ static void RF_StateOFF(DATA_QUEUE ReceiveData,tRfGlobalData* GlobalData, tState
 			xQueueSend(QueueCoreHandle,&SendData,portMAX_DELAY);
 
 			/* Init Variables. */
-			RadioParam.TxConfig.SfBqIq.Bits.BW=RadioParam.RxConfig.SfBqIq.Bits.BW=DR_BW_125_KHZ;
-			RadioParam.TxConfig.SfBqIq.Bits.IqInvert=RadioParam.RxConfig.SfBqIq.Bits.IqInvert = DR_IQ_TRUE;
-			RadioParam.TxConfig.SfBqIq.Bits.SF=RadioParam.RxConfig.SfBqIq.Bits.SF=DR_SF9;
-			EepromStart(false);
-			memcpy(&RadioParam.Power,(uint8_t*)EEPROM_RF_TX_POWER,1);
-			EepromStop();
+
+			RadioParam.TxConfig.bw=RC_RadioGetTxBw();
+			RadioParam.TxConfig.iq=RC_RadioGetTxIq();
+			RadioParam.TxConfig.sf=RC_RadioGetTxSf();
+
+			RadioParam.RxConfig.bw=RC_RadioGetRxBw();
+			RadioParam.RxConfig.iq=RC_RadioGetRxIq();
+			RadioParam.RxConfig.sf=RC_RadioGetRxSf();
+
+			RadioParam.Power = RC_RadioGetTxPower();
 			if(RadioParam.Power>22)	RadioParam.Power = 22;
 			else if (RadioParam.Power<(-80)) RadioParam.Power = -80;
-			RadioParam.RxConfig.freq = 869525000;
-			RadioParam.RxConfig.freq = 869525000;
+
 			PRT_SetAtten1To(0);
 			PRT_SetAtten2To(0);
 
 			RadioCleanAndStandby();
-			RU_LoRaConfigAndStartRX(RadioParam.RxConfig.freq,RadioParam.RxConfig.SfBqIq,true,portMAX_DELAY);
+			//RU_LoRaConfigAndStartRX(RC_RadioGetRxFreq(),RadioParam.RxConfig,true,portMAX_DELAY);
 
 		}
 		else if(ReceiveData.Data==DATA_TO_RF_START_OFF)

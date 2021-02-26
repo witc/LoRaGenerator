@@ -9,7 +9,7 @@
 #define TASKRF_TASKRF_H_
 
 #include "radio.h"
-
+#include "RadioCommands.h"
 
 /**
  *
@@ -41,7 +41,7 @@ typedef struct
 	struct AES_ctx PairingCtxDown;
 	GeneralPacketsUpOrDown_t	localTxBuffer;
 	uint8_t						sizeOfPacket;
-	DrConfig_t					nextDr;
+	RadioPar					nextDr;
 
 	void* PointerMalloc;
 
