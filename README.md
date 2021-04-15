@@ -1,6 +1,8 @@
 # LoRaGenerator
 Universal  LoRa packet generator with user settings.
 
+# Udelat i zvlast funkce only GET!!!!!?????
+
 ## Commands:
 ### Radio
 Every Radio packet sets radio to Standby mode!
