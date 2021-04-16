@@ -85,58 +85,12 @@ extern "C" {
 #define RUN_WITH_DEBUG							0
 #define DEBUG_IN_STOP_MODE						0
 #define DEBUG_NO_FACTORY_TEST					0
-#define DEBUG_STUCK_IN_WD_FAIL					0
-#define DEBUG_STAY_OFF_AFTER_RESET				0
-
-
-#define VOLUME_SOUND							22	//puvodne 22
 
 
 #define CONST_ONE_SEC							(1000)
 #define CONST_ONE_MIN							(60000)
 #define CONST_ONE_HOUR							(3600000)
 #define TIMER_BLINK_PERIOD_FTEST				(0.2*CONST_ONE_SEC)
-#define TIME_LED_ON								(90)		// pri periodeickem blikani po stisku tlacitka
-#define TIMER_BLINK_PERIOD						(1.5*CONST_ONE_SEC)
-#define TIME_SOUND_BEEP_PULSE					(90)
-#define TIME_SOUND_BEEP_PULSE_LONG				(500)
-#define DURATION_ALIVE_SHOW_ACTIVITY			(((120*CONST_ONE_SEC*2)/TIMER_BLINK_PERIOD)-2)/*change only first const*/
-#define IMPULSE_HEARTBEAT_PERIOD				(4*CONST_ONE_SEC)
-#define TX_PERIOD								(15*CONST_ONE_MIN)	//15 min
-#define	DURATION_RX_WINDOW_1					(300)
-#define TIME_TO_ENABLE_TRIGGER					(380)
-#define PAIR_TIME_LIMIT							(2*CONST_ONE_MIN)
-#define HYSTERESIS_PULSE						(7)	//5 = 500 V
-#define MAX_ATTEMPTS_TO_SEND_DATA				(7)
-#define MIN_ATTEMPTS_TO_SEND_DATA				(2)
-/* Time on air of packet. */
-#define	TOA_OF_MONITOR_INFO						320
-
-/* LBT settings */
-#define MAX_LBT_TRY								10
-#define NO_OF_CADS_IN_LBT						3
-#define RANDOM_DELAY_BEF_FIRST_TX				500
-#define RANDOM_DELAY_BETWEEN_CAD				600
-#define MAX_TIME_BEF_SEND_PACKET				(100+RANDOM_DELAY_BEF_FIRST_TX+MAX_LBT_TRY*RANDOM_DELAY_BETWEEN_CAD)
-
-#define TIME_RF_TX_TIMEOUT						(MAX_TIME_BEF_SEND_PACKET+TOA_OF_MONITOR_INFO)
-#define TIME_TO_REPEATE_PACKET					(TIME_RF_TX_TIMEOUT+100)
-#define TIME_TO_EN_SEND_NEXT_PACKET				(700)	/* Cekame na mozny prijem po odvysilani */
-#define	TIME_TO_TRY_SEND_NEXT_PACKET			(500)	/* */
-#define MAX_TIME_MEAS_BATT						20
-
-#define RSSI_TEST_MIN							(-150)
-#define RSSI_TEST_MAX							(-50)
-
-
-
-#define LENGTH_IMPULSE_FILTER					3
-#define ADC_BATT_BUFFER_SIZE					8	//kazdou hodnotu 4x kanal+referenci
-#define ADC_IMPULSE_BUFFER_SIZE					8	//kazdou hodnotu 4x kanal+referenci
-
-#define BATT_ALARM_LEVEL_BLINK					10	// na GW 10%
-#define BATT_ALARM_LEVEL_SOUND					5	// na GW 5%
-#define BATT_DIVIDER							(0.253731)		// Napetovy delic u baterie
 
 /* USER CODE END EM */
 
@@ -150,6 +104,8 @@ void 	MeasureStart	(void);
 void	MeasureStop		(void);
 void 	osDelayWatchdog	(uint32_t msDelay);
 bool	M_IsMcuLocked	(void);
+
+
 //#endif
 /* USER CODE END EFP */
 
@@ -158,43 +114,30 @@ bool	M_IsMcuLocked	(void);
 #define LONG_PRESS_PERIOD 40
 #define REPEAT_PRESS_PERIOD 50
 #define EXTRA_LONG_PRESS 55
-#define RF_TX_ENABLE_Pin GPIO_PIN_3
-#define RF_TX_ENABLE_GPIO_Port GPIOA
-#define RF_NSS_Pin GPIO_PIN_4
-#define RF_NSS_GPIO_Port GPIOA
+#define SX1262_TX_ENABLE_Pin GPIO_PIN_3
+#define SX1262_TX_ENABLE_GPIO_Port GPIOA
+#define SX1262_NSS_Pin GPIO_PIN_4
+#define SX1262_NSS_GPIO_Port GPIOA
 #define SX1262_SCK_Pin GPIO_PIN_5
 #define SX1262_SCK_GPIO_Port GPIOA
 #define SX1262_MISO_Pin GPIO_PIN_6
 #define SX1262_MISO_GPIO_Port GPIOA
 #define SX1262_MOSI_Pin GPIO_PIN_7
 #define SX1262_MOSI_GPIO_Port GPIOA
-#define RF_NRESET_Pin GPIO_PIN_0
-#define RF_NRESET_GPIO_Port GPIOB
-#define RF_BUSY_Pin GPIO_PIN_1
-#define RF_BUSY_GPIO_Port GPIOB
-#define RF_DIO_Pin GPIO_PIN_2
-#define RF_DIO_GPIO_Port GPIOB
-#define RF_DIO_EXTI_IRQn EXTI2_3_IRQn
-#define ATTEN_SCK_Pin GPIO_PIN_10
-#define ATTEN_SCK_GPIO_Port GPIOB
-#define RF_MISO_Pin GPIO_PIN_14
-#define RF_MISO_GPIO_Port GPIOB
-#define ATTEN_MOSI_Pin GPIO_PIN_15
-#define ATTEN_MOSI_GPIO_Port GPIOB
-#define ATTEN_LE1_Pin GPIO_PIN_8
-#define ATTEN_LE1_GPIO_Port GPIOA
-#define ATTEN_LE2_Pin GPIO_PIN_9
-#define ATTEN_LE2_GPIO_Port GPIOA
-#define LED_RED_Pin GPIO_PIN_5
-#define LED_RED_GPIO_Port GPIOB
-#define LED_GREEN_Pin GPIO_PIN_9
+#define SX1262_NRESET_Pin GPIO_PIN_1
+#define SX1262_NRESET_GPIO_Port GPIOB
+#define SX1262_DIO_Pin GPIO_PIN_2
+#define SX1262_DIO_GPIO_Port GPIOB
+#define SX1262_DIO_EXTI_IRQn EXTI2_3_IRQn
+#define SX1262_BUSY_Pin GPIO_PIN_10
+#define SX1262_BUSY_GPIO_Port GPIOB
+#define LED_GREEN_Pin GPIO_PIN_15
 #define LED_GREEN_GPIO_Port GPIOB
+#define LED_BLUE_Pin GPIO_PIN_5
+#define LED_BLUE_GPIO_Port GPIOB
 /* USER CODE BEGIN Private defines */
 
-#define LOCAL_KEY			"Dogtrace Fencee"
-
 #define BLINK_INFINITY		UINT64_MAX
-
 
 /*!
  *	Address for Core Task
@@ -219,8 +162,6 @@ bool	M_IsMcuLocked	(void);
 #define ADDR_TO_CORE_UART_READ_RX_BUFFER		238
 #define ADDR_TO_CORE_UART_RX_NEW_PACKET			237
 #define ADDR_TO_CORE_TX_RF_TIMEOUT				236
-
-
 
 /*!
  *	Data for Core Task
@@ -341,11 +282,11 @@ void inline LedRadioTXActive(bool ledOn)
 {
 	if(ledOn == true)
 	{
-		LL_GPIO_SetOutputPin(greenLEDPort,greenLEDPin);
+		LL_GPIO_SetOutputPin(LED_BLUE_GPIO_Port,LED_BLUE_Pin);
 	}
 	else
 	{
-		LL_GPIO_ResetOutputPin(greenLEDPort,greenLEDPin);
+		LL_GPIO_ResetOutputPin(LED_BLUE_GPIO_Port,LED_BLUE_Pin);
 	}
 }
 
@@ -353,11 +294,11 @@ void inline LedRadioRXActive(bool ledOn)
 {
 	if(ledOn == true)
 	{
-		LL_GPIO_SetOutputPin(redLEDPort,redLEDPin);
+		LL_GPIO_SetOutputPin(LED_GREEN_GPIO_Port,LED_GREEN_Pin);
 	}
 	else
 	{
-		LL_GPIO_ResetOutputPin(redLEDPort,redLEDPin);
+		LL_GPIO_ResetOutputPin(LED_GREEN_GPIO_Port,LED_GREEN_Pin);
 	}
 }
 

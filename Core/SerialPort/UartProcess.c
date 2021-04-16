@@ -129,10 +129,8 @@ eUARTBufferMasg UP_FindAnyMsg(uint8_t **rxPacket,uint8_t *doCheckAgain)
 			if(UP_CalcCRC(&workingBuffer[startHeader],3)!=workingBuffer[startHeader+3])
 			{
 				/* mame bulshitni zacatek takze to zahod */
-				LL_GPIO_SetOutputPin(LED_RED_GPIO_Port,LED_RED_Pin);
 				workinkgStart++;
 				sumArrivalSize--;
-				LL_GPIO_ResetOutputPin(LED_RED_GPIO_Port,LED_RED_Pin);
 			//	LL_GPIO_SetOutputPin(LED_RED_GPIO_Port,LED_RED_Pin);
 			}
 			else if((payloadSizeFromHeader>MAX_SIZE_FOR_PAYLOAD)||(payloadSizeFromHeader==0))

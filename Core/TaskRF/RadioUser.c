@@ -49,14 +49,6 @@ bool RU_SX1262Assign(void)
 	spiDevice.pin_RF_SWITCH.port=SX1262_TX_ENABLE_GPIO_Port;
 	spiDevice.pin_RF_SWITCH.pin=SX1262_TX_ENABLE_Pin;
 
-#if AES_USE_SW_VERSION
-	spiDevice.AES_ECB_Encrypt=AES_ECB_encrypt;
-	spiDevice.AES_ECB_Decrypt=AES_ECB_decrypt;
-#elif
-
-#endif
-
-
 #if (RF_USE_DMA==1)
 
 #endif
@@ -115,11 +107,12 @@ void RU_CommandProcess(RfCommands cmd,tRfGlobalData* GlobalData, DATA_QUEUE *Rec
 			break;
 
 		case RF_CMD_TX_CW:
-			RadioCleanAndStandby();
+			//RadioCleanAndStandby();
+			RadioStandby();
 			//PRT_SetAtten1To(0);
 			//PRT_SetAtten2To(0);
 			RadioSetTxContinuousWave(RadioParam.TxConfig.freq,RadioParam.Power,0);
-			osDelay(1);
+			//osDelay(1);
 			break;
 
 		case RF_CMD_STOP_TX_AND_DISCARD:
@@ -134,7 +127,8 @@ void RU_CommandProcess(RfCommands cmd,tRfGlobalData* GlobalData, DATA_QUEUE *Rec
 
 		case RF_CMD_SEND_UNIVERSAL_PAYLOAD_NOW:
 			TxPacket=ReceiveData->pointer;
-			RadioCleanAndStandby();
+			//RadioCleanAndStandby();
+			RadioStandby();
 
 			PRT_PowerDistribution((int8_t)(RadioParam.Power),&tempPower,&atten1,&atten2);
 			PRT_SetAtten1To(atten1);

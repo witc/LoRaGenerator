@@ -403,7 +403,7 @@ static void CORE_StateStartOFF(DATA_QUEUE ReceiveData,tCoreGlobalData* GlobalDat
 
 		/* Deinit variables. */
 
-		LL_GPIO_ResetOutputPin(LED_RED_GPIO_Port,LED_RED_Pin);
+		LL_GPIO_ResetOutputPin(LED_BLUE_GPIO_Port,LED_BLUE_Pin);
 		LL_GPIO_ResetOutputPin(LED_GREEN_GPIO_Port,LED_GREEN_Pin);
 	}
 

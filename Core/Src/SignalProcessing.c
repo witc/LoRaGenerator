@@ -14,35 +14,6 @@
 /* ADC Batt*/
 #define CONST_MV_TO_PACKET_MULTIPLE		(254/5)
 
-/**
- *
- * @param adc
- * @return
- */
-void SP_SMA_ImpulseFilter(uint16_t adc, tCoreGlobalData *GlobalData)
-{
-//	static uint16_t filterBuff[LENGTH_IMPULSE_FILTER-1];
-//	uint32_t sumFilter=0;
-//
-//
-//	for(uint8_t i=(LENGTH_IMPULSE_FILTER-1);i>1;i--)
-//	{
-//		filterBuff[i-1]=filterBuff[i-2];
-//	}
-//
-//	filterBuff[0]=adc;
-//
-//	for(uint8_t i=0;i<(LENGTH_IMPULSE_FILTER-1);i++)
-//	{
-//		sumFilter+=filterBuff[i];
-//	}
-//
-//	GlobalData->LastFilteredImpulsemV= (uint16_t)(sumFilter/(LENGTH_IMPULSE_FILTER-1));
-
-	/* odstraneni filtrace pro zachyceni prustrelu n ohrade */
-	GlobalData->LastFilteredImpulsemV = adc;
-
-}
 
 /**
  *

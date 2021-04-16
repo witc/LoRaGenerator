@@ -298,7 +298,6 @@ void StartTaskRF(void const * argument)
 	static void* PointerToMalloc = NULL;
 	static portBASE_TYPE ReturnValue;
 
-
 	RF_StateINIT(ReceiveData,&DataTaskRf, &StateAutomat,&PointerToMalloc);
 
 	for(;;)

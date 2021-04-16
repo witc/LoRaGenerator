@@ -1373,8 +1373,7 @@ HAL_StatusTypeDef HAL_UART_Receive_IT(UART_HandleTypeDef *huart, uint8_t *pData,
 HAL_StatusTypeDef HAL_UART_Transmit_DMA(UART_HandleTypeDef *huart, uint8_t *pData, uint16_t Size)
 {
   /* Check that a Tx process is not already ongoing */
-	huart->gState = HAL_UART_STATE_READY;
-	if (huart->gState == HAL_UART_STATE_READY)
+  if (huart->gState == HAL_UART_STATE_READY)
   {
     if ((pData == NULL) || (Size == 0U))
     {
@@ -3172,8 +3171,6 @@ static void UART_DMATransmitCplt(DMA_HandleTypeDef *hdma)
 
     /* Enable the UART Transmit Complete Interrupt */
     SET_BIT(huart->Instance->CR1, USART_CR1_TCIE);
-
-    HAL_UART_TxCpltCallback(huart);
   }
   /* DMA Circular mode */
   else

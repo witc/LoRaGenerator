@@ -12,8 +12,7 @@
 #define I_AM_RF_END_DEVICE				1
 #define I_AM_RF_GATEWAY					0
 #define RF_USE_DMA						0
-#define AES_USE_SW_VERSION				1
-#define AES_USE_HW_VERSION				0
+
 
 #if (I_AM_RF_END_DEVICE==I_AM_RF_GATEWAY)
 	#error ("definuj typ systemu")
@@ -27,12 +26,6 @@
 	#error("definuj typ koncoveho zarizeni")
 #endif
 
-#endif
-
-
-
-#if (AES_USE_SW_VERSION==AES_USE_HW_VERSION)
-	#error ("definuj zpusob kodovani")
 #endif
 
 #endif /* SX1262_RADIOCONFIG_H_ */

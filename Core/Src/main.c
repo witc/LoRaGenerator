@@ -175,7 +175,6 @@ int main(void)
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
   MX_DMA_Init();
-  MX_SPI2_Init();
   MX_TIM22_Init();
   MX_TIM7_Init();
   MX_RTC_Init();
@@ -267,7 +266,7 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
 	signed portBASE_TYPE xHigherPriorityTaskWoken;
 	xHigherPriorityTaskWoken=pdFALSE;
 
-	if(GPIO_Pin==RF_DIO_Pin)
+	if(GPIO_Pin==SX1262_DIO_Pin)
 	{
 		SendData.Address=ADDR_TO_RF_SX1262_IRQ;
 		if(xQueueSendFromISR(QueueRFHandle,&SendData,&xHigherPriorityTaskWoken)!=pdPASS)

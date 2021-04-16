@@ -19,6 +19,7 @@ extern SPI_HandleTypeDef hspi2;
  */
 void PRT_SetAtten1To(double atten)
 {
+#if (BOARD_LORA_GENERATOR==1)
 	uint8_t temp;
 
 	if(atten > 31.75)	atten = 31.75;
@@ -29,6 +30,7 @@ void PRT_SetAtten1To(double atten)
 	HAL_SPI_Transmit(&hspi2,&temp,1,10000);
 	HAL_GPIO_WritePin(ATTEN_LE1_GPIO_Port,ATTEN_LE1_Pin,1);
 	HAL_GPIO_WritePin(ATTEN_LE1_GPIO_Port,ATTEN_LE1_Pin,0);
+#endif
 }
 
 /**
@@ -37,6 +39,7 @@ void PRT_SetAtten1To(double atten)
  */
 void PRT_SetAtten2To(double atten)
 {
+#if (BOARD_LORA_GENERATOR==1)
 	uint8_t temp;
 
 	atten=SP_ConstrainDouble(atten,0,31.75);
@@ -45,6 +48,8 @@ void PRT_SetAtten2To(double atten)
 	HAL_SPI_Transmit(&hspi2,&temp,1,10000);
 	HAL_GPIO_WritePin(ATTEN_LE2_GPIO_Port,ATTEN_LE2_Pin,1);
 	HAL_GPIO_WritePin(ATTEN_LE2_GPIO_Port,ATTEN_LE2_Pin,0);
+
+#endif
 }
 
 /**
