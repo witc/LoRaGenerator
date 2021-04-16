@@ -63,7 +63,7 @@ CRC is the same for header and whole packet
 | CRC RX  | 15  | yes |  Crc check true/false (1 B)| 1 - Succes /0 - failure|
 | preparePacket  | 16  |yes | data[0] - nasledna velikost,  data[N] (N B)| 1 - Succes /0 - failure|
 | AutoRepeating  | 17  | yes |  true/false (4 B) (max = never repeat)| 1 - Succes /0 - failure|
-| startRx  | 21  |  yes|  Timeout (ms) (4 B) | 1 - Succes /0 - failure|
+| startRx  | 21  |  yes|  singleRX true/false (1 B) | 1 - Succes /0 - failure|
 
 **Action Flags**
 1 = only set the value
