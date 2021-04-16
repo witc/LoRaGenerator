@@ -78,6 +78,8 @@ CRC is the same for header and whole packet
 | sendPacket  | 252 | no |  empty | 1 - Succes /0 - failure|
 | startTXCW  | 251  | no || 1 - Succes /0 - failure|
 | setStandby  | 250  | no || 1 - Succes /0 - failure|
+| readRxPacket  | 249  | no || 1 - Succes /0 - failure|
+
 
 **system info**
 -MCU, radio chip, max output power, min output power,
