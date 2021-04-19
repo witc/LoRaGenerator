@@ -106,6 +106,12 @@ void RU_CommandProcess(RfCommands cmd,tRfGlobalData* GlobalData, DATA_QUEUE *Rec
 			RadioCleanAndStandby();
 			break;
 
+		case RF_CMD_START_RX:
+			GlobalData->rxSingle = (bool)ReceiveData->temp;
+			GlobalData->payloadSize = ReceiveData->temp2;
+			RU_LoRaConfigAndStartRX(RadioParam.RxConfig.freq,RadioParam.RxConfig,true,GlobalData->payloadSize,portMAX_DELAY);
+			break;
+
 		case RF_CMD_TX_CW:
 			//RadioCleanAndStandby();
 			RadioStandby();
@@ -165,7 +171,6 @@ uint8_t RU_IRQProcess(tRfGlobalData* GlobalData)
 	GeneralPacketsUpOrDown_t RxBuffer;
 	GeneralPacketsUpOrDown_t *RxBufferToCore;
 
-
 	RadioStandby();
 	irqRegs = SX126xGetIrqStatus();
 	SX126xClearIrqStatus(IRQ_RADIO_ALL);
@@ -195,18 +200,34 @@ uint8_t RU_IRQProcess(tRfGlobalData* GlobalData)
 					SendData.temp=size;
 					SendData.pointer = RxBufferToCore;
 					xQueueSend(QueueCoreHandle, &SendData, portMAX_DELAY);
+
+					if(GlobalData->rxSingle == true)
+					{
+						RadioCleanAndStandby();
+						break;
+					}
                  }
 		    }
 
-			//RU_LoRaConfigAndStartRX(RadioParam.RxConfig.freq,RadioParam.RxConfig,true,portMAX_DELAY);
+			RU_LoRaConfigAndStartRX(RadioParam.RxConfig.freq,RadioParam.RxConfig,true,GlobalData->payloadSize,portMAX_DELAY);
 
 	        break;
 
         case RF_TX_RUNNING:
 
-        //	RU_LoRaConfigAndStartRX(RadioParam.RxConfig.freq,RadioParam.RxConfig,true,portMAX_DELAY);
+        	if(GlobalData->rxSingle == true)
+			{
+				RadioCleanAndStandby();
+			}
+        	else
+        	{
+        		RU_LoRaConfigAndStartRX(RadioParam.RxConfig.freq,RadioParam.RxConfig,true,GlobalData->payloadSize, portMAX_DELAY);
+        	}
+
            	SendData.Address=ADDR_TO_CORE_TX_PACKET_DONE;
            	xQueueSend(QueueCoreHandle, &SendData, portMAX_DELAY);
+
+
 
             break;
 

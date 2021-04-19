@@ -102,29 +102,6 @@ static void (*StateCORE[])(DATA_QUEUE, tCoreGlobalData*,	tStateCoreAutomat*) =
 
 /**
  *
- * @param huart
- */
-void HAL_UART_TxCpltCallback(UART_HandleTypeDef *huart)
-{
-	BaseType_t xHigherPriorityTaskWoken = pdFALSE;
-
-	if(UartTxDoneNotify!=NULL)
-	{
-		/* Notify the task that the transfer is complete. */
-		vTaskNotifyGiveFromISR( UartTxDoneNotify, &xHigherPriorityTaskWoken );
-		/* There are no ADC in progress, so no tasks to notify. */
-		//UartTxDoneNotify = NULL;
-	}
-	else
-	{
-
-	}
-
-	portYIELD_FROM_ISR( xHigherPriorityTaskWoken );
-}
-
-/**
- *
  * @param argument
  */
 void CallbackRepeateTx(void const * argument)
@@ -307,6 +284,8 @@ static void CORE_StateON(DATA_QUEUE ReceiveData,tCoreGlobalData* GlobalData, tSt
 	uint8_t					*TxBuffer;
 	uint8_t					*RxUartMsg = NULL;
 	uint8_t					doCheckAgain = 0;
+	static uint8_t			localRxPacketBuff[PACKET_MAX_SIZE];
+	static uint8_t			lastRxPacketSize;
 
 	Gl_HeapFree=xPortGetMinimumEverFreeHeapSize();
 
@@ -315,6 +294,10 @@ static void CORE_StateON(DATA_QUEUE ReceiveData,tCoreGlobalData* GlobalData, tSt
 	{
 		case ADDR_TO_CORE_RF_DATA_RECEIVED:
 
+			memcpy(&localRxPacketBuff[1],ReceiveData.pointer,ReceiveData.temp);
+			lastRxPacketSize=ReceiveData.temp;
+			localRxPacketBuff[0] =lastRxPacketSize;
+			UP_UartSendData(UART_MSG_GET_RX_PACKET,localRxPacketBuff,lastRxPacketSize+1);
 
 			break;
 
@@ -355,6 +338,9 @@ static void CORE_StateON(DATA_QUEUE ReceiveData,tCoreGlobalData* GlobalData, tSt
 			}
 			while(doCheckAgain == 1 );
 
+			LL_TIM_EnableIT_UPDATE(TIM6);
+			LL_TIM_SetCounter(TIM6,0);
+			LL_TIM_EnableCounter(TIM6);
 
 			break;
 

@@ -16,7 +16,7 @@
 #define MAXIMAL_SIZE_USART_RX_MSG		(sizeof(SyncUartMsg)+UART_BUFF_HEADER_SIZE+60/*payload*/+UART_BUFF_CRC_SIZE/*crc*/)
 #define UART_CIRCLE_MAX_BUFFER_SIZE		(600)	//musi byt > 2= MAximal RX msg ?!?
 #define MAX_SIZE_FOR_PAYLOAD			(300)
-#define UART_CHECK_FREQUENCY			(20)	//(115200 = 14,4 B/ms => za 2ms = < 30 Byte)
+#define UART_CHECK_FREQUENCY			(50)	//(115200 = 14,4 B/ms => za 2ms = < 30 Byte)
 
 
 /**

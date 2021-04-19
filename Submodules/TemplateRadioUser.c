@@ -46,14 +46,14 @@ __attribute__(( weak ))void RU_CommandProcess(RfCommands cmd,tRfGlobalData* Glob
 /*
  * brief: Set RX config
  */
-__attribute__(( weak )) void RU_LoRaConfigAndStartRX (uint32_t freq,RadioPar DR, bool Rx, uint32_t rxTimeout)
+__attribute__(( weak )) void RU_LoRaConfigAndStartRX (uint32_t freq,RadioPar DR, bool Rx,uint8_t payloadSize, uint32_t rxTimeout)
 {
 	bool rxContin=false;
 
 	if(rxTimeout==portMAX_DELAY)	rxContin=true;
 
 	RadioSetRxConfig(freq,MODEM_LORA,DR.bw,DR.sf+5,DR.cr+1/*cr*/,0/*AFC*/,8/*preamble*/,0/*symbtimeout to lock*/,
-					 (bool)DR.headerMode/*fixlen*/,10/*length*/,(bool)DR.crcCheck/*crc on*/,0,0,(bool)DR.iq,rxContin/*rx continous*/);
+					 (DR.headerMode==true) ? false:true/*fixlen*/,payloadSize/*length*/,(bool)DR.crcCheck/*crc on*/,0,0,(bool)DR.iq,rxContin/*rx continous*/);
 
 	if (Rx == true)   RadioRxBoosted (rxTimeout);
 }
@@ -68,6 +68,6 @@ __attribute__(( weak )) void RU_RFSetTXUp(int8_t power, uint32_t freq, RadioPar 
 	/* Radio TX configuration for "Up" way */
 
 	RadioSetTxConfig(freq, MODEM_LORA /* modem*/,(int8_t)power /*power*/, 0/*fdev*/, DR.bw/*BW*/,DR.sf+5 /*SF*/,
-					 	 	 	 1 /*coderate*/, 8 /*preamble*/, (bool)DR.headerMode /*fixlen*/, (bool)DR.crcCheck/*crc on*/,
+					 	 	 	 1 /*coderate*/, 8 /*preamble*/,  (DR.headerMode==true) ? false:true /*fixlen*/, (bool)DR.crcCheck/*crc on*/,
 								 0 /*freqhop*/, 0 /* hopeperiod*/, DR.iq /* IQ inverted*/, 0xff /*Timeout*/);
 }

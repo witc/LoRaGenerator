@@ -9,7 +9,7 @@
 #define SRC_LOADCONFIG_H_
 
 
-#define USE_INTERNAL_EEPROM
+#define USE_INTERNAL_EEPROM		1
 
 #define radioSF_MAX		12
 #define radioSF_MIN		5
@@ -55,7 +55,7 @@ void inline EepromStop(void)
 #define EE_RADIO_RX_BW			(EE_RADIO_TX_BW+sizeof(uint32_t))
 #define EE_RADIO_TX_INVERT		(EE_RADIO_RX_BW+sizeof(uint32_t))
 #define EE_RADIO_RX_INVERT		(EE_RADIO_TX_INVERT+sizeof(uint32_t))
-#define EE_RADIO_TX_CR			(EE_RADIO_TX_INVERT+sizeof(uint32_t))
+#define EE_RADIO_TX_CR			(EE_RADIO_RX_INVERT+sizeof(uint32_t))
 #define EE_RADIO_RX_CR			(EE_RADIO_TX_CR+sizeof(uint32_t))
 #define EE_RADIO_TX_HEADER		(EE_RADIO_RX_CR+sizeof(uint32_t))
 #define EE_RADIO_RX_HEADER		(EE_RADIO_TX_HEADER+sizeof(uint32_t))

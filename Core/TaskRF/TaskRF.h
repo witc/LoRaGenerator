@@ -29,6 +29,8 @@ typedef enum
 typedef struct
 {
 	RadioState_t		RF_State;
+	bool				rxSingle;
+	uint8_t				payloadSize;
 
 }__packed tRfGlobalData;
 

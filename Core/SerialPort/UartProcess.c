@@ -263,8 +263,9 @@ void UP_UartSendData(uint8_t opCode, uint8_t *answer,uint8_t size)
 		}
 		else
 		{
+			/* Timeout occured?!? */
+			//TODO
 			xTaskNotify(UartTxDoneNotify,0, eNoAction );
-			/* There are no ADC in progress, so no tasks to notify. */
 			UartTxDoneNotify = NULL;
 		}
 	}
@@ -329,4 +330,27 @@ uint8_t UP_CalcCRC(uint8_t *data, uint8_t size)
         crc = crc8tab[crc ^ *data++];
     }
     return crc;
+}
+
+/**
+ *
+ * @param huart
+ */
+void HAL_UART_TxCpltCallback(UART_HandleTypeDef *huart)
+{
+	BaseType_t xHigherPriorityTaskWoken = pdFALSE;
+
+	if(UartTxDoneNotify!=NULL)
+	{
+		/* Notify the task that the transfer is complete. */
+		vTaskNotifyGiveFromISR( UartTxDoneNotify, &xHigherPriorityTaskWoken );
+		/* There are no ADC in progress, so no tasks to notify. */
+		//UartTxDoneNotify = NULL;
+	}
+	else
+	{
+
+	}
+
+	portYIELD_FROM_ISR( xHigherPriorityTaskWoken );
 }

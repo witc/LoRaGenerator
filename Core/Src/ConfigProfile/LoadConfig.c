@@ -81,7 +81,7 @@ uint8_t LC_GetSystemIfo(uint8_t *data)
  */
 void LC_SaveTXFreq(uint32_t freq)
 {
-#ifdef USE_INTERNAL_EEPROM
+#if (USE_INTERNAL_EEPROM==1)
 	EepromStart(true);
 	HAL_FLASHEx_DATAEEPROM_Program(FLASH_TYPEPROGRAMDATA_WORD,EE_RADIO_TX_FREQ,freq);
 	EepromStop();
@@ -94,7 +94,7 @@ void LC_SaveTXFreq(uint32_t freq)
  */
 void LC_SaveRXFreq(uint32_t freq)
 {
-#ifdef USE_INTERNAL_EEPROM
+#if (USE_INTERNAL_EEPROM==1)
 	EepromStart(true);
 	HAL_FLASHEx_DATAEEPROM_Program(FLASH_TYPEPROGRAMDATA_WORD,EE_RADIO_RX_FREQ,freq);
 	EepromStop();
@@ -106,7 +106,7 @@ void LC_SaveRXFreq(uint32_t freq)
  */
 void LC_SaveTXSF(uint8_t sf)
 {
-#ifdef USE_INTERNAL_EEPROM
+#if (USE_INTERNAL_EEPROM==1)
 	EepromStart(true);
 	HAL_FLASHEx_DATAEEPROM_Program(FLASH_TYPEPROGRAMDATA_BYTE,EE_RADIO_TX_SF,sf);
 	EepromStop();
@@ -119,7 +119,7 @@ void LC_SaveTXSF(uint8_t sf)
  */
 void LC_SaveRXSF(uint8_t sf)
 {
-#ifdef USE_INTERNAL_EEPROM
+#if (USE_INTERNAL_EEPROM==1)
 	EepromStart(true);
 	HAL_FLASHEx_DATAEEPROM_Program(FLASH_TYPEPROGRAMDATA_BYTE,EE_RADIO_RX_SF,sf);
 	EepromStop();
@@ -132,7 +132,7 @@ void LC_SaveRXSF(uint8_t sf)
  */
 void LC_SaveTXBW(uint8_t bw)
 {
-#ifdef USE_INTERNAL_EEPROM
+#if (USE_INTERNAL_EEPROM==1)
 	EepromStart(true);
 	HAL_FLASHEx_DATAEEPROM_Program(FLASH_TYPEPROGRAMDATA_BYTE,EE_RADIO_TX_BW,(uint8_t)(bw));
 	EepromStop();
@@ -145,7 +145,7 @@ void LC_SaveTXBW(uint8_t bw)
  */
 void LC_SaveRXBW(uint8_t bw)
 {
-#ifdef USE_INTERNAL_EEPROM
+#if (USE_INTERNAL_EEPROM==1)
 	EepromStart(true);
 	HAL_FLASHEx_DATAEEPROM_Program(FLASH_TYPEPROGRAMDATA_BYTE,EE_RADIO_RX_BW,(uint8_t)(bw));
 	EepromStop();
@@ -158,7 +158,7 @@ void LC_SaveRXBW(uint8_t bw)
  */
 void LC_SaveTXIQ(uint8_t iq)
 {
-#ifdef USE_INTERNAL_EEPROM
+#if (USE_INTERNAL_EEPROM==1)
 	EepromStart(true);
 	HAL_FLASHEx_DATAEEPROM_Program(FLASH_TYPEPROGRAMDATA_BYTE,EE_RADIO_TX_INVERT,(uint8_t)(iq));
 	EepromStop();
@@ -171,7 +171,7 @@ void LC_SaveTXIQ(uint8_t iq)
  */
 void LC_SaveRXIQ(uint8_t iq)
 {
-#ifdef USE_INTERNAL_EEPROM
+#if (USE_INTERNAL_EEPROM==1)
 	EepromStart(true);
 	HAL_FLASHEx_DATAEEPROM_Program(FLASH_TYPEPROGRAMDATA_BYTE,EE_RADIO_RX_INVERT,(uint8_t)(iq));
 	EepromStop();
@@ -184,7 +184,7 @@ void LC_SaveRXIQ(uint8_t iq)
  */
 void LC_SaveTXCR(uint8_t cr)
 {
-#ifdef USE_INTERNAL_EEPROM
+#if (USE_INTERNAL_EEPROM==1)
 	EepromStart(true);
 	HAL_FLASHEx_DATAEEPROM_Program(FLASH_TYPEPROGRAMDATA_BYTE,EE_RADIO_TX_CR,(uint8_t)(cr));
 	EepromStop();
@@ -197,7 +197,7 @@ void LC_SaveTXCR(uint8_t cr)
  */
 void LC_SaveRXCR(uint8_t cr)
 {
-#ifdef USE_INTERNAL_EEPROM
+#if (USE_INTERNAL_EEPROM==1)
 	EepromStart(true);
 	HAL_FLASHEx_DATAEEPROM_Program(FLASH_TYPEPROGRAMDATA_BYTE,EE_RADIO_RX_CR,(uint8_t)(cr));
 	EepromStop();
@@ -210,7 +210,7 @@ void LC_SaveRXCR(uint8_t cr)
  */
 void LC_SaveTXHeader(uint8_t header)
 {
-#ifdef USE_INTERNAL_EEPROM
+#if (USE_INTERNAL_EEPROM==1)
 	EepromStart(true);
 	HAL_FLASHEx_DATAEEPROM_Program(FLASH_TYPEPROGRAMDATA_BYTE,EE_RADIO_TX_HEADER,(uint8_t)(header));
 	EepromStop();
@@ -223,7 +223,7 @@ void LC_SaveTXHeader(uint8_t header)
  */
 void LC_SaveRXHeader(uint8_t header)
 {
-#ifdef USE_INTERNAL_EEPROM
+#if (USE_INTERNAL_EEPROM==1)
 	EepromStart(true);
 	HAL_FLASHEx_DATAEEPROM_Program(FLASH_TYPEPROGRAMDATA_BYTE,EE_RADIO_RX_HEADER,(uint8_t)(header));
 	EepromStop();
@@ -236,7 +236,7 @@ void LC_SaveRXHeader(uint8_t header)
  */
 void LC_SaveTXCRC(uint8_t crc)
 {
-#ifdef USE_INTERNAL_EEPROM
+#if (USE_INTERNAL_EEPROM==1)
 	EepromStart(true);
 	HAL_FLASHEx_DATAEEPROM_Program(FLASH_TYPEPROGRAMDATA_BYTE,EE_RADIO_TX_CRC,(uint8_t)(crc));
 	EepromStop();
@@ -249,7 +249,7 @@ void LC_SaveTXCRC(uint8_t crc)
  */
 void LC_SaveRXCRC(uint8_t crc)
 {
-#ifdef USE_INTERNAL_EEPROM
+#if (USE_INTERNAL_EEPROM==1)
 	EepromStart(true);
 	HAL_FLASHEx_DATAEEPROM_Program(FLASH_TYPEPROGRAMDATA_BYTE,EE_RADIO_RX_CRC,(uint8_t)(crc));
 	EepromStop();
@@ -263,7 +263,7 @@ void LC_SaveRXCRC(uint8_t crc)
  */
 void LC_SaveTXPower(uint8_t power)
 {
-#ifdef USE_INTERNAL_EEPROM
+#if (USE_INTERNAL_EEPROM==1)
 	EepromStart(true);
 	HAL_FLASHEx_DATAEEPROM_Program(FLASH_TYPEPROGRAMDATA_BYTE,EE_RADIO_TX_POWER,(uint8_t)(power));
 	EepromStop();

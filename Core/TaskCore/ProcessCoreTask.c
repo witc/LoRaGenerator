@@ -46,13 +46,15 @@ void PCT_SendRfPacket()
 /*
  *
  */
-void PCT_SetRadioRX()
+void PCT_SetRadioRX(bool single, uint8_t payloadSize)
 {
 	DATA_QUEUE SendData;
 	SendData.pointer = NULL;
 
 	SendData.Address=ADDR_TO_RF_CMD;
 	SendData.Data=RF_CMD_START_RX;
+	SendData.temp = single;
+	SendData.temp2 = payloadSize;
 	xQueueSend(QueueRFHandle,&SendData,portMAX_DELAY);
 }
 
@@ -64,9 +66,13 @@ void PCT_SetRadioRX()
  */
 uint8_t PCT_DecodeUartRxMsg(uint8_t *rxBuffer)
 {
-	if(rxBuffer[0] < 0x81)
+	if(rxBuffer[0] <= UART_MSG_SET_REPEATING_PERIOD)
 	{
 		PCT_ProcessSetCommands(rxBuffer);
+	}
+	else if(rxBuffer[0] <= UART_MSG_GET_REPEATING_PERIOD)
+	{
+		PCT_SendMyParam(rxBuffer[0]-40);
 	}
 	else
 	{
@@ -135,14 +141,28 @@ void PCT_ProcessSetCommands(uint8_t *rxBuffer)
 				retTemp = RC_RadioSetRxCr((uint8_t)rxBuffer[2]);
 				break;
 
+			case UART_MSG_HEADER_MODE_TX:
+				retTemp = RC_RadioSetTXHeaderMode((uint8_t)rxBuffer[2]);
+				break;
+
+			case UART_MSG_HEADER_MODE_RX:
+				retTemp = RC_RadioSetRXHeaderMode((uint8_t)rxBuffer[2]);
+				break;
+
+			case UART_MSG_TX_CRC:
+				retTemp = RC_RadioSetTXCRC((uint8_t)rxBuffer[2]);
+				break;
+
+			case UART_MSG_RX_CRC:
+				retTemp = RC_RadioSetRXCRC((uint8_t)rxBuffer[2]);
+				break;
+
+
 			case UART_MSG_PREP_PACKET:
 				retTemp = RC_SavePacket(rxBuffer);
 				break;
 
-			case UART_MSG_START_RX:
-				//PCT_SendRfPacket();
-				osThreadYield();
-				break;
+
 
 			default:
 				break;
@@ -160,10 +180,9 @@ void PCT_ProcessSetCommands(uint8_t *rxBuffer)
 		if(actionFlags > ACTION_FLAG_SET)
 		{
 			/*odesilame info o prijatem parametru */
-			PCT_SendMyParam(rxBuffer);
+			PCT_SendMyParam(rxBuffer[0]);
 		}
 	}
-
 }
 
 
@@ -178,6 +197,11 @@ void PCT_ProcessSystemCommands(uint8_t *rxBuffer)
 
 	switch(cmd)
 	{
+		case UART_MSG_START_RX:
+			PCT_SetRadioRX(rxBuffer[1] /* single */, rxBuffer[2] /* payload Size*/);
+			osThreadYield();
+			break;
+
 		case UART_MSG_SET_STANDBY:
 			retTemp = RC_RadioSetStandby();
 			osThreadYield();
@@ -213,14 +237,11 @@ void PCT_ProcessSystemCommands(uint8_t *rxBuffer)
  *
  * @param rxBuffer
  */
-void PCT_SendMyParam(uint8_t *rxBuffer)
+void PCT_SendMyParam(eUartMsgSetCmds cmd)
 {
 	DATA_QUEUE SendData;
 	SendData.pointer = NULL;
 	uint32_t tempData;
-
-	eUartMsgSetCmds cmd = rxBuffer[0];
-	eActionFlags actionFlags = rxBuffer[1];
 
 	switch(cmd)
 	{
@@ -306,7 +327,6 @@ void PCT_SendMyParam(uint8_t *rxBuffer)
 			tempData =(uint32_t) RC_RadioGetRadioStatus();			//retTemp = RC_RadioSetTxFreq((rxBuffer[1]<<24)|(rxBuffer[2]<<16)|(rxBuffer[3]<<8)|(rxBuffer[4]));
 			//UP_UartSendData(UART_MSG_RX_CR,(uint8_t*)&tempData,1);
 			break;
-
 
 //		case UART_MSG_PREP_PACKET:
 //			tempData = RC_RadioGetTxFreq();			//retTemp = RC_RadioSetTxFreq((rxBuffer[1]<<24)|(rxBuffer[2]<<16)|(rxBuffer[3]<<8)|(rxBuffer[4]));

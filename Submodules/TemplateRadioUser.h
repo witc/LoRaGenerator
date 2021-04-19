@@ -59,7 +59,7 @@ uint8_t 	RU_IRQProcess				(tRfGlobalData* GlobalData);
 void 		RU_CommandProcess			(RfCommands cmd,tRfGlobalData* GlobalData, DATA_QUEUE *ReceiveData);
 void 		RU_RadioStandby				(void);
 void 		RU_RadioSleep				(void);
-void 		RU_LoRaConfigAndStartRX 	(uint32_t freq,RadioPar DR, bool Rx, uint32_t rxTimeout);
+void 		RU_LoRaConfigAndStartRX 	(uint32_t freq,RadioPar DR, bool Rx,uint8_t payloadSize, uint32_t rxTimeout);
 void 		RU_RFSetTXUp				(int8_t power, uint32_t freq, RadioPar DR);
 void 		RU_RFSetTXDown				(void);
 void 		RU_GetRfFrequency			(uint32_t *frequency);
