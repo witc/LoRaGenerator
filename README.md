@@ -1,8 +1,6 @@
 # LoRaGenerator
 Universal  LoRa packet generator with user settings.
 
-# Udelat i zvlast funkce only GET!!!!!?????
-
 ## Commands:
 ### Radio
 Every Radio packet sets radio to Standby mode!
@@ -43,6 +41,7 @@ Every Radio packet sets radio to Standby mode!
 
 **CRC8 implementation with polynom = x7+ x6+ x4+ x2+ x0 (0xD5)**
 CRC is the same for header and whole packet
+
 **Table of commands for radio**
 | **cmd**  | **opCode** 1B  |**action flags** 1B |**parameters** NB|  **retVal** 1B
 |---|---|--|--|--|
@@ -63,7 +62,29 @@ CRC is the same for header and whole packet
 | CRC RX  | 15  | yes |  Crc check true/false (1 B)| 1 - Succes /0 - failure|
 | preparePacket  | 16  |yes | data[0] - nasledna velikost,  data[N] (N B)| 1 - Succes /0 - failure|
 | AutoRepeating  | 17  | yes |  true/false (4 B) (max = never repeat)| 1 - Succes /0 - failure|
-| startRx  | 21  |  yes|  singleRX true/false (1 B) | 1 - Succes /0 - failure|
+
+
+**Table of short (GET) commands for radio**
+| **cmd**  | **opCode** 1B  |**action flags** 1B |**parameters** NB|  **retVal** 1B
+|---|---|--|--|--|
+| GetTxFreq  | 1+40  | yes | Frequency (4B)| 1 - Succes /0 - failure|
+| GetRxFreq  | 2+40  | yes |  Frequency (4B)| 1 - Succes /0 - failure|
+| GetTxPower  | 3+40  | yes | Power (1B)| 1 - Succes /0 - failure|
+| GetTxSF  | 4+40  | yes | Spreading factor SF5-SF12 (1B)| 1 - Succes /0 - failure|
+| GetRxSF  | 5+40  |yes  | Spreading factor SF5-SF12 (1B)| 1 - Succes /0 - failure|
+| GetTxBW  | 6+40  |yes |  BandWidth 7.81 - 500 kHz (4B)| 1 - Succes /0 - failure|
+| GetRxBW  | 7+40  |yes  |  BandWidth 7.81 - 500 kHz (4B)| 1 - Succes /0 - failure|
+| GetTxIQ  | 8+40  |yes |  IQ invert true/false (1B)| 1 - Succes /0 - failure|
+| GetRxIQ  | 9+40  |yes |  IQ invert true/false (1B)| 1 - Succes /0 - failure|
+| GetTxCR  | 10+40  |yes |  CodeRate 4/5-4/8 (1B)| 1 - Succes /0 - failure|
+| GetRxCR  | 11+40  |yes  |  CodeRate 4/5-4/8 (1B)| 1 - Succes /0 - failure|
+| GetHeaderMode  TX | 12+40  | yes|   Enable header mode true/false (1 B)| 1 - Succes /0 - failure|
+| GetHeaderMode  RX | 13+40  | yes|   Enable header mode true/false (1 B)| 1 - Succes /0 - failure|
+| GetTxCRC  | 14+40  | yes |  Crc check true/false (1 B)| 1 - Succes /0 - failure|
+| GetRxCRC  | 15+40  | yes |  Crc check true/false (1 B)| 1 - Succes /0 - failure|
+| GetpreparePacket  | 16+40  |yes | data[0] - nasledna velikost,  data[N] (N B)| 1 - Succes /0 - failure|
+| GetAutoRepeating  | 17+40  | yes |  true/false (4 B) (max = never repeat)| 1 - Succes /0 - failure|
+
 
 **Action Flags**
 1 = only set the value
@@ -79,6 +100,7 @@ CRC is the same for header and whole packet
 | startTXCW  | 251  | no || 1 - Succes /0 - failure|
 | setStandby  | 250  | no || 1 - Succes /0 - failure|
 | readRxPacket  | 249  | no || 1 - Succes /0 - failure|
+| startRx  | 248  |  no|  singleRX true/false (1 B) | 1 - Succes /0 - failure|
 
 
 **system info**
