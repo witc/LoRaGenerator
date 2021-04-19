@@ -92,15 +92,15 @@ CRC is the same for header and whole packet
 3 = only get value from LoRaGenerator
 
 **Table of commands with no actions flag**
-| **cmd**  | **opCode** 1B  |**action flags** 1B |**parameters** NB|  **retVal** 1B
+| **cmd**  | **opCode** 1B |**parameters** NB|  **retVal** 1B
 |---|---|--|--|--|
-| WhoAreYou  | 254  | no | type for generator 2 B +systemInfo (NB)| 1 - Succes /0 - failure|
-| WhatIsYourName  | 253  | no | String with name| 1 - Succes /0 - failure|
-| sendPacket  | 252 | no |  empty | 1 - Succes /0 - failure|
-| startTXCW  | 251  | no || 1 - Succes /0 - failure|
-| setStandby  | 250  | no || 1 - Succes /0 - failure|
-| readRxPacket  | 249  | no || 1 - Succes /0 - failure|
-| startRx  | 248  |  no|  singleRX true/false (1 B) | 1 - Succes /0 - failure|
+| WhoAreYou  | 254 | type for generator 2 B +systemInfo (NB)| 1 - Succes /0 - failure|
+| WhatIsYourName  | 253 | String with name| 1 - Succes /0 - failure|
+| sendPacket  | 252  | empty | 1 - Succes /0 - failure|
+| startTXCW  | 251  | | 1 - Succes /0 - failure|
+| setStandby  | 250   || 1 - Succes /0 - failure|
+| readRxPacket  | 249  | | 1 - Succes /0 - failure|
+| startRx  | 248  | singleRX true/false (1 B) | 1 - Succes /0 - failure|
 
 
 **system info**
