@@ -93,7 +93,7 @@ CRC is the same for header and whole packet
 
 **Table of commands with no actions flag**
 | **cmd**  | **opCode** 1B |**parameters** NB|  **retVal** 1B
-|---|---|--|--|--|
+|---|---|--|--|
 | WhoAreYou  | 254 | type for generator 2 B +systemInfo (NB)| 1 - Succes /0 - failure|
 | WhatIsYourName  | 253 | String with name| 1 - Succes /0 - failure|
 | sendPacket  | 252  | empty | 1 - Succes /0 - failure|
