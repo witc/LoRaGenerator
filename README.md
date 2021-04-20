@@ -99,7 +99,7 @@ CRC is the same for header and whole packet
 | sendPacket  | 252  | empty | 1 - Succes /0 - failure|
 | startTXCW  | 251  | | 1 - Succes /0 - failure|
 | setStandby  | 250   || 1 - Succes /0 - failure|
-| readRxPacket  | 249  | | 1 - Succes /0 - failure|
+| readRxPacket  | 249  | payoad size (1B), rssi (1B), payload (NB) | 1 - Succes /0 - failure|
 | startRx  | 248  | singleRX true/false (1 B), payloadSize 1 - 250 (1B) (does not care in Header Mode) | 1 - Succes /0 - failure|
 
 
