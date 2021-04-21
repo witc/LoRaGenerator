@@ -44,7 +44,7 @@ Universal  LoRa packet generator with user settings.
 **Payload**
 | 1B  | 1B   | NB|
 |---|---|--|
-| Command| Action flags (only for way from PC to Generator)  |data|   
+| Command (opCode)| Action flags (only for way from PC to Generator)  |data|   
 
 **Action Flags**
 -1 = only set the value
