@@ -44,12 +44,8 @@ Universal  LoRa packet generator with user settings.
 **Payload**
 | 1B  | 1B   | NB|
 |---|---|--|
-| Command (opCode)| Action flags (only for way from PC to Generator)  |data|   
+| Command (opCode) |data|   
 
-**Action Flags**
-- 1 = only set the value
-- 2 = set and get answer back
-- 3 = only get value from LoRaGenerator
 
 **CRC8 implementation with polynom = x7+ x6+ x4+ x2+ x0 (0xD5)**
 CRC is the same for header and whole packet
@@ -74,6 +70,10 @@ CRC is the same for header and whole packet
 | CRC RX  | 15  | yes |  Crc check true/false (1 B)| 1 - Succes /0 - failure|
 | preparePacket  | 16  |yes | data[0] - nasledna velikost,  data[N] (N B)| 1 - Succes /0 - failure|
 
+**Action Flags**
+- 1 = only set the value
+- 2 = set and get answer back
+- 3 = only get value from LoRaGenerator
 
 **Table of short (GET) commands for radio**
 | **cmd meaning**  | **opCode** 1B |**parameters** NB|  **retVal** 1B
