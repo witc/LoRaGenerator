@@ -7,6 +7,7 @@
 
 #include "main.h"
 #include "TaskRF.h"
+#include "ProcessCoreTask.h"
 #include "radio_general.h"
 #include "TemplateRadioUser.h"
 #include "LoRa_Codec.h"
@@ -49,6 +50,9 @@ __attribute__(( weak ))void RU_CommandProcess(RfCommands cmd,tRfGlobalData* Glob
 __attribute__(( weak )) void RU_LoRaConfigAndStartRX (uint32_t freq,RadioPar DR, bool Rx,uint8_t payloadSize, uint32_t rxTimeout)
 {
 	bool rxContin=false;
+
+	PRT_SetAtten1To(0);
+	PRT_SetAtten2To(0);
 
 	if(rxTimeout==portMAX_DELAY)	rxContin=true;
 

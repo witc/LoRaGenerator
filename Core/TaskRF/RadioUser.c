@@ -115,9 +115,11 @@ void RU_CommandProcess(RfCommands cmd,tRfGlobalData* GlobalData, DATA_QUEUE *Rec
 		case RF_CMD_TX_CW:
 			//RadioCleanAndStandby();
 			RadioStandby();
-			//PRT_SetAtten1To(0);
-			//PRT_SetAtten2To(0);
-			RadioSetTxContinuousWave(RadioParam.TxConfig.freq,RadioParam.Power,0);
+			PRT_PowerDistribution((int8_t)(RadioParam.Power),&tempPower,&atten1,&atten2);
+			PRT_SetAtten1To(atten1);
+			PRT_SetAtten2To(atten2);
+
+			RadioSetTxContinuousWave(RadioParam.TxConfig.freq,tempPower,0);
 			//osDelay(1);
 			break;
 

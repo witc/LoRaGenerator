@@ -163,7 +163,7 @@ static void RF_StateOFF(DATA_QUEUE ReceiveData,tRfGlobalData* GlobalData, tState
 
 			RadioParam.Power = RC_RadioGetTxPower();
 			if(RadioParam.Power>22)	RadioParam.Power = 22;
-			else if (RadioParam.Power<(-80)) RadioParam.Power = -80;
+			else if (RadioParam.Power<(-72)) RadioParam.Power = -72;
 
 			PRT_SetAtten1To(0);
 			PRT_SetAtten2To(0);
@@ -176,7 +176,7 @@ static void RF_StateOFF(DATA_QUEUE ReceiveData,tRfGlobalData* GlobalData, tState
 		{
 			RadioDeinit();
 			taskENTER_CRITICAL();
-			LL_EXTI_DisableIT_0_31(LL_EXTI_LINE_2);//interrupt from Semtech - only one IRQ
+			LL_EXTI_DisableIT_0_31(LL_EXTI_LINE_2); //interrupt from Semtech - only one IRQ
 			LL_EXTI_ClearFlag_0_31(LL_EXTI_LINE_2);
 			taskEXIT_CRITICAL();
 

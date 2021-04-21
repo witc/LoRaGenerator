@@ -286,6 +286,7 @@ static void CORE_StateON(DATA_QUEUE ReceiveData,tCoreGlobalData* GlobalData, tSt
 	uint8_t					doCheckAgain = 0;
 	static uint8_t			localRxPacketBuff[PACKET_MAX_SIZE];
 	static uint8_t			lastRxPacketSize;
+	static uint8_t			lastRssiPacket;
 
 	Gl_HeapFree=xPortGetMinimumEverFreeHeapSize();
 
@@ -294,10 +295,13 @@ static void CORE_StateON(DATA_QUEUE ReceiveData,tCoreGlobalData* GlobalData, tSt
 	{
 		case ADDR_TO_CORE_RF_DATA_RECEIVED:
 
-			memcpy(&localRxPacketBuff[1],ReceiveData.pointer,ReceiveData.temp);
+			memcpy(&localRxPacketBuff[2],ReceiveData.pointer,ReceiveData.temp);
+			lastRssiPacket = (uint8_t) ReceiveData.RFU;
 			lastRxPacketSize=ReceiveData.temp;
-			localRxPacketBuff[0] =lastRxPacketSize;
-			UP_UartSendData(UART_MSG_GET_RX_PACKET,localRxPacketBuff,lastRxPacketSize+1);
+			localRxPacketBuff[0] = lastRxPacketSize;
+			localRxPacketBuff[1] = lastRssiPacket;
+
+			UP_UartSendData(UART_MSG_GET_RX_PACKET,localRxPacketBuff,lastRxPacketSize+2);
 
 			break;
 

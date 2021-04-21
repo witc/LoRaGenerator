@@ -8,8 +8,8 @@
 #ifndef INC_TARGET_H_
 #define INC_TARGET_H_
 
-#define BOARD_USB_RF_LINK				1
-#define BOARD_LORA_GENERATOR			0
+#define BOARD_USB_RF_LINK				0
+#define BOARD_LORA_GENERATOR			1
 
 
 #define greenLEDPort				GPIOB
@@ -19,12 +19,21 @@
 
 //Features
 
-
+#if (BOARD_USB_RF_LINK==1)
 #define TARGET_BOARD_NAME			"LoRaUSBStick "
 #define TARGET_BOARD_MCU			"STM32L071CB "
 #define TARGET_BOARD_RADIO			"SX1262 "
 #define TARGET_MAX_POWER			("22 ")
 #define TARGET_MIN_POWER			("-9 ")
+
+#elif (BOARD_LORA_GENERATOR == 1)
+#define TARGET_BOARD_NAME			"LoRaGenerator "
+#define TARGET_BOARD_MCU			"STM32L071CB "
+#define TARGET_BOARD_RADIO			"SX1262 "
+#define TARGET_MAX_POWER			("15 ")
+#define TARGET_MIN_POWER			("-72 ")
+
+#endif
 
 
 #endif /* INC_TARGET_H_ */

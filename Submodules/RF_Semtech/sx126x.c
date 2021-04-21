@@ -479,19 +479,50 @@ void SX126xSetTxParams( int8_t power, RadioRampTimes_t rampTime  )
     	else if(power > 20)
     	{
     		paDutyCycle = 0x3;
-			hpMax = 0x05;
+			hpMax = 0x06;
     	}
+    	else if(power > 18)
+		{
+			paDutyCycle = 0x3;
+			hpMax = 0x04;
+		}
     	else if(power > 17)
 		{
 			paDutyCycle = 0x2;
-			hpMax = 0x03;
+			hpMax = 0x04;
 		}
-//    	else if(power >= (-9) )
+    	else if(power > 14)
+		{
+			paDutyCycle = 0x4;
+			hpMax = 0x02;
+		}
+    	else if(power > 12)
+		{
+			paDutyCycle = 0x1;
+			hpMax = 0x02;
+		}
+    	else if(power > 11)
+		{
+			paDutyCycle = 0x0;
+			hpMax = 0x02;
+		}
+    	else if(power > 10)
+		{
+			paDutyCycle = 0x4;
+			hpMax = 0x01;
+		}
+    	else if(power > 9)
+		{
+			paDutyCycle = 0x3;
+			hpMax = 0x01;
+		}
+
+//    	else if(power >= (14) )
 //    	{
 //    		paDutyCycle = 0x2;
 //			hpMax = 0x02;
 //    	}
-//    	 	/* prechod na low PA */
+    	/* prechod na low PA */
     	else
     	{
     		paDutyCycle = 0x2;

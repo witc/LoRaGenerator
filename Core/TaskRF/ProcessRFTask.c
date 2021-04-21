@@ -75,7 +75,7 @@ void PRT_PowerDistribution(double wantedPowerdBm, int8_t *outPowerdB, double *at
 
 	wantedPowerdBm+=6;	//6 = utlum na cestach
 
-	tempPower = SP_ConstrainDouble(wantedPowerdBm,-80,22);
+	tempPower = SP_ConstrainDouble(wantedPowerdBm,-72,22);
 
 	tempResiduePower = fmod(tempPower,1);
 	//tempResiduePower = (double)(tempPower%1);
