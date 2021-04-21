@@ -47,9 +47,9 @@ Universal  LoRa packet generator with user settings.
 | Command (opCode)| Action flags (only for way from PC to Generator)  |data|   
 
 **Action Flags**
--1 = only set the value
--2 = set and get answer back
--3 = only get value from LoRaGenerator
+- 1 = only set the value
+- 2 = set and get answer back
+- 3 = only get value from LoRaGenerator
 
 **CRC8 implementation with polynom = x7+ x6+ x4+ x2+ x0 (0xD5)**
 CRC is the same for header and whole packet
