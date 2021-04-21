@@ -47,14 +47,14 @@ Universal  LoRa packet generator with user settings.
 | Command| Action flags (only for way from PC to Generator)  |data|   
 
 **Action Flags**
-1 = only set the value
-2 = set and get answer back
-3 = only get value from LoRaGenerator
+-1 = only set the value
+-2 = set and get answer back
+-3 = only get value from LoRaGenerator
 
 **CRC8 implementation with polynom = x7+ x6+ x4+ x2+ x0 (0xD5)**
 CRC is the same for header and whole packet
 
-**Table of commands for radio**
+**Table of radio commands **
 | **cmd**  | **opCode** 1B  |**action flags** 1B |**parameters** NB|  **retVal** 1B
 |---|---|--|--|--|
 | TxFreq  | 1  | yes | Frequency (4B)| 1 - Succes /0 - failure|
@@ -76,7 +76,7 @@ CRC is the same for header and whole packet
 
 
 **Table of short (GET) commands for radio**
-| **cmd**  | **opCode** 1B  |**action flags** 1B |**parameters** NB|  **retVal** 1B
+| **cmd**  | **opCode** 1B |**parameters** NB|  **retVal** 1B
 |---|---|--|--|--|
 | GetTxFreq  | 1+40  |  Frequency (4B)| 1 - Succes /0 - failure|
 | GetRxFreq  | 2+40  |   Frequency (4B)| 1 - Succes /0 - failure|
@@ -96,7 +96,7 @@ CRC is the same for header and whole packet
 | GetpreparePacket  | 16+40  | data[0] - nasledna velikost,  data[N] (N B)| 1 - Succes /0 - failure|
 
 
-**Table of commands with no actions flag**
+**Table of actions commands **
 | **cmd**  | **opCode** 1B |**parameters** NB|  **retVal** 1B
 |---|---|--|--|
 | WhoAreYou  | 254 | type for generator 2 B +systemInfo (NB)| 1 - Succes /0 - failure|
