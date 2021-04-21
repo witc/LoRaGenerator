@@ -99,8 +99,8 @@ CRC is the same for header and whole packet
 **Table of actions commands **
 | **cmd meaning**  | **opCode** 1B |**parameters** NB|  **retVal** 1B
 |---|---|--|--|
-| WhoAreYou  | 254 | type for generator 2 B +systemInfo (NB)| 1 - Succes /0 - failure|
-| WhatIsYourName  | 253 | String with name| 1 - Succes /0 - failure|
+| WhoAreYou  | 254 | "MCU " "Radiochip " "minTxPower " "maxTxPower " "mcuID ", (NB)| 1 - Succes /0 - failure|
+| WhatIsYourName  | 253 | "Target name "| 1 - Succes /0 - failure|
 | sendPacket  | 252  | empty | 1 - Succes /0 - failure|
 | startTXCW  | 251  | | 1 - Succes /0 - failure|
 | setStandby  | 250   || 1 - Succes /0 - failure|
@@ -109,7 +109,7 @@ CRC is the same for header and whole packet
 
 
 **system info**
--MCU, radio chip, max output power, min output power,
+
 
 **Odpovedi od LoRaGeneratoru maji stejny tvar paketu az na chybejici Byte action flags**
 
