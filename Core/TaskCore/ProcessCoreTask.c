@@ -66,11 +66,11 @@ void PCT_SetRadioRX(bool single, uint8_t payloadSize)
  */
 uint8_t PCT_DecodeUartRxMsg(uint8_t *rxBuffer)
 {
-	if(rxBuffer[0] <= UART_MSG_SET_REPEATING_PERIOD)
+	if(rxBuffer[0] <= UART_MSG_PREP_PACKET)
 	{
 		PCT_ProcessSetCommands(rxBuffer);
 	}
-	else if(rxBuffer[0] <= UART_MSG_GET_REPEATING_PERIOD)
+	else if(rxBuffer[0] <= UART_MSG_GET_PREP_PACKET)
 	{
 		PCT_SendMyParam(rxBuffer[0]-40);
 	}
