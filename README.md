@@ -75,7 +75,9 @@ CRC is the same for header and whole packet
 - 2 = set and get answer back
 - 3 = only get value from LoRaGenerator
 
+
 **Table of short (GET) commands for radio**
+
 | **cmd meaning**  | **opCode** 1B |**parameters** NB|  **retVal** 1B
 |---|---|--|--|
 | GetTxFreq  | 1+40  |  Frequency (4B)| 1 - Succes /0 - failure|
