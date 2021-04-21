@@ -55,7 +55,7 @@ Universal  LoRa packet generator with user settings.
 CRC is the same for header and whole packet
 
 **Table of radio commands **
-| **cmd**  | **opCode** 1B  |**action flags** 1B |**parameters** NB|  **retVal** 1B
+| **cmd meaning**  | **opCode** 1B  |**action flags** 1B |**parameters** NB|  **retVal** 1B
 |---|---|--|--|--|
 | TxFreq  | 1  | yes | Frequency (4B)| 1 - Succes /0 - failure|
 | RxFreq  | 2  | yes |  Frequency (4B)| 1 - Succes /0 - failure|
@@ -76,7 +76,7 @@ CRC is the same for header and whole packet
 
 
 **Table of short (GET) commands for radio**
-| **cmd**  | **opCode** 1B |**parameters** NB|  **retVal** 1B
+| **cmd meaning**  | **opCode** 1B |**parameters** NB|  **retVal** 1B
 |---|---|--|--|--|
 | GetTxFreq  | 1+40  |  Frequency (4B)| 1 - Succes /0 - failure|
 | GetRxFreq  | 2+40  |   Frequency (4B)| 1 - Succes /0 - failure|
@@ -97,8 +97,8 @@ CRC is the same for header and whole packet
 
 
 **Table of actions commands **
-| **cmd**  | **opCode** 1B |**parameters** NB|  **retVal** 1B
-|---|---|--|--|
+| **cmd meaning**  | **opCode** 1B |**parameters** NB|  **retVal** 1B
+|---|---|--|
 | WhoAreYou  | 254 | type for generator 2 B +systemInfo (NB)| 1 - Succes /0 - failure|
 | WhatIsYourName  | 253 | String with name| 1 - Succes /0 - failure|
 | sendPacket  | 252  | empty | 1 - Succes /0 - failure|
