@@ -77,7 +77,7 @@ CRC is the same for header and whole packet
 
 **Table of short (GET) commands for radio**
 | **cmd meaning**  | **opCode** 1B |**parameters** NB|  **retVal** 1B
-|---|---|--|--|--|
+|---|---|--|--|
 | GetTxFreq  | 1+40  |  Frequency (4B)| 1 - Succes /0 - failure|
 | GetRxFreq  | 2+40  |   Frequency (4B)| 1 - Succes /0 - failure|
 | GetTxPower  | 3+40   | Power (1B)| 1 - Succes /0 - failure|
@@ -98,7 +98,7 @@ CRC is the same for header and whole packet
 
 **Table of actions commands **
 | **cmd meaning**  | **opCode** 1B |**parameters** NB|  **retVal** 1B
-|---|---|--|
+|---|---|--|--|
 | WhoAreYou  | 254 | type for generator 2 B +systemInfo (NB)| 1 - Succes /0 - failure|
 | WhatIsYourName  | 253 | String with name| 1 - Succes /0 - failure|
 | sendPacket  | 252  | empty | 1 - Succes /0 - failure|
