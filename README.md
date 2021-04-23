@@ -42,8 +42,8 @@ Universal  LoRa packet generator with user settings.
 | size of payload  |RFU| crc Header  
 
 **Payload**
-| 1B  | 1B   | NB|
-|---|---|--|
+| 1B  |  NB|
+|---|---|
 | Command (opCode) |data|   
 
 
