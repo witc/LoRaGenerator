@@ -50,7 +50,7 @@ Universal  LoRa packet generator with user settings.
 **CRC8 implementation with polynom = x7+ x6+ x4+ x2+ x0 (0xD5)**
 CRC is the same for header and whole packet
 
-**Table of radio commands **
+**Table of radio commands**
 | **cmd meaning**  | **opCode** 1B  |**action flags** 1B |**parameters** NB|  **retVal** 1B
 |---|---|--|--|--|
 | TxFreq  | 1  | yes | Frequency (4B)| 1 - Succes /0 - failure|
@@ -98,7 +98,7 @@ CRC is the same for header and whole packet
 | GetpreparePacket  | 16+40  | data[0] - nasledna velikost,  data[N] (N B)| 1 - Succes /0 - failure|
 
 
-**Table of actions commands **
+**Table of actions commands**
 | **cmd meaning**  | **opCode** 1B |**parameters** NB|  **retVal** 1B
 |---|---|--|--|
 | WhoAreYou  | 254 | "MCU " "Radiochip " "minTxPower " "maxTxPower " "mcuID ", (NB)| 1 - Succes /0 - failure|
