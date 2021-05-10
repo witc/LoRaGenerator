@@ -31,6 +31,7 @@ typedef struct
 	RadioState_t		RF_State;
 	bool				rxSingle;
 	uint8_t				payloadSize;
+	bool				activeRepeater;
 
 }__packed tRfGlobalData;
 

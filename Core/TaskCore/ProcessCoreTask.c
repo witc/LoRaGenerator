@@ -43,6 +43,7 @@ void PCT_SendRfPacket()
 }
 
 
+
 /*
  *
  */
@@ -56,6 +57,8 @@ void PCT_SetRadioRX(bool single, uint8_t payloadSize)
 	SendData.temp = single;
 	SendData.temp2 = payloadSize;
 	xQueueSend(QueueRFHandle,&SendData,portMAX_DELAY);
+
+	RC_RadioSetRXPayloadSize(payloadSize);
 }
 
 
@@ -162,8 +165,6 @@ void PCT_ProcessSetCommands(uint8_t *rxBuffer)
 				retTemp = RC_SavePacket(rxBuffer);
 				break;
 
-
-
 			default:
 				break;
 		}
@@ -230,6 +231,9 @@ void PCT_ProcessSystemCommands(uint8_t *rxBuffer)
 		default:
 			break;
 	}
+
+
+	RC_RadioSetState(cmd);
 
 }
 

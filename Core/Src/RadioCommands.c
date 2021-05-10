@@ -34,6 +34,36 @@ tRadioParam 	RadioParam;
 tPacketParam	PacketParam;
 
 extern osMessageQId QueueRFHandle;
+
+
+/**
+ *
+ * @param state
+ * @return
+ */
+bool RC_RadioSetState(uint8_t state)
+{
+	LC_SaveRadioState(state);
+	return true;
+}
+
+/**
+ *
+ * @return
+ */
+uint8_t RC_RadioGetRadioState(void)
+{
+	uint8_t ret;
+#if (USE_INTERNAL_EEPROM==1)
+	EepromStart(false);
+	memcpy(&ret,(uint8_t*)EE_RADIO_STATE,1);
+	EepromStop();
+#endif
+
+	return  ret;
+}
+
+
 /**
  *
  */
@@ -789,6 +819,35 @@ uint8_t RC_GetSizeOfSavedPacket(void)
 #if (USE_INTERNAL_EEPROM==1)
 	EepromStart(false);
 	memcpy(&temp,(uint8_t *)EE_RF_PACKET_SIZE,1);
+	EepromStop();
+#endif
+
+	return temp;
+}
+
+/**
+ *
+ * @return
+ */
+bool RC_RadioSetRXPayloadSize(uint8_t payloadSize)
+{
+
+	LC_SaveRxPayloadSize(payloadSize);
+	return true;
+}
+
+
+/**
+ *
+ * @param payloadSize
+ * @return
+ */
+uint8_t RC_RadioGetRXPayloadSize()
+{
+	uint8_t temp;
+#if (USE_INTERNAL_EEPROM==1)
+	EepromStart(false);
+	memcpy(&temp,(uint8_t *)EE_RADIO_RX_SIZE,1);
 	EepromStop();
 #endif
 

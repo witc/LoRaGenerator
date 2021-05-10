@@ -55,6 +55,8 @@ typedef struct
 extern tRadioParam RadioParam;
 extern tPacketParam	PacketParam;
 
+bool RC_RadioSetState(RadioState_t state);
+uint8_t RC_RadioGetRadioState(void);
 bool RC_RadioSetTxFreq(uint32_t freq);
 uint32_t RC_RadioGetTxFreq(void);
 bool RC_RadioSetRxFreq(uint32_t freq);
@@ -91,6 +93,7 @@ bool RC_RadioSetStandby();
 bool RC__RadioSetTxCW();
 bool RC_SavePacket(uint8_t *data);
 uint8_t RC_GetSizeOfSavedPacket(void);
-
+bool RC_RadioSetRXPayloadSize(uint8_t payloadSize);
+uint8_t RC_RadioGetRXPayloadSize();
 
 #endif /* SRC_RADIOCOMMANDS_H_ */

@@ -169,6 +169,7 @@ static void RF_StateOFF(DATA_QUEUE ReceiveData,tRfGlobalData* GlobalData, tState
 			PRT_SetAtten2To(0);
 
 			RadioCleanAndStandby();
+
 			//RU_LoRaConfigAndStartRX(RC_RadioGetRxFreq(),RadioParam.RxConfig,true,portMAX_DELAY);
 
 		}

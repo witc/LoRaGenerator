@@ -112,6 +112,10 @@ void RU_CommandProcess(RfCommands cmd,tRfGlobalData* GlobalData, DATA_QUEUE *Rec
 			RU_LoRaConfigAndStartRX(RadioParam.RxConfig.freq,RadioParam.RxConfig,true,GlobalData->payloadSize,portMAX_DELAY);
 			break;
 
+		case RF_CMD_ACTIVATE_RPTR:
+			GlobalData->activeRepeater = true;
+
+			break;
 		case RF_CMD_TX_CW:
 			//RadioCleanAndStandby();
 			RadioStandby();
@@ -146,7 +150,6 @@ void RU_CommandProcess(RfCommands cmd,tRfGlobalData* GlobalData, DATA_QUEUE *Rec
 
 			taskENTER_CRITICAL();
 			RadioSend((uint8_t *)EE_RF_DATA_PACKET,RC_GetSizeOfSavedPacket());
-		//	RadioSend((uin8_t*)"Pokus zda to bude vubec fungovat",RC_GetSizeOfSavedPacket());
 			taskEXIT_CRITICAL();
 
 			break;
@@ -206,6 +209,19 @@ uint8_t RU_IRQProcess(tRfGlobalData* GlobalData)
 					if(GlobalData->rxSingle == true)
 					{
 						RadioCleanAndStandby();
+						break;
+					}
+
+					//if(GlobalData->activeRepeater == true)
+					{
+						PRT_SetAtten1To(0);
+						PRT_SetAtten2To(0);
+						RU_RFSetTXUp(22,RadioParam.RxConfig.freq,RadioParam.RxConfig);
+
+						taskENTER_CRITICAL();
+						RadioSend(RxBuffer.DataArray,size);
+						taskEXIT_CRITICAL();
+
 						break;
 					}
                  }

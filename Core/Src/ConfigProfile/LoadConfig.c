@@ -76,6 +76,23 @@ uint8_t LC_GetSystemIfo(uint8_t *data)
 	return cnt;
 }
 
+/**
+ *
+ * @param rfState
+ */
+void LC_SaveRadioState(uint8_t rfState)
+{
+#if (USE_INTERNAL_EEPROM==1)
+	EepromStart(true);
+	HAL_FLASHEx_DATAEEPROM_Program(FLASH_TYPEPROGRAMDATA_BYTE,EE_RADIO_STATE,rfState);
+	EepromStop();
+#endif
+
+}
+
+
+
+
 /*
  *
  */
@@ -266,6 +283,19 @@ void LC_SaveTXPower(uint8_t power)
 #if (USE_INTERNAL_EEPROM==1)
 	EepromStart(true);
 	HAL_FLASHEx_DATAEEPROM_Program(FLASH_TYPEPROGRAMDATA_BYTE,EE_RADIO_TX_POWER,(uint8_t)(power));
+	EepromStop();
+#endif
+}
+
+/**
+ *
+ * @param rxSize
+ */
+void LC_SaveRxPayloadSize(uint8_t rxSize)
+{
+#if (USE_INTERNAL_EEPROM == 1)
+	EepromStart(true);
+	HAL_FLASHEx_DATAEEPROM_Program(FLASH_TYPEPROGRAMDATA_BYTE,EE_RADIO_RX_SIZE,(uint8_t)(rxSize));
 	EepromStop();
 #endif
 }

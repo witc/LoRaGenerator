@@ -114,6 +114,7 @@ typedef enum
 
 
 uint8_t			PCT_DecodeUartRxMsg(uint8_t *rxBuffer);
+void 			PCT_SetRadioRX(bool single, uint8_t payloadSize);
 void 			PCT_ProcessSetCommands(uint8_t *rxBuffer);
 void 			PCT_ProcessGetCommands(uint8_t *rxBuffer);
 void 			PCT_SendMyParam(eUartMsgSetCmds cmd);

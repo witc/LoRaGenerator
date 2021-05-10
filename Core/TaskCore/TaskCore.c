@@ -260,7 +260,22 @@ static void CORE_StateStartON(DATA_QUEUE ReceiveData,tCoreGlobalData* GlobalData
 		LL_TIM_EnableCounter(TIM6);
 
 		///* load config */
+		switch (RC_RadioGetRadioState())
+		{
+			case UART_MSG_START_RX:
+				PCT_SetRadioRX(false,RC_RadioGetRXPayloadSize());
+				break;
 
+			case UART_MSG_SET_TX_CW:
+				break;
+
+			case UART_MSG_SEND_PACKET:
+
+				break;
+
+			default:
+				break;
+		}
 
 	}
 }

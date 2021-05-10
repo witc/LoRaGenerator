@@ -46,7 +46,7 @@ void inline EepromStop(void)
 
 #define EE_RADIO_TX_POWER		DATA_EEPROM_BASE
 #define EE_RF_DATA_PACKET		(EE_RADIO_TX_POWER+sizeof(uint32_t))
-#define EE_RF_PACKET_SIZE		(EE_RF_DATA_PACKET+50*sizeof(uint32_t))	//uint8_t
+#define EE_RF_PACKET_SIZE		(EE_RF_DATA_PACKET+50*sizeof(uint32_t))	//uint8_t	for TX payload
 #define EE_RADIO_TX_FREQ		(EE_RF_PACKET_SIZE+sizeof(uint32_t))
 #define EE_RADIO_RX_FREQ		(EE_RADIO_TX_FREQ+sizeof(uint32_t))
 #define EE_RADIO_TX_SF			(EE_RADIO_RX_FREQ+sizeof(uint32_t))
@@ -61,6 +61,8 @@ void inline EepromStop(void)
 #define EE_RADIO_RX_HEADER		(EE_RADIO_TX_HEADER+sizeof(uint32_t))
 #define EE_RADIO_TX_CRC			(EE_RADIO_RX_HEADER+sizeof(uint32_t))
 #define EE_RADIO_RX_CRC			(EE_RADIO_TX_CRC+sizeof(uint32_t))
+#define EE_RADIO_STATE			(EE_RADIO_RX_CRC+sizeof(uint32_t))
+#define EE_RADIO_RX_SIZE		(EE_RADIO_STATE+sizeof(uint32_t))	// for RX payload
 
 
 #endif
@@ -82,6 +84,7 @@ typedef struct
 
 
 uint8_t LC_GetSystemIfo(uint8_t *data);
+void LC_SaveRadioState(uint8_t rfState);
 void LC_SaveTXFreq(uint32_t freq);
 void LC_SaveRXFreq(uint32_t freq);
 void LC_SaveTXSF(uint8_t sf);
