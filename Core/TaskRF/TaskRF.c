@@ -23,6 +23,7 @@ extern osTimerId TimerRepeateTXHandle;
 extern SPI_HandleTypeDef hspi2;
 
 
+
 tRadioParam 	RadioParam;
 /**
  *
@@ -153,14 +154,30 @@ static void RF_StateOFF(DATA_QUEUE ReceiveData,tRfGlobalData* GlobalData, tState
 
 			/* Init Variables. */
 
-			RadioParam.TxConfig.bw=RC_RadioGetTxBw();
+			uint32_t bw = RC_RadioGetTxBw();
+			for(uint8_t i=0; i< (DR_BW_SIZE); i++)
+			{
+				if(bw == RadioBW[i])
+				{
+					RadioParam.TxConfig.bw = i;
+					break;
+				}
+			}
+
 			RadioParam.TxConfig.iq=RC_RadioGetTxIq();
-			RadioParam.TxConfig.sf=RC_RadioGetTxSf();
+			uint8_t sf=RC_RadioGetTxSf();
+			for(uint8_t i=0; i< (DR_BW_SIZE); i++)
+			{
+				if(sf == RadioSF[i])
+				{
+					RadioParam.TxConfig.sf = i;
+					break;
+				}
+			}
 
-			RadioParam.RxConfig.bw=RC_RadioGetRxBw();
-			RadioParam.RxConfig.iq=RC_RadioGetRxIq();
-			RadioParam.RxConfig.sf=RC_RadioGetRxSf();
-
+			RadioParam.TxConfig.freq=RC_RadioGetTxFreq();
+			RadioParam.TxConfig.headerMode=RC_RadioGetTXHeaderMode();
+			RadioParam.TxConfig.crcCheck=RC_RadioGetTXCRC();
 			RadioParam.Power = RC_RadioGetTxPower();
 			if(RadioParam.Power>22)	RadioParam.Power = 22;
 			else if (RadioParam.Power<(-72)) RadioParam.Power = -72;
@@ -168,6 +185,30 @@ static void RF_StateOFF(DATA_QUEUE ReceiveData,tRfGlobalData* GlobalData, tState
 			PRT_SetAtten1To(0);
 			PRT_SetAtten2To(0);
 
+			bw = RC_RadioGetRxBw();
+			for(uint8_t i=0; i< (DR_BW_SIZE); i++)
+			{
+				if(bw == RadioBW[i])
+				{
+					RadioParam.RxConfig.bw = i;
+					break;
+				}
+			}
+
+			RadioParam.RxConfig.iq=RC_RadioGetRxIq();
+			sf=RC_RadioGetRxSf();
+			for(uint8_t i=0; i< (DR_BW_SIZE); i++)
+			{
+				if(sf == RadioSF[i])
+				{
+					RadioParam.RxConfig.sf = i;
+					break;
+				}
+			}
+
+			RadioParam.RxConfig.freq=RC_RadioGetRxFreq();
+			RadioParam.RxConfig.headerMode=RC_RadioGetRXHeaderMode();
+			RadioParam.RxConfig.crcCheck=RC_RadioGetRXCRC();
 			RadioCleanAndStandby();
 
 			//RU_LoRaConfigAndStartRX(RC_RadioGetRxFreq(),RadioParam.RxConfig,true,portMAX_DELAY);

@@ -14,6 +14,12 @@
 #define RADIO_CMD_SF_OFFSET		5
 #define RADIO_CMD_CR_OFFSET		45
 
+static const uint8_t		RadioSF[DR_SF_SIZE] = {5,6,7,8,9,10,11,12};
+static const uint32_t 		RadioBW[DR_BW_SIZE] = {7810,10420,15630,20830,31250,41670,62500,125000,250000,500000};
+static const uint8_t 		RadioIQ[DR_IQ_SIZE] = {0,1};
+static const uint8_t  		RadioCR[DR_CR_SIZE] = {45,46,47,48};
+static const uint8_t 		RadioHeader[DR_HEADER_SIZE] = {0,1};
+static const uint8_t 		RadioCrc[DR_CRC_SIZE] = {0,1};
 
 
 typedef struct

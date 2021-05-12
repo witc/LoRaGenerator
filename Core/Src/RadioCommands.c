@@ -23,12 +23,7 @@
 //													&PCT_RadioSetTxCW,
 //													};
 
-const uint8_t	RadioSF[DR_SF_SIZE] = {5,6,7,8,9,10,11,12};
-const  uint32_t 	RadioBW[DR_BW_SIZE] = {7810,10420,15630,20830,31250,41670,62500,125000,250000,500000};
-const  uint8_t 	RadioIQ[DR_IQ_SIZE] = {0,1};
-const  uint8_t  	RadioCR[DR_CR_SIZE] = {45,46,47,48};
-const  uint8_t 	RadioHeader[DR_HEADER_SIZE] = {0,1};
-const  uint8_t 	RadioCrc[DR_CRC_SIZE] = {0,1};
+
 
 tRadioParam 	RadioParam;
 tPacketParam	PacketParam;
