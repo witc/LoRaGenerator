@@ -108,6 +108,10 @@ CRC is the same for header and whole packet
 | setStandby  | 250   || 1 - Succes /0 - failure|
 | readRxPacket  | 249  | payoad size (1B), rssi (1B), payload (NB) | 1 - Succes /0 - failure|
 | startRx  | 248  | singleRX true/false (1 B), payloadSize 1 - 250 (1B) (value does not care in active Header Mode) | 1 - Succes /0 - failure|
+| ResetMcu  | 247   || |
+| EraseApp  | 246   || 1 - Eraseed /0 - failure|
+| WriteData  | 245 | Mem addr (4 B) + data (16 B)| 1 - ACK /0 - (NACK) failure|
+
 
 
 **system info**
