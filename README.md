@@ -44,7 +44,7 @@ Universal  LoRa packet generator with user settings.
 **Payload**
 | 1B  | 1B   | NB|
 |---|---|--|
-| Command (opCode) |data|   
+| Command (opCode) |actionFlags|   
 
 
 **CRC8 implementation with polynom = x7+ x6+ x4+ x2+ x0 (0xD5)**
