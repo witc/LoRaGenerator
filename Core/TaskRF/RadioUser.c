@@ -24,7 +24,7 @@ extern osTimerId TimerRepeateTXHandle;
 extern  SPI_HandleTypeDef			hspi1;
 
 tRadioUserConfig					RadioUserConfig;
-Radio_Configuration_Struct 			spiDevice;
+tRadioConfiguration 				spiDevice;
 
 
 /**
@@ -93,11 +93,11 @@ void RU_CommandProcess(RfCommands cmd,tRfGlobalData* GlobalData, DATA_QUEUE *Rec
 
 	switch (cmd)
 	{
-		case RF_CMD_INIT_OFF:
+		case RF_CMD_DEINIT:
 			RadioDeinit();
 			break;
 
-		case RF_CMD_INIT_ON:
+		case RF_CMD_INIT:
 			RadioInit();
 
 			break;
@@ -164,38 +164,25 @@ void RU_CommandProcess(RfCommands cmd,tRfGlobalData* GlobalData, DATA_QUEUE *Rec
  */
 uint8_t RU_IRQProcess(tRfGlobalData* GlobalData)
 {
-	DATA_QUEUE SendData;
-	SendData.pointer=NULL;
-	PacketStatus_t RadioPktStatus;
 	uint16_t irqRegs =0;
-	uint8_t size=0;
+	uint8_t packetSize=0;
+	tGeneralPacket RxBuffer;
 
-	GeneralPacketsUpOrDown_t RxBuffer;
-	GeneralPacketsUpOrDown_t *RxBufferToCore;
+	RadioState_t radioState = RadioStandby();
 
-	RadioStandby();
 	irqRegs = SX126xGetIrqStatus();
 	SX126xClearIrqStatus(IRQ_RADIO_ALL);
 
-	switch (GlobalData->RF_State)
+	switch (radioState)
 	{
 	    case RF_RX_RUNNING:
 
-            if (((irqRegs & IRQ_RX_DONE) == IRQ_RX_DONE)&& ((irqRegs & IRQ_CRC_ERROR) != IRQ_CRC_ERROR)) //Data recieved
+            if (((irqRegs & IRQ_RX_DONE) == IRQ_RX_DONE)&& ((irqRegs & IRQ_CRC_ERROR) != IRQ_CRC_ERROR)) //Data rxed
             {
-                if (SX126xGetPayload(RxBuffer.DataArray, &size, PACKET_MAX_SIZE)== 0)
+                if (SX126xGetPayload(RxBuffer.DataArray, &packetSize, radioPACKET_MAX_SIZE) == 0)
                 {
                     SX126xGetPacketStatus(&RadioPktStatus);	//RSSI, SNR, Freq Error,..
 
-                   	RxBufferToCore = pvPortMalloc(sizeof(GeneralPacketsUpOrDown_t));
-					if (RxBufferToCore == NULL)
-					{
-						osDelay(500);
-						RxBufferToCore = pvPortMalloc(sizeof(GeneralPacketsUpOrDown_t));
-						if (RxBufferToCore == NULL)  LogError(51334);
-					}
-					memset(RxBufferToCore, 0, sizeof(GeneralPacketsUpOrDown_t));
-					memcpy(RxBufferToCore,&RxBuffer,sizeof(GeneralPacketsUpOrDown_t));
 
 					SendData.Address = ADDR_TO_CORE_RF_DATA_RECEIVED;
 					SendData.RFU=RadioPktStatus.Params.LoRa.SignalRssiPkt;
@@ -240,6 +227,3 @@ uint8_t RU_IRQProcess(tRfGlobalData* GlobalData)
 	return 0;
 
 }
-
-
-

@@ -1,5 +1,5 @@
 /*
- * spi_general.c
+ * radio_general.c
  *
  *  Created on: 7. 10. 2019
  *      Author: jan.ropek
@@ -44,8 +44,8 @@ void RG_SX1262IrqEnable(void)
  */
 void RG_SX126xWaitOnBusy(void )
 {
-
     while(HAL_GPIO_ReadPin(spiDevice.pin_BUSY.port,spiDevice.pin_BUSY.pin) == 1 );
+    //TODO JR omezit timeoutem a vyhodit err callback?
 }
 
 /**
@@ -56,7 +56,6 @@ void RG_SX126xWakeup(void )
 {
 	uint8_t temp=RADIO_GET_STATUS;
 
-//	spiDevice.AtomicActionEnter();
 	HAL_GPIO_WritePin(spiDevice.pin_NSS.port,spiDevice.pin_NSS.pin,0);
 	osDelay(1);
     RG_SX1262WriteSpi(&temp,1);
@@ -64,8 +63,6 @@ void RG_SX126xWakeup(void )
     RG_SX1262WriteSpi(&temp,1);
 
     HAL_GPIO_WritePin(spiDevice.pin_NSS.port,spiDevice.pin_NSS.pin,1);
-
-//    spiDevice.AtomicActionExit();
 
     // Wait for chip to be ready.
     RG_SX126xWaitOnBusy();
@@ -79,14 +76,11 @@ void RG_SX126xWriteCommand( uint8_t command, uint8_t *buffer, uint16_t size )
 {
     SX126xCheckDeviceReady();
 
-//    spiDevice.AtomicActionEnter();
     HAL_GPIO_WritePin(spiDevice.pin_NSS.port,spiDevice.pin_NSS.pin,0);
-
     RG_SX1262WriteSpi((uint8_t*)&command,1);
     RG_SX1262WriteSpi(buffer,size);
 
     HAL_GPIO_WritePin(spiDevice.pin_NSS.port,spiDevice.pin_NSS.pin,1);
-//    spiDevice.AtomicActionExit();
 
     if( command != RADIO_SET_SLEEP )
     {
@@ -103,17 +97,13 @@ void RG_SX126xReadCommand( uint8_t command, uint8_t *buffer, uint16_t size  )
 	uint8_t temp;
     SX126xCheckDeviceReady();
 
-//    spiDevice.AtomicActionEnter();
     HAL_GPIO_WritePin(spiDevice.pin_NSS.port,spiDevice.pin_NSS.pin,0);
-
     RG_SX1262WriteSpi(&command,1);
-
     temp=0;
     RG_SX1262WriteSpi(&temp,1);
     RG_SX1262ReadSpi(buffer,size);
 
     HAL_GPIO_WritePin(spiDevice.pin_NSS.port,spiDevice.pin_NSS.pin,1);
-//    spiDevice.AtomicActionExit();
 
     RG_SX126xWaitOnBusy();
 }
@@ -128,7 +118,6 @@ void RG_SX126xWriteRegisters( uint16_t address, uint8_t *buffer, uint16_t size)
 
 	SX126xCheckDeviceReady();
 
-	//spiDevice.AtomicActionEnter();
 	HAL_GPIO_WritePin(spiDevice.pin_NSS.port,spiDevice.pin_NSS.pin,0);
 
 	RG_SX1262WriteSpi(&temp,1);
@@ -136,11 +125,9 @@ void RG_SX126xWriteRegisters( uint16_t address, uint8_t *buffer, uint16_t size)
 	RG_SX1262WriteSpi(&temp,1);
 	temp=( address & 0x00FF );
 	RG_SX1262WriteSpi(&temp,1);
-
 	RG_SX1262WriteSpi(buffer,size);
 
 	HAL_GPIO_WritePin(spiDevice.pin_NSS.port,spiDevice.pin_NSS.pin,1);
-	//spiDevice.AtomicActionExit();
 
 	RG_SX126xWaitOnBusy();
 
@@ -162,22 +149,17 @@ void RG_SX126xReadRegisters( uint16_t address, uint8_t *buffer, uint16_t size )
 	uint8_t temp=RADIO_READ_REGISTER;
     SX126xCheckDeviceReady();
 
-    //spiDevice.AtomicActionEnter();
-	HAL_GPIO_WritePin(spiDevice.pin_NSS.port,spiDevice.pin_NSS.pin,0);
+  	HAL_GPIO_WritePin(spiDevice.pin_NSS.port,spiDevice.pin_NSS.pin,0);
 
     RG_SX1262WriteSpi(&temp,1);
     temp=(( address & 0xFF00 )>>8);
     RG_SX1262WriteSpi(&temp,1);
     temp=( address & 0x00FF );
     RG_SX1262WriteSpi(&temp,1);
-
     temp=0;
     RG_SX1262WriteSpi(&temp,1);
-
     RG_SX1262ReadSpi(buffer,size);
-
 	HAL_GPIO_WritePin(spiDevice.pin_NSS.port,spiDevice.pin_NSS.pin,1);
-	//spiDevice.AtomicActionExit();
 
     RG_SX126xWaitOnBusy();
 }
@@ -202,15 +184,12 @@ void RG_SX126xWriteBuffer( uint8_t offset, uint8_t *buffer, uint8_t size )
 
 	SX126xCheckDeviceReady();
 
-	//spiDevice.AtomicActionEnter();
 	HAL_GPIO_WritePin(spiDevice.pin_NSS.port,spiDevice.pin_NSS.pin,0);
-
 	RG_SX1262WriteSpi(&temp,1);
 	RG_SX1262WriteSpi(&offset,1);
 	RG_SX1262WriteSpi(buffer,size);
 
 	HAL_GPIO_WritePin(spiDevice.pin_NSS.port,spiDevice.pin_NSS.pin,1);
-	//spiDevice.AtomicActionExit();
 
 	RG_SX126xWaitOnBusy();
 }
@@ -225,9 +204,7 @@ void RG_SX126xReadBuffer( uint8_t offset, uint8_t *buffer, uint8_t size )
 
 	SX126xCheckDeviceReady();
 
-	//spiDevice.AtomicActionEnter();
 	HAL_GPIO_WritePin(spiDevice.pin_NSS.port,spiDevice.pin_NSS.pin,0);
-
 	RG_SX1262WriteSpi(&temp,1);
 	RG_SX1262WriteSpi(&offset,1);
 	temp=0;
@@ -235,19 +212,26 @@ void RG_SX126xReadBuffer( uint8_t offset, uint8_t *buffer, uint8_t size )
 	RG_SX1262ReadSpi(buffer,size);
 
 	HAL_GPIO_WritePin(spiDevice.pin_NSS.port,spiDevice.pin_NSS.pin,1);
-	//spiDevice.AtomicActionExit();
 
 	RG_SX126xWaitOnBusy();
 
 }
 
-
+/**
+ *
+ * @param channel
+ * @return
+ */
 uint8_t RG_SX126xGetPaSelect( uint32_t channel)
 {
 	return SX1262;
 }
 
-void RG_RFSwitch(Enum_RF_switch state)
+/**
+ *
+ * @param state
+ */
+void RG_RFSwitch(eRF_switch state)
 {
 
 	switch (state)

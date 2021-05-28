@@ -148,7 +148,6 @@ void RadioDeinit( )
 {
 	RadioCleanAndStandby();
 	RadioSleep();
-
 }
 
 

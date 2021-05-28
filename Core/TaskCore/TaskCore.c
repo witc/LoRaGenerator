@@ -279,12 +279,12 @@ static void CORE_StateON(DATA_QUEUE ReceiveData,tCoreGlobalData* GlobalData, tSt
 {
 	DATA_QUEUE	SendData;
 	SendData.pointer=NULL;
-	static GeneralPacketsUpOrDown_t	localTxBuffer;
+	static tGeneralPacket	localTxBuffer;
 	static uint8_t			localTxPacketSize=0;
 	uint8_t					*TxBuffer;
 	uint8_t					*RxUartMsg = NULL;
 	uint8_t					doCheckAgain = 0;
-	static uint8_t			localRxPacketBuff[PACKET_MAX_SIZE];
+	static uint8_t			localRxPacketBuff[radioPACKET_MAX_SIZE];
 	static uint8_t			lastRxPacketSize;
 	static uint8_t			lastRssiPacket;
 

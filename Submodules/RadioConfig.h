@@ -9,23 +9,19 @@
 #define SX1262_RADIOCONFIG_H_
 
 /* Set definition according to your system*/
-#define I_AM_RF_END_DEVICE				1
-#define I_AM_RF_GATEWAY					0
-#define RF_USE_DMA						0
+#define radioEND_DEVICE							(1)
+#define radioGATEWAY							(2)
 
 
-#if (I_AM_RF_END_DEVICE==I_AM_RF_GATEWAY)
+#define radioDEV_TYPE							radioGATEWAY
+#define radioUSE_SPI_BY_DMA						0
+
+#define radioPACKET_MAX_SIZE					250
+
+#if ((radioDEV_TYPE != radioEND_DEVICE) && (radioDEV_TYPE != radioGATEWAY))
 	#error ("definuj typ systemu")
 #endif
 
 
-#if (I_AM_RF_END_DEVICE==1)
-	#define	I_AM_NODE_MONITOR				1
-	#define	I_AM_NODE_ENERGY				0
-#if (I_AM_NODE_MONITOR==I_AM_NODE_ENERGY)
-	#error("definuj typ koncoveho zarizeni")
-#endif
-
-#endif
 
 #endif /* SX1262_RADIOCONFIG_H_ */

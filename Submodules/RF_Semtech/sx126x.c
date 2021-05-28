@@ -68,7 +68,7 @@ void SX126xInit( void)
     RG_SX126xWakeup();
     SX126xSetStandby( STDBY_RC);
 
-#ifdef USE_TCXO
+#if (USE_TCXO == true)
     CalibrationParams_t calibParam;
 
     SX126xSetDio3AsTcxoCtrl( TCXO_CTRL_1_7V, RADIO_TCXO_SETUP_TIME << 6 ); // convert from ms to SX126x time base

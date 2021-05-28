@@ -13,7 +13,7 @@ void 	ARP_RfStandardTreatment	(DATA_QUEUE ReceiveData,tCoreGlobalData* GlobalDat
 void 	ARP_PairStart			(tCoreGlobalData *GlobalData);
 void 	ARP_RfTestFactoryRSSI	(DATA_QUEUE ReceiveData,tCoreGlobalData* GlobalData);
 void 	ARP_PairStop			(tCoreGlobalData *GlobalData,bool pairsucceeded);
-void 	ARP_SendMonitorInfo		(tCoreGlobalData *GlobalData,GeneralPacketsUpOrDown_t *pBuffer,uint8_t size, bool sendNow);
+void 	ARP_SendMonitorInfo		(tCoreGlobalData *GlobalData,tGeneralPacket *pBuffer,uint8_t size, bool sendNow);
 void 	ARP_USBSendHereIam		(tCoreGlobalData *GlobalData);
 void 	ARP_USBSendCoefSaved	(tCoreGlobalData *GlobalData);
 void 	ARP_USBSendPulsemV		(tCoreGlobalData *GlobalData, uint16_t pulsemV);
@@ -23,5 +23,5 @@ void 	ARP_SendDummyPacket		(void);
 void 	ARP_SetCorrespondingDr	(void);
 void 	ARP_SetRxCounter		(uint32_t counter);
 uint32_t ARP_ReadRxCounter		(void);
-uint8_t ARP_CreateMonitorInfo	(tCoreGlobalData *GlobalData,uint8_t kVoltage,uint8_t battVoltage, bool checkAlarm, GeneralPacketsUpOrDown_t  *TxPacket);
+uint8_t ARP_CreateMonitorInfo	(tCoreGlobalData *GlobalData,uint8_t kVoltage,uint8_t battVoltage, bool checkAlarm, tGeneralPacket  *TxPacket);
 #endif /* TASKCORE_AUXRFPROCESS_H_ */

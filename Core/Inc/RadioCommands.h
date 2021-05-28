@@ -16,44 +16,7 @@
 
 
 
-typedef struct
-{
-	ENUM_DR_SF	sf;
-	ENUM_DR_BW	bw;
-	ENUM_DR_IQ	iq;
-	uint32_t	freq;
-	ENUM_DR_CR	cr;
-	ENUM_DR_HEADER	headerMode;
-	ENUM_DR_CRC		crcCheck;
 
-}RadioPar;
-
-/**
- *
- */
-typedef struct
-{
-	RadioPar		RxConfig;
-	RadioPar		TxConfig;
-	int8_t				Power;
-
-
-}tRadioParam;
-
-/**
- *
- */
-typedef struct
-{
-	bool		autoRepeat;
-	uint32_t	repeatPeriod;
-	uint32_t	rxTimeout;
-
-}tPacketParam;
-
-
-extern tRadioParam RadioParam;
-extern tPacketParam	PacketParam;
 
 bool RC_RadioSetTxFreq(uint32_t freq);
 uint32_t RC_RadioGetTxFreq(void);

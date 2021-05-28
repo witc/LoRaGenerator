@@ -41,7 +41,7 @@ typedef struct
 {
 	struct AES_ctx PairingCtx;
 	struct AES_ctx PairingCtxDown;
-	GeneralPacketsUpOrDown_t	localTxBuffer;
+	tGeneralPacket	localTxBuffer;
 	uint8_t						sizeOfPacket;
 	RadioPar					nextDr;
 

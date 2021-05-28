@@ -17,17 +17,14 @@
  *
  */
 #include "RadioConfig.h"
-#include "radio_general.h"
-#include "main.h"
-#include "LoRa_Codec.h"
-#include "radio.h"
-#include "sx126x.h"
+//#include "radio_general.h"
+//#include "main.h"
 
 
 /**
  *brief: Calculate  crc - 16/MODBUS - init 0xffff
  */
-uint16_t crc16(uint16_t crcValue, uint8_t newByte)
+uint16_t LC_RadioCRC(uint16_t crcValue, uint8_t newByte)
 {
 	int i;
 
