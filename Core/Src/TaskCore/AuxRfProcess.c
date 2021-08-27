@@ -28,7 +28,7 @@ void ARP_RfStandardTreatment(DATA_QUEUE ReceiveData,tCoreGlobalData* GlobalData)
 {
 	DATA_QUEUE SendData;
 	SendData.pointer=NULL;
-	GeneralPacketsUpOrDown_t 	*RxPacket;
+	tGeneralPacket 	*RxPacket;
 
 	RxPacket=ReceiveData.pointer;
 
@@ -43,7 +43,7 @@ void ARP_RfStandardTreatment(DATA_QUEUE ReceiveData,tCoreGlobalData* GlobalData)
  * @param sendAlarm
  * @return
  */
-uint8_t ARP_CreateMonitorInfo(tCoreGlobalData *GlobalData,uint8_t kVoltage,uint8_t battVoltage, bool checkAlarm, GeneralPacketsUpOrDown_t  *TxPacket)
+uint8_t ARP_CreateMonitorInfo(tCoreGlobalData *GlobalData,uint8_t kVoltage,uint8_t battVoltage, bool checkAlarm, tGeneralPacket  *TxPacket)
 {
 	//GeneralPacketsUpOrDown_t 	TxPacket;
 //	uint8_t size=0;
@@ -107,7 +107,7 @@ uint8_t ARP_CreateMonitorInfo(tCoreGlobalData *GlobalData,uint8_t kVoltage,uint8
  * @param kVoltage
  * @param battVoltage
  */
-void ARP_SendMonitorInfo(tCoreGlobalData *GlobalData,GeneralPacketsUpOrDown_t *pBuffer,uint8_t size, bool sendNow)
+void ARP_SendMonitorInfo(tCoreGlobalData *GlobalData,tGeneralPacket *pBuffer,uint8_t size, bool sendNow)
 {
 //	DATA_QUEUE	SendData;
 //	SendData.pointer=NULL;

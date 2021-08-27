@@ -68,10 +68,6 @@ eUARTBufferMasg UP_FindAnyMsg(uint8_t **rxPacket,uint8_t *doCheckAgain)
 
 	static uint16_t	sizeToCheck;
 
-	//memset(workingBuffer,0,UART_CIRCLE_MAX_BUFFER_SIZE);
-	/* read DMA status */
-	//dmaOverRun = LL_DMA_IsActiveFlag_TC3(DMA1);
-	//if (dmaOverRun) 	LL_DMA_ClearFlag_TC3(DMA1);
 	tempCntDma = LL_DMA_GetDataLength(DMA1,LL_DMA_CHANNEL_3);
 
 	dmaOverRun=0;
@@ -96,12 +92,8 @@ eUARTBufferMasg UP_FindAnyMsg(uint8_t **rxPacket,uint8_t *doCheckAgain)
 
 	remainsToZero = tempCntDma;
 
-	/* pokud ted nic neprislo*/
-	//if(actualArrivalSize == 0)	return eUART_MSG_EMPTY;	//neprislo nic
-
 	/* data budeme hledat od startToFind az po sumArrivalSize */
 /********************************************************************************/
-
 	if(sumArrivalSize<MINIMAL_SIZE_USART_RX_MSG)
 	{
 		*doCheckAgain = 0;
@@ -353,4 +345,56 @@ void HAL_UART_TxCpltCallback(UART_HandleTypeDef *huart)
 	}
 
 	portYIELD_FROM_ISR( xHigherPriorityTaskWoken );
+}
+
+
+/**
+ *
+ */
+void PCT_InitUartDMA(void)
+{
+	/*Uart  Init DMA */
+	LL_DMA_DisableChannel(DMA1,LL_DMA_CHANNEL_3);
+	LL_DMA_ConfigTransfer(DMA1, LL_DMA_CHANNEL_3,
+							LL_DMA_DIRECTION_PERIPH_TO_MEMORY |
+							LL_DMA_PRIORITY_LOW              |
+							LL_DMA_MODE_CIRCULAR              |
+							LL_DMA_PERIPH_NOINCREMENT         |
+							LL_DMA_MEMORY_INCREMENT           |
+							LL_DMA_PDATAALIGN_BYTE            |
+							LL_DMA_MDATAALIGN_BYTE);
+
+	LL_DMA_ConfigAddresses(DMA1, LL_DMA_CHANNEL_3,
+							 LL_USART_DMA_GetRegAddr(USART1, LL_USART_DMA_REG_DATA_RECEIVE),
+							 (uint32_t)GlUartRxBugger,LL_DMA_GetDataTransferDirection(DMA1, LL_DMA_CHANNEL_3));
+
+	LL_DMA_SetDataLength(DMA1, LL_DMA_CHANNEL_3, UART_CIRCLE_MAX_BUFFER_SIZE);
+	LL_DMA_SetPeriphRequest(DMA1, LL_DMA_CHANNEL_3, LL_DMA_REQUEST_3);
+
+	/* Enable DMA RX Interrupt */
+	LL_USART_EnableDMAReq_RX(USART1);
+	/* Enable DMA Channel Rx */
+	LL_DMA_EnableChannel(DMA1, LL_DMA_CHANNEL_3);
+
+//	osTimerStart(TimerUartRxCheckHandle,TIME_TO_CHECK_UART_RX_BUFFER);
+	HAL_NVIC_DisableIRQ(TIM6_IRQn);
+	HAL_NVIC_ClearPendingIRQ(TIM6_IRQn);
+	HAL_NVIC_EnableIRQ(TIM6_IRQn);
+
+	LL_TIM_SetAutoReload(TIM6,__LL_TIM_CALC_ARR(32000000,LL_TIM_GetPrescaler(TIM6),UART_CHECK_FREQUENCY));   //(1/MINIMAL_SIZE_USART_RX_MSG)
+	LL_TIM_EnableIT_UPDATE(TIM6);
+	LL_TIM_SetCounter(TIM6,0);
+	LL_TIM_EnableCounter(TIM6);
+
+}
+
+
+/**
+ *
+ */
+void PCT_ShceduleUartCheck(void)
+{
+	LL_TIM_EnableIT_UPDATE(TIM6);
+	LL_TIM_SetCounter(TIM6,0);
+	LL_TIM_EnableCounter(TIM6);
 }

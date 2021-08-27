@@ -44,7 +44,6 @@ void RG_SX1262IrqEnable(void)
  */
 void RG_SX126xWaitOnBusy(void )
 {
-
     while(HAL_GPIO_ReadPin(spiDevice.pin_BUSY.port,spiDevice.pin_BUSY.pin) == 1 );
 }
 
@@ -247,7 +246,7 @@ uint8_t RG_SX126xGetPaSelect( uint32_t channel)
 	return SX1262;
 }
 
-void RG_RFSwitch(Enum_RF_switch state)
+void RG_RFSwitch(eRF_switch state)
 {
 
 	switch (state)

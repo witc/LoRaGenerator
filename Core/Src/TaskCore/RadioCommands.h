@@ -8,7 +8,7 @@
 #ifndef SRC_RADIOCOMMANDS_H_
 #define SRC_RADIOCOMMANDS_H_
 
-#define MAX_ALLOWEDPACKET_SIZE			200
+#define RF_MAX_ALLOWEDPACKET_SIZE			(200)
 
 
 #define RADIO_CMD_SF_OFFSET		5
@@ -18,13 +18,13 @@
 
 typedef struct
 {
-	ENUM_DR_SF	sf;
-	ENUM_DR_BW	bw;
-	ENUM_DR_IQ	iq;
+	eDR_SF		sf;
+	eDR_BW		bw;
+	eDR_IQ		iq;
 	uint32_t	freq;
-	ENUM_DR_CR	cr;
-	ENUM_DR_HEADER	headerMode;
-	ENUM_DR_CRC		crcCheck;
+	eDR_CR		cr;
+	eDR_HEADER	headerMode;
+	eDR_CRC		crcCheck;
 
 }RadioPar;
 
@@ -35,7 +35,7 @@ typedef struct
 {
 	RadioPar		RxConfig;
 	RadioPar		TxConfig;
-	int8_t				Power;
+	int8_t			Power;
 
 
 }tRadioParam;

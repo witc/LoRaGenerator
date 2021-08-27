@@ -224,18 +224,7 @@ typedef struct
 
 }DATA_QUEUE;
 
-/**
- *
- */
-typedef enum
-{
-	STATE_CORE_INIT,
-	STATE_CORE_OFF,
-	STATE_CORE_START_ON,
-	STATE_CORE_ON,
-	STATE_CORE_START_OFF,
-	STATE_CORE_ERROR			// pokud zabral watchdog
-}eStateCoreSystem;
+
 
 
 /**
@@ -249,39 +238,6 @@ typedef enum
 
 }eWatchDog;
 
-/**
- *
- */
-typedef enum
-{
-	STATE_RF_INIT,     //!< STATE_INIT
-	STATE_RF_OFF,      //!< STATE_OFF
-	STATE_RF_START_ON, //!< STATE_START_ON
-	STATE_RF_ON,       //!< STATE_ON
-	STATE_RF_START_OFF,//!< STATE_START_OFF
-	STATE_RF_ERROR			// pokud zabral watchdog
-
-}eStateRfSystem;
-
-/**
- * Core task
- */
-typedef struct
-{
-	eStateCoreSystem	ActualState;
-	eStateCoreSystem	PreviousState;
-
-} tStateCoreAutomat;
-
-/**
- * RF task
- */
-typedef struct
-{
-	eStateRfSystem	ActualState;
-	eStateRfSystem	PreviousState;
-
-} tStateRfAutomat;
 
 
 /**

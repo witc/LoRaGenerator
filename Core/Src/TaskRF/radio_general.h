@@ -10,17 +10,7 @@
 
 #include "main.h"
 #include "LoRa_Codec.h"
-#include "AES_SW.h"
 
-
-
-typedef union
-{
-	uint64_t   AES_Key_Long[2];
-	uint32_t   AES_Key_Word[4];
-	uint8_t	   AES_Key_Byte[16];
-
-}Aes_t;
 
 /*
  *
@@ -30,7 +20,7 @@ typedef struct
 	uint32_t 		pin;
 	GPIO_TypeDef	*port;
 
-}PinStruct;
+}tPinStruct;
 
 /*
  *
@@ -40,15 +30,15 @@ typedef enum
 	SWITCH_RX=0,
 	SWITCH_TX=!SWITCH_RX
 
-}Enum_RF_switch;
+}eRF_switch;
 
 typedef struct {
 
-	PinStruct 			pin_NSS;				/* SPI Select pin */
-	PinStruct			pin_BUSY;				/* BUSY pin */
-	PinStruct			pin_RESET;				/* Reset pin */
-	PinStruct			pin_DIO1;				/* DIO1 - IRQ 1 pin */
-	PinStruct			pin_RF_SWITCH;			/* RF switch */
+	tPinStruct 			pin_NSS;				/* SPI Select pin */
+	tPinStruct			pin_BUSY;				/* BUSY pin */
+	tPinStruct			pin_RESET;				/* Reset pin */
+	tPinStruct			pin_DIO1;				/* DIO1 - IRQ 1 pin */
+	tPinStruct			pin_RF_SWITCH;			/* RF switch */
 	SPI_HandleTypeDef	*target;				/* SPI target */
 #if (RF_USE_DMA==1)
 	osSemaphoreId		RFBinarySPISemaphore;
@@ -73,20 +63,9 @@ typedef struct {
 }Radio_Configuration_Struct;
 
 
-/*
- *
- */
-typedef struct
-{
-	Union64 	MyTxEui;
-	Aes_t		MyAesKey;
-
-}tRadioUserConfig;
-
-
 
 extern Radio_Configuration_Struct 	spiDevice;
-extern tRadioUserConfig				RadioUserConfig;
+
 
 void	RG_SX126xWaitOnBusy			(void);
 void	RG_SX126xWakeup				(void);
@@ -103,6 +82,6 @@ void 	RG_SX126xReset				(void);
 void 	RG_SX1262WriteSpi			(uint8_t *data,uint8_t size);
 void 	RG_SX1262ReadSpi			(uint8_t *buffer,uint8_t size);
 void 	RG_SX1262WriteSpi			(uint8_t *data,uint8_t size);
-void 	RG_RFSwitch					(Enum_RF_switch state);
+void 	RG_RFSwitch					(eRF_switch state);
 
 #endif /* SRC_SUBMODULES_SPI_GENERAL_H_ */

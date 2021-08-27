@@ -497,11 +497,11 @@ void RadioTx( uint32_t timeout  )
     SX126xSetTx( timeout << 6  );
 }
 
-void RadioSetTxContinuousWave( uint32_t freq, int8_t power, uint16_t time  )
+void RadioSetTxContinuousWave(tRadioParam 	radioParam)
 {
 	LedRadioTXActive(true);
-    SX126xSetRfFrequency( freq  );
-    SX126xSetRfTxPower( power  );
+    SX126xSetRfFrequency( radioParam.TxConfig.freq );
+    SX126xSetRfTxPower( radioParam.Power);
     SX126xSetTxContinuousWave();
     //SX126xSetTxInfinitePreamble();
 }

@@ -33,7 +33,7 @@ tRadioParam 	RadioParam;
  * @return
  */
 static void RF_StateINIT(DATA_QUEUE ReceiveData,
-		tRfGlobalData* GlobalData, tStateRfAutomat* StateAutomat,
+		tRfGlobalData* rfGlData, tStateRfAutomat* StateAutomat,
 		void** PointerMalloc);
 /**
  *
@@ -44,7 +44,7 @@ static void RF_StateINIT(DATA_QUEUE ReceiveData,
  * @return
  */
 static void RF_StateOFF(DATA_QUEUE ReceiveData,
-		tRfGlobalData* GlobalData, tStateRfAutomat* StateAutomat,
+		tRfGlobalData* rfGlData, tStateRfAutomat* StateAutomat,
 		void** PointerMalloc);
 /**
  *
@@ -55,7 +55,7 @@ static void RF_StateOFF(DATA_QUEUE ReceiveData,
  * @return
  */
 static void RF_StateStartON(DATA_QUEUE ReceiveData,
-		tRfGlobalData* GlobalData, tStateRfAutomat* StateAutomat,
+		tRfGlobalData* rfGlData, tStateRfAutomat* StateAutomat,
 		void** PointerMalloc);
 /**
  *
@@ -66,7 +66,7 @@ static void RF_StateStartON(DATA_QUEUE ReceiveData,
  * @return
  */
 static void RF_StateON(DATA_QUEUE ReceiveData,
-		tRfGlobalData* GlobalData, tStateRfAutomat* StateAutomat,
+		tRfGlobalData* rfGlData, tStateRfAutomat* StateAutomat,
 		void** PointerMalloc);
 
 /**
@@ -78,7 +78,7 @@ static void RF_StateON(DATA_QUEUE ReceiveData,
  * @return
  */
 static void RF_StateStartOFF(DATA_QUEUE ReceiveData,
-		tRfGlobalData* GlobalData, tStateRfAutomat* StateAutomat,
+		tRfGlobalData* rfGlData, tStateRfAutomat* StateAutomat,
 		void** PointerMalloc);
 
 /**
@@ -101,7 +101,7 @@ static void (*StateRF[])(DATA_QUEUE, tRfGlobalData*,	tStateRfAutomat*, void**) =
  * @param PointerMalloc
  * @return
  */
-static void RF_StateINIT(DATA_QUEUE ReceiveData,tRfGlobalData* GlobalData, tStateRfAutomat* StateAutomat,void** PointerMalloc)
+static void RF_StateINIT(DATA_QUEUE ReceiveData,tRfGlobalData* rfGlData, tStateRfAutomat* StateAutomat,void** PointerMalloc)
 {
 	/*Reset and + test Rf chip communication */
 	if(RU_SX1262Assign() != true)
@@ -127,7 +127,7 @@ static void RF_StateINIT(DATA_QUEUE ReceiveData,tRfGlobalData* GlobalData, tStat
  * @param PointerMalloc
  * @return
  */
-static void RF_StateOFF(DATA_QUEUE ReceiveData,tRfGlobalData* GlobalData, tStateRfAutomat* StateAutomat,void** PointerMalloc)
+static void RF_StateOFF(DATA_QUEUE ReceiveData,tRfGlobalData* rfGlData, tStateRfAutomat* StateAutomat,void** PointerMalloc)
 {
 	DATA_QUEUE SendData;
 	SendData.pointer=NULL;
@@ -200,7 +200,7 @@ static void RF_StateOFF(DATA_QUEUE ReceiveData,tRfGlobalData* GlobalData, tState
  * @param PointerMalloc
  * @return
  */
-static void RF_StateStartON(DATA_QUEUE ReceiveData,tRfGlobalData* GlobalData, tStateRfAutomat* StateAutomat,void** PointerMalloc)
+static void RF_StateStartON(DATA_QUEUE ReceiveData,tRfGlobalData* rfGlData, tStateRfAutomat* StateAutomat,void** PointerMalloc)
 {
 
 }
@@ -213,14 +213,13 @@ static void RF_StateStartON(DATA_QUEUE ReceiveData,tRfGlobalData* GlobalData, tS
  * @param PointerMalloc
  * @return
  */
-static void RF_StateON(DATA_QUEUE ReceiveData,tRfGlobalData* GlobalData, tStateRfAutomat* StateAutomat,void** PointerMalloc)
+static void RF_StateON(DATA_QUEUE ReceiveData,tRfGlobalData* rfGlData, tStateRfAutomat* StateAutomat,void** PointerMalloc)
 {
 	DATA_QUEUE SendData;
 	SendData.pointer = NULL;
-	p_tStaticStructure_RF LocalStaticStructure;
 
 	/* Get RF state*/
-	GlobalData->RF_State = RadioGetStatus();
+	rfGlData->RF_State = RadioGetStatus();
 
 	switch (ReceiveData.Address)
 	{
@@ -254,16 +253,16 @@ static void RF_StateON(DATA_QUEUE ReceiveData,tRfGlobalData* GlobalData, tStateR
 				StateAutomat->PreviousState=StateAutomat->ActualState;
 				StateAutomat->ActualState=STATE_RF_ON;
 
-				if (GlobalData->RF_State != RF_IDLE)	RadioCleanAndStandby();
+				if (rfGlData->RF_State != RF_IDLE)	RadioCleanAndStandby();
 			}
 			break;
 
 		case ADDR_TO_RF_CMD:
-			RU_CommandProcess((RfCommands)ReceiveData.Data,GlobalData, &ReceiveData);
+			RU_CommandProcess((RfCommands)ReceiveData.Data,rfGlData, &ReceiveData);
 			break;
 
 		case ADDR_TO_RF_SX1262_IRQ:
-			RU_IRQProcess(GlobalData);
+			RU_IRQProcess(rfGlData);
 			break;
 
 
@@ -280,7 +279,7 @@ static void RF_StateON(DATA_QUEUE ReceiveData,tRfGlobalData* GlobalData, tStateR
  * @param PointerMalloc
  * @return
  */
-static void RF_StateStartOFF(DATA_QUEUE ReceiveData,tRfGlobalData* GlobalData, tStateRfAutomat* StateAutomat,void** PointerMalloc)
+static void RF_StateStartOFF(DATA_QUEUE ReceiveData,tRfGlobalData* rfGlData, tStateRfAutomat* StateAutomat,void** PointerMalloc)
 {
 
 }

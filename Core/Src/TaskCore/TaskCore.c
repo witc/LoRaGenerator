@@ -43,7 +43,7 @@ uint8_t GlUartRxBugger[UART_CIRCLE_MAX_BUFFER_SIZE];
  * @return
  */
 static void CORE_StateINIT(DATA_QUEUE ReceiveData,
-		tCoreGlobalData* GlobalData, tStateCoreAutomat* StateAutomat);
+		tCoreGlobalData* coreGlData, tStateCoreAutomat* StateAutomat);
 /**
  *
  * @param ReceiveData
@@ -53,7 +53,7 @@ static void CORE_StateINIT(DATA_QUEUE ReceiveData,
  * @return
  */
 static void CORE_StateOFF(DATA_QUEUE ReceiveData,
-		tCoreGlobalData* GlobalData, tStateCoreAutomat* StateAutomat);
+		tCoreGlobalData* coreGlData, tStateCoreAutomat* StateAutomat);
 /**
  *
  * @param ReceiveData
@@ -63,7 +63,7 @@ static void CORE_StateOFF(DATA_QUEUE ReceiveData,
  * @return
  */
 static void CORE_StateStartON(DATA_QUEUE ReceiveData,
-		tCoreGlobalData* GlobalData, tStateCoreAutomat* StateAutomat);
+		tCoreGlobalData* coreGlData, tStateCoreAutomat* StateAutomat);
 
 
 /**
@@ -75,7 +75,7 @@ static void CORE_StateStartON(DATA_QUEUE ReceiveData,
  * @return
  */
 static void CORE_StateON(DATA_QUEUE ReceiveData,
-		tCoreGlobalData* GlobalData, tStateCoreAutomat* StateAutomat);
+		tCoreGlobalData* coreGlData, tStateCoreAutomat* StateAutomat);
 
 /**
  *
@@ -86,7 +86,7 @@ static void CORE_StateON(DATA_QUEUE ReceiveData,
  * @return
  */
 static void CORE_StateStartOFF(DATA_QUEUE ReceiveData,
-		tCoreGlobalData* GlobalData, tStateCoreAutomat* StateAutomat);
+		tCoreGlobalData* coreGlData, tStateCoreAutomat* StateAutomat);
 
 /**
  *
@@ -162,7 +162,7 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
  * @param PointerMalloc
  * @return
  */
-static void CORE_StateINIT(DATA_QUEUE ReceiveData,tCoreGlobalData* GlobalData, tStateCoreAutomat* StateAutomat)
+static void CORE_StateINIT(DATA_QUEUE ReceiveData,tCoreGlobalData* coreGlData, tStateCoreAutomat* StateAutomat)
 {
 	DATA_QUEUE	SendData;
 	SendData.pointer = NULL;
@@ -170,6 +170,7 @@ static void CORE_StateINIT(DATA_QUEUE ReceiveData,tCoreGlobalData* GlobalData, t
 
 	StateAutomat->PreviousState=StateAutomat->ActualState;
 	StateAutomat->ActualState=STATE_CORE_START_ON;
+
 	SendData.Data = DATA_TO_RF_START_ON;
 	SendData.Address = ADDR_TO_RF_CHANGE_STATE;
 	xQueueSend(QueueRFHandle,&SendData,portMAX_DELAY);
@@ -184,12 +185,9 @@ static void CORE_StateINIT(DATA_QUEUE ReceiveData,tCoreGlobalData* GlobalData, t
  * @param PointerMalloc
  * @return
  */
-static void CORE_StateOFF(DATA_QUEUE ReceiveData,tCoreGlobalData* GlobalData, tStateCoreAutomat* StateAutomat)
+static void CORE_StateOFF(DATA_QUEUE ReceiveData,tCoreGlobalData* coreGlData, tStateCoreAutomat* StateAutomat)
 {
-	if(ReceiveData.Address == ADDR_TO_CORE_KEYBOARD_EVENT)
-	{
 
-	}
 }
 
 
@@ -201,10 +199,8 @@ static void CORE_StateOFF(DATA_QUEUE ReceiveData,tCoreGlobalData* GlobalData, tS
  * @param PointerMalloc
  * @return
  */
-static void CORE_StateStartON(DATA_QUEUE ReceiveData,tCoreGlobalData* GlobalData, tStateCoreAutomat* StateAutomat)
+static void CORE_StateStartON(DATA_QUEUE ReceiveData,tCoreGlobalData* coreGlData, tStateCoreAutomat* StateAutomat)
 {
-	DATA_QUEUE	SendData;
-	SendData.pointer=NULL;
 
 	static bool tempRfAck;
 
@@ -222,45 +218,11 @@ static void CORE_StateStartON(DATA_QUEUE ReceiveData,tCoreGlobalData* GlobalData
 
 		/* Init timers. */
 
+		/* load config */
+
 		LL_GPIO_SetOutputPin(LED_GREEN_GPIO_Port,LED_GREEN_Pin);
 		osDelay(200);
 		LL_GPIO_ResetOutputPin(LED_GREEN_GPIO_Port,LED_GREEN_Pin);
-
-		/*Uart  Init DMA */
-		LL_DMA_DisableChannel(DMA1,LL_DMA_CHANNEL_3);
-		LL_DMA_ConfigTransfer(DMA1, LL_DMA_CHANNEL_3,
-		                        LL_DMA_DIRECTION_PERIPH_TO_MEMORY |
-								LL_DMA_PRIORITY_LOW              |
-								LL_DMA_MODE_CIRCULAR              |
-		                        LL_DMA_PERIPH_NOINCREMENT         |
-		                        LL_DMA_MEMORY_INCREMENT           |
-		                        LL_DMA_PDATAALIGN_BYTE            |
-		                        LL_DMA_MDATAALIGN_BYTE);
-
-		LL_DMA_ConfigAddresses(DMA1, LL_DMA_CHANNEL_3,
-		                         LL_USART_DMA_GetRegAddr(USART1, LL_USART_DMA_REG_DATA_RECEIVE),
-		                         (uint32_t)GlUartRxBugger,LL_DMA_GetDataTransferDirection(DMA1, LL_DMA_CHANNEL_3));
-
-		LL_DMA_SetDataLength(DMA1, LL_DMA_CHANNEL_3, UART_CIRCLE_MAX_BUFFER_SIZE);
-		LL_DMA_SetPeriphRequest(DMA1, LL_DMA_CHANNEL_3, LL_DMA_REQUEST_3);
-
-		/* Enable DMA RX Interrupt */
-		LL_USART_EnableDMAReq_RX(USART1);
-		/* Enable DMA Channel Rx */
-		LL_DMA_EnableChannel(DMA1, LL_DMA_CHANNEL_3);
-
-	//	osTimerStart(TimerUartRxCheckHandle,TIME_TO_CHECK_UART_RX_BUFFER);
-		HAL_NVIC_DisableIRQ(TIM6_IRQn);
-		HAL_NVIC_ClearPendingIRQ(TIM6_IRQn);
-		HAL_NVIC_EnableIRQ(TIM6_IRQn);
-
-		LL_TIM_SetAutoReload(TIM6,__LL_TIM_CALC_ARR(32000000,LL_TIM_GetPrescaler(TIM6),UART_CHECK_FREQUENCY));   //(1/MINIMAL_SIZE_USART_RX_MSG)
-		LL_TIM_EnableIT_UPDATE(TIM6);
-		LL_TIM_SetCounter(TIM6,0);
-		LL_TIM_EnableCounter(TIM6);
-
-		///* load config */
-
 
 	}
 }
@@ -275,13 +237,13 @@ static void CORE_StateStartON(DATA_QUEUE ReceiveData,tCoreGlobalData* GlobalData
  * @param PointerMalloc
  * @return
  */
-static void CORE_StateON(DATA_QUEUE ReceiveData,tCoreGlobalData* GlobalData, tStateCoreAutomat* StateAutomat)
+static void CORE_StateON(DATA_QUEUE ReceiveData,tCoreGlobalData* coreGlData, tStateCoreAutomat* StateAutomat)
 {
-	DATA_QUEUE	SendData;
-	SendData.pointer=NULL;
-	static GeneralPacketsUpOrDown_t	localTxBuffer;
-	static uint8_t			localTxPacketSize=0;
-	uint8_t					*TxBuffer;
+	//DATA_QUEUE	SendData;
+	//SendData.pointer=NULL;
+	//static tGeneralPacket	localTxBuffer;
+	//static uint8_t			localTxPacketSize=0;
+	//uint8_t					*TxBuffer;
 	uint8_t					*RxUartMsg = NULL;
 	uint8_t					doCheckAgain = 0;
 	static uint8_t			localRxPacketBuff[PACKET_MAX_SIZE];
@@ -342,9 +304,7 @@ static void CORE_StateON(DATA_QUEUE ReceiveData,tCoreGlobalData* GlobalData, tSt
 			}
 			while(doCheckAgain == 1 );
 
-			LL_TIM_EnableIT_UPDATE(TIM6);
-			LL_TIM_SetCounter(TIM6,0);
-			LL_TIM_EnableCounter(TIM6);
+			PCT_ShceduleUartCheck();
 
 			break;
 
@@ -352,7 +312,6 @@ static void CORE_StateON(DATA_QUEUE ReceiveData,tCoreGlobalData* GlobalData, tSt
 			//RxUartMsg=ReceiveData.pointer;
 
 			break;
-
 
 		default:
 			break;
@@ -370,7 +329,7 @@ static void CORE_StateON(DATA_QUEUE ReceiveData,tCoreGlobalData* GlobalData, tSt
  * @param PointerMalloc
  * @return
  */
-static void CORE_StateStartOFF(DATA_QUEUE ReceiveData,tCoreGlobalData* GlobalData, tStateCoreAutomat* StateAutomat)
+static void CORE_StateStartOFF(DATA_QUEUE ReceiveData,tCoreGlobalData* coreGlData, tStateCoreAutomat* StateAutomat)
 {
 
 	static bool tempRfAck;

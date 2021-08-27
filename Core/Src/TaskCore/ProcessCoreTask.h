@@ -118,5 +118,6 @@ void 			PCT_ProcessSetCommands(uint8_t *rxBuffer);
 void 			PCT_ProcessGetCommands(uint8_t *rxBuffer);
 void 			PCT_SendMyParam(eUartMsgSetCmds cmd);
 void 			PCT_SendRfPacket();
+void 			PCT_ProcessSystemCommands(uint8_t *rxBuffer);
 
 #endif /* TASKCORE_PROCESSCORETASK_H_ */

@@ -23,6 +23,35 @@ typedef enum
 
 }eRxChannels;
 
+
+/**
+ *
+ */
+typedef enum
+{
+	STATE_RF_INIT,     //!< STATE_INIT
+	STATE_RF_OFF,      //!< STATE_OFF
+	STATE_RF_START_ON, //!< STATE_START_ON
+	STATE_RF_ON,       //!< STATE_ON
+	STATE_RF_START_OFF,//!< STATE_START_OFF
+	STATE_RF_ERROR			// pokud zabral watchdog
+
+}eStateRfSystem;
+
+
+
+/**
+ * RF task
+ */
+typedef struct
+{
+	eStateRfSystem	ActualState;
+	eStateRfSystem	PreviousState;
+
+} tStateRfAutomat;
+
+
+
 /**
  *
  */
@@ -39,11 +68,10 @@ typedef struct
  */
 typedef struct
 {
-	struct AES_ctx PairingCtx;
-	struct AES_ctx PairingCtxDown;
-	GeneralPacketsUpOrDown_t	localTxBuffer;
-	uint8_t						sizeOfPacket;
-	RadioPar					nextDr;
+
+	tGeneralPacket	localTxBuffer;
+	uint8_t			sizeOfPacket;
+	RadioPar		nextDr;
 
 	void* PointerMalloc;
 

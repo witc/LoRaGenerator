@@ -9,7 +9,6 @@
 #include "TaskRF.h"
 #include "TaskCore.h"
 #include "TemplateRadioUser.h"
-#include "AES_SW.h"
 #include "ProcessRFTask.h"
 #include "LoRa_Codec.h"
 #include "RadioUser.h"
@@ -23,7 +22,6 @@ extern osMessageQId QueueCoreHandle;
 extern osTimerId TimerRepeateTXHandle;
 extern  SPI_HandleTypeDef			hspi1;
 
-tRadioUserConfig					RadioUserConfig;
 Radio_Configuration_Struct 			spiDevice;
 
 
@@ -32,7 +30,6 @@ Radio_Configuration_Struct 			spiDevice;
  */
 bool RU_SX1262Assign(void)
 {
-	RadioPar tempRxDR, tempTxDR;
 	taskENTER_CRITICAL();
 
 	/* init */
@@ -82,14 +79,13 @@ bool RU_SX1262Assign(void)
  * @param GlobalData
  * @param ReceiveData
  */
-void RU_CommandProcess(RfCommands cmd,tRfGlobalData* GlobalData, DATA_QUEUE *ReceiveData)
+void RU_CommandProcess(RfCommands cmd,tRfGlobalData* rfGlData, DATA_QUEUE *ReceiveData)
 {
 	DATA_QUEUE			SendData;
 	SendData.pointer = NULL;
-	uint8_t				*TxPacket;
-	uint32_t			rfFreq=0;
-	int8_t				tempPower;
-	double				atten1,atten2;
+	//uint8_t				*TxPacket;
+	//int8_t				tempPower;
+	//double				atten1,atten2;
 
 	switch (cmd)
 	{
@@ -107,24 +103,24 @@ void RU_CommandProcess(RfCommands cmd,tRfGlobalData* GlobalData, DATA_QUEUE *Rec
 			break;
 
 		case RF_CMD_START_RX:
-			GlobalData->rxSingle = (bool)ReceiveData->temp;
-			GlobalData->payloadSize = ReceiveData->temp2;
-			RU_LoRaConfigAndStartRX(RadioParam.RxConfig.freq,RadioParam.RxConfig,true,GlobalData->payloadSize,portMAX_DELAY);
+			rfGlData->rxSingle = (bool)ReceiveData->temp;
+			rfGlData->payloadSize = ReceiveData->temp2;
+			RU_LoRaConfigAndStartRX(RadioParam,true,rfGlData->payloadSize,portMAX_DELAY);
 			break;
 
 		case RF_CMD_TX_CW:
-			//RadioCleanAndStandby();
-			RadioStandby();
-			PRT_PowerDistribution((int8_t)(RadioParam.Power),&tempPower,&atten1,&atten2);
-			PRT_SetAtten1To(atten1);
-			PRT_SetAtten2To(atten2);
+			RadioCleanAndStandby();
+			//RadioStandby();
+			//PRT_PowerDistribution((int8_t)(RadioParam.Power),&tempPower,&atten1,&atten2);
+			//PRT_SetAtten1To(atten1);
+			//PRT_SetAtten2To(atten2);
 
-			RadioSetTxContinuousWave(RadioParam.TxConfig.freq,tempPower,0);
+			RadioSetTxContinuousWave(RadioParam);
 			//osDelay(1);
 			break;
 
 		case RF_CMD_STOP_TX_AND_DISCARD:
-			if (GlobalData->RF_State == RF_TX_RUNNING)
+			if (rfGlData->RF_State == RF_TX_RUNNING)
 			{
 				RadioCleanAndStandby();
 				SendData.Address=ADDR_TO_CORE_TX_PACKET_DONE;
@@ -134,19 +130,18 @@ void RU_CommandProcess(RfCommands cmd,tRfGlobalData* GlobalData, DATA_QUEUE *Rec
 			break;
 
 		case RF_CMD_SEND_UNIVERSAL_PAYLOAD_NOW:
-			TxPacket=ReceiveData->pointer;
+			//TxPacket=ReceiveData->pointer;
 			//RadioCleanAndStandby();
 			RadioStandby();
 
-			PRT_PowerDistribution((int8_t)(RadioParam.Power),&tempPower,&atten1,&atten2);
-			PRT_SetAtten1To(atten1);
-			PRT_SetAtten2To(atten2);
+			//PRT_PowerDistribution((int8_t)(RadioParam.Power),&tempPower,&atten1,&atten2);
+			//PRT_SetAtten1To(atten1);
+			//PRT_SetAtten2To(atten2);
 
-			RU_RFSetTXUp(tempPower,RadioParam.TxConfig.freq,RadioParam.TxConfig);
+			RU_RFSetTXUp(RadioParam);
 
 			taskENTER_CRITICAL();
 			RadioSend((uint8_t *)EE_RF_DATA_PACKET,RC_GetSizeOfSavedPacket());
-		//	RadioSend((uin8_t*)"Pokus zda to bude vubec fungovat",RC_GetSizeOfSavedPacket());
 			taskEXIT_CRITICAL();
 
 			break;
@@ -162,7 +157,7 @@ void RU_CommandProcess(RfCommands cmd,tRfGlobalData* GlobalData, DATA_QUEUE *Rec
  * @param GlobalData
  * @return
  */
-uint8_t RU_IRQProcess(tRfGlobalData* GlobalData)
+uint8_t RU_IRQProcess(tRfGlobalData* rfGlData)
 {
 	DATA_QUEUE SendData;
 	SendData.pointer=NULL;
@@ -170,14 +165,14 @@ uint8_t RU_IRQProcess(tRfGlobalData* GlobalData)
 	uint16_t irqRegs =0;
 	uint8_t size=0;
 
-	GeneralPacketsUpOrDown_t RxBuffer;
-	GeneralPacketsUpOrDown_t *RxBufferToCore;
+	tGeneralPacket RxBuffer;
+	tGeneralPacket *RxBufferToCore;
 
 	RadioStandby();
 	irqRegs = SX126xGetIrqStatus();
 	SX126xClearIrqStatus(IRQ_RADIO_ALL);
 
-	switch (GlobalData->RF_State)
+	switch (rfGlData->RF_State)
 	{
 	    case RF_RX_RUNNING:
 
@@ -187,15 +182,15 @@ uint8_t RU_IRQProcess(tRfGlobalData* GlobalData)
                 {
                     SX126xGetPacketStatus(&RadioPktStatus);	//RSSI, SNR, Freq Error,..
 
-                   	RxBufferToCore = pvPortMalloc(sizeof(GeneralPacketsUpOrDown_t));
+                   	RxBufferToCore = pvPortMalloc(sizeof(tGeneralPacket));
 					if (RxBufferToCore == NULL)
 					{
 						osDelay(500);
-						RxBufferToCore = pvPortMalloc(sizeof(GeneralPacketsUpOrDown_t));
+						RxBufferToCore = pvPortMalloc(sizeof(tGeneralPacket));
 						if (RxBufferToCore == NULL)  LogError(51334);
 					}
-					memset(RxBufferToCore, 0, sizeof(GeneralPacketsUpOrDown_t));
-					memcpy(RxBufferToCore,&RxBuffer,sizeof(GeneralPacketsUpOrDown_t));
+					memset(RxBufferToCore, 0, sizeof(tGeneralPacket));
+					memcpy(RxBufferToCore,&RxBuffer,sizeof(tGeneralPacket));
 
 					SendData.Address = ADDR_TO_CORE_RF_DATA_RECEIVED;
 					SendData.RFU=RadioPktStatus.Params.LoRa.SignalRssiPkt;
@@ -203,7 +198,7 @@ uint8_t RU_IRQProcess(tRfGlobalData* GlobalData)
 					SendData.pointer = RxBufferToCore;
 					xQueueSend(QueueCoreHandle, &SendData, portMAX_DELAY);
 
-					if(GlobalData->rxSingle == true)
+					if(rfGlData->rxSingle == true)
 					{
 						RadioCleanAndStandby();
 						break;
@@ -211,25 +206,23 @@ uint8_t RU_IRQProcess(tRfGlobalData* GlobalData)
                  }
 		    }
 
-			RU_LoRaConfigAndStartRX(RadioParam.RxConfig.freq,RadioParam.RxConfig,true,GlobalData->payloadSize,portMAX_DELAY);
+			RU_LoRaConfigAndStartRX(RadioParam,true, rfGlData->payloadSize,portMAX_DELAY);
 
 	        break;
 
         case RF_TX_RUNNING:
 
-        	if(GlobalData->rxSingle == true)
+        	if(rfGlData->rxSingle == true)
 			{
 				RadioCleanAndStandby();
 			}
         	else
         	{
-        		RU_LoRaConfigAndStartRX(RadioParam.RxConfig.freq,RadioParam.RxConfig,true,GlobalData->payloadSize, portMAX_DELAY);
+        		RU_LoRaConfigAndStartRX(RadioParam,true,rfGlData->payloadSize, portMAX_DELAY);
         	}
 
            	SendData.Address=ADDR_TO_CORE_TX_PACKET_DONE;
            	xQueueSend(QueueCoreHandle, &SendData, portMAX_DELAY);
-
-
 
             break;
 

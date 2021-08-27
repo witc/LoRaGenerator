@@ -10,9 +10,6 @@
 
 #include "RadioConfig.h"
 #include "radio_general.h"
-#include "AES_SW.h"
-
-#define PACKET_MAX_SIZE							250
 
 /*
  *
@@ -22,7 +19,7 @@ typedef enum
 	DR_IQ_FALSE=0,
 	DR_IQ_TRUE=1,
 	DR_IQ_SIZE,
-}ENUM_DR_IQ;
+}eDR_IQ;
 
 
 /**
@@ -33,7 +30,7 @@ typedef enum
 	DR_HEADER_FALSE=0,//!< DR_HEADER_FALSE
 	DR_HEADER_TRUE=1, //!< DR_HEADER_TRUE
 	DR_HEADER_SIZE,   //!< DR_HEADER_SIZE
-}ENUM_DR_HEADER;
+}eDR_HEADER;
 
 /**
  *
@@ -43,7 +40,7 @@ typedef enum
 	DR_CRC_FALSE=0,
 	DR_CRC_TRUE=1,
 	DR_CRC_SIZE,
-}ENUM_DR_CRC;
+}eDR_CRC;
 
 
 
@@ -64,7 +61,7 @@ typedef enum
 	DR_BW_500_KHZ=9,
 	DR_BW_SIZE,
 
-}ENUM_DR_BW;
+}eDR_BW;
 
 /*
  *
@@ -81,7 +78,7 @@ typedef enum
 	DR_SF12=7,
 	DR_SF_SIZE,
 
-}ENUM_DR_SF;
+}eDR_SF;
 
 /**
  *
@@ -94,18 +91,15 @@ typedef enum
 	DR_CR_48=3,//!< DR_CR_48
 	DR_CR_SIZE,
 
-}ENUM_DR_CR;
+}eDR_CR;
 
 
 
 typedef union
 {
-	uint8_t  						DataArray[PACKET_MAX_SIZE];
+	uint8_t  			DataArray[PACKET_MAX_SIZE];
 
-}GeneralPacketsUpOrDown_t;
+}tGeneralPacket;
 
-
-
-uint16_t crc16(uint16_t crcValue, uint8_t newByte);
 
 #endif /* RF_SEMTECH_JUSTLORAPROCESS_H_ */

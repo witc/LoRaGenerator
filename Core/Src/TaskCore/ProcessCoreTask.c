@@ -28,18 +28,12 @@ void PCT_SendRfPacket()
 	DATA_QUEUE SendData;
 	SendData.pointer = NULL;
 
-	//if(RC_GetSizeOfSavedPacket()!=0)
-	{
-		SendData.Address=ADDR_TO_RF_CMD;
-		SendData.Data=RF_CMD_SEND_UNIVERSAL_PAYLOAD_NOW;
-		xQueueSend(QueueRFHandle,&SendData,portMAX_DELAY);
+	SendData.Address=ADDR_TO_RF_CMD;
+	SendData.Data=RF_CMD_SEND_UNIVERSAL_PAYLOAD_NOW;
+	xQueueSend(QueueRFHandle,&SendData,portMAX_DELAY);
 
-		//osTimerStart(TimerRfTxTimeoutHandle,) TODO zvazit jak nastavit timeout  - aby byl spravne platny
-	}
-//	else
-//	{
-//		//todo send error
-//	}
+	//osTimerStart(TimerRfTxTimeoutHandle,) TODO zvazit jak nastavit timeout  - aby byl spravne platny
+
 }
 
 
@@ -66,17 +60,20 @@ void PCT_SetRadioRX(bool single, uint8_t payloadSize)
  */
 uint8_t PCT_DecodeUartRxMsg(uint8_t *rxBuffer)
 {
+
 	if(rxBuffer[0] <= UART_MSG_PREP_PACKET)
 	{
 		PCT_ProcessSetCommands(rxBuffer);
 	}
+	/* only get */
 	else if(rxBuffer[0] <= UART_MSG_GET_PREP_PACKET)
 	{
 		PCT_SendMyParam(rxBuffer[0]-40);
 	}
 	else
 	{
-		PCT_ProcessSystemCommands();
+		/* general commands */
+		PCT_ProcessSystemCommands(rxBuffer);
 	}
 
 }
@@ -87,8 +84,6 @@ uint8_t PCT_DecodeUartRxMsg(uint8_t *rxBuffer)
  */
 void PCT_ProcessSetCommands(uint8_t *rxBuffer)
 {
-	DATA_QUEUE SendData;
-	SendData.pointer = NULL;
 	bool retTemp=false;
 	eUartMsgSetCmds cmd = rxBuffer[0];
 	eActionFlags actionFlags = rxBuffer[1];
@@ -163,7 +158,6 @@ void PCT_ProcessSetCommands(uint8_t *rxBuffer)
 				break;
 
 
-
 			default:
 				break;
 		}
@@ -186,10 +180,11 @@ void PCT_ProcessSetCommands(uint8_t *rxBuffer)
 }
 
 
+/**
+ *
+ */
 void PCT_ProcessSystemCommands(uint8_t *rxBuffer)
 {
-	DATA_QUEUE SendData;
-	SendData.pointer = NULL;
 	uint8_t retTemp=false;
 	uint8_t tempBuffer[100];
 
@@ -239,8 +234,6 @@ void PCT_ProcessSystemCommands(uint8_t *rxBuffer)
  */
 void PCT_SendMyParam(eUartMsgSetCmds cmd)
 {
-	DATA_QUEUE SendData;
-	SendData.pointer = NULL;
 	uint32_t tempData;
 
 	switch(cmd)

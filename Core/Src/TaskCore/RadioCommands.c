@@ -529,7 +529,7 @@ bool RC_RadioSetTXHeaderMode(uint8_t header)
 	if(header<DR_HEADER_SIZE)
 	{
 		taskENTER_CRITICAL();
-		RadioParam.TxConfig.headerMode=(ENUM_DR_HEADER)header;
+		RadioParam.TxConfig.headerMode=(eDR_HEADER)header;
 		taskEXIT_CRITICAL();
 		LC_SaveTXHeader(header);
 		return true;
@@ -579,7 +579,7 @@ bool RC_RadioSetRXHeaderMode(uint8_t header)
 	if(header<DR_HEADER_SIZE)
 	{
 		taskENTER_CRITICAL();
-		RadioParam.RxConfig.headerMode=(ENUM_DR_HEADER)header;
+		RadioParam.RxConfig.headerMode=(eDR_HEADER)header;
 		taskEXIT_CRITICAL();
 		LC_SaveRXHeader(header);
 		return true;
@@ -627,7 +627,7 @@ bool RC_RadioSetTXCRC(uint8_t crc)
 	if(crc<DR_CRC_SIZE)
 	{
 		taskENTER_CRITICAL();
-		RadioParam.TxConfig.crcCheck=(ENUM_DR_CRC)crc;
+		RadioParam.TxConfig.crcCheck=(eDR_CRC)crc;
 		taskEXIT_CRITICAL();
 		LC_SaveTXCRC(crc);
 		return true;
@@ -674,7 +674,7 @@ bool RC_RadioSetRXCRC(uint8_t crc)
 	if(crc<DR_CRC_SIZE)
 	{
 		taskENTER_CRITICAL();
-		RadioParam.RxConfig.crcCheck=(ENUM_DR_CRC)crc;
+		RadioParam.RxConfig.crcCheck=(eDR_CRC)crc;
 		taskEXIT_CRITICAL();
 		LC_SaveRXCRC(crc);
 		return true;
@@ -758,7 +758,7 @@ bool RC_RadioSetTxCW()
 
 bool RC_SavePacket(uint8_t *data)
 {
-	if(data[2]<=MAX_ALLOWEDPACKET_SIZE)
+	if(data[2]<=RF_MAX_ALLOWEDPACKET_SIZE)
 	{
 
 #if (USE_INTERNAL_EEPROM==1)

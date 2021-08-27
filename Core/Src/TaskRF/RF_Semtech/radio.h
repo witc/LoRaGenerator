@@ -26,6 +26,7 @@
 #include "stdbool.h"
 #include "stdint.h"
 #include "radio_general.h"
+#include "RadioCommands.h"
 
 /*!
  * Radio driver supported modems
@@ -248,7 +249,7 @@ void RadioStartCad( );
  * \param [IN]: power      Sets the output power [dBm]
  * \param [IN]: time       Transmission mode timeout [s]
  */
-void RadioSetTxContinuousWave( uint32_t freq, int8_t power, uint16_t time  );
+void RadioSetTxContinuousWave(tRadioParam 	radioParam);
 
 /*!
  * \brief Reads the current RSSI value

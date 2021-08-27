@@ -43,6 +43,29 @@ typedef struct
 	uint8_t Counter;
 }tKeyBoard;
 
+/**
+ *
+ */
+typedef enum
+{
+	STATE_CORE_INIT,
+	STATE_CORE_OFF,
+	STATE_CORE_START_ON,
+	STATE_CORE_ON,
+	STATE_CORE_START_OFF,
+	STATE_CORE_ERROR			// pokud zabral watchdog
+}eStateCoreSystem;
+
+
+/**
+ * Core task
+ */
+typedef struct
+{
+	eStateCoreSystem	ActualState;
+	eStateCoreSystem	PreviousState;
+
+} tStateCoreAutomat;
 
 /**
  *

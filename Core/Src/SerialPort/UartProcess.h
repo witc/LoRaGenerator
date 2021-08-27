@@ -50,5 +50,7 @@ bool 			UP_FindSyncWord(uint8_t *data, uint16_t sizeToSearch, uint16_t *headerSt
 eUARTBufferMasg UP_FindAnyMsg(uint8_t **rxPacket,uint8_t *doCheckAgain);
 void 			UP_UartSendData(uint8_t opCode, uint8_t *answer,uint8_t size);
 void 			UP_UartTransmitRawData(uint8_t *buffer, uint8_t size);
+void 			PCT_InitUartDMA(void);
+void 			PCT_ShceduleUartCheck(void);
 
 #endif /* SERIALPORT_UARTPROCESS_H_ */
