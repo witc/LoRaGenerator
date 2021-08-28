@@ -53,7 +53,6 @@ void SysTick_Handler(void);
 void PVD_IRQHandler(void);
 void RTC_IRQHandler(void);
 void EXTI2_3_IRQHandler(void);
-void DMA1_Channel2_3_IRQHandler(void);
 void TIM6_IRQHandler(void);
 void TIM7_IRQHandler(void);
 void TIM22_IRQHandler(void);
