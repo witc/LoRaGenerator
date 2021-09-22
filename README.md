@@ -22,8 +22,6 @@ Universal  LoRa packet generator with user settings.
 - AutoRepeating
 
 ### Actions:
-- WhoAreYou  
-- WhatIsYourName 
 - sendPacket  (send prepared packet)
 - startTXCW  (continues wave)
 - setStandby 
@@ -34,41 +32,20 @@ Universal  LoRa packet generator with user settings.
 
 | 2B  |  4B  |  n |  1B |
 |---|---|---|---|
-| Sync Word  - 0x2DD4  |Header|  payload |  crc - from whole packet |
+| Sync Word  - 0x2DD6  |Header|  payload |  crc - from whole packet |
 
 **Header**
 | 1B  |  2B | 1B  | 
 |---|---|---|
 | size of payload  |RFU| crc Header  
 
-**Payload**
-| 1B  | 1B   | NB|
-|---|---|--|
-| Command (opCode) |actionFlags|   
-
-
 **CRC8 implementation with polynom = x7+ x6+ x4+ x2+ x0 (0xD5)**
 CRC is the same for header and whole packet
 
-**Table of radio commands **
-| **cmd meaning**  | **opCode** 1B  |**action flags** 1B |**parameters** NB|  **retVal** 1B
-|---|---|--|--|--|
-| TxFreq  | 1  | yes | Frequency (4B)| 1 - Succes /0 - failure|
-| RxFreq  | 2  | yes |  Frequency (4B)| 1 - Succes /0 - failure|
-| TxPower  | 3  | yes | Power (1B)| 1 - Succes /0 - failure|
-| TxSF  | 4  | yes | Spreading factor SF5-SF12 (1B)| 1 - Succes /0 - failure|
-| RxSF  | 5  |yes  | Spreading factor SF5-SF12 (1B)| 1 - Succes /0 - failure|
-| TxBW  | 6  |yes |  BandWidth 7.81 - 500 kHz (4B)| 1 - Succes /0 - failure|
-| RxBW  | 7  |yes  |  BandWidth 7.81 - 500 kHz (4B)| 1 - Succes /0 - failure|
-| TxIQ  | 8  |yes |  IQ invert true/false (1B)| 1 - Succes /0 - failure|
-| RxIQ  | 9  |yes |  IQ invert true/false (1B)| 1 - Succes /0 - failure|
-| TxCR  | 10  |yes |  CodeRate 4/5-4/8 (1B)| 1 - Succes /0 - failure|
-| RxCR  | 11  |yes  |  CodeRate 4/5-4/8 (1B)| 1 - Succes /0 - failure|
-| HeaderMode  TX | 12  | yes|   Enable header mode true/false (1 B)| 1 - Succes /0 - failure|
-| HeaderMode  RX | 13  | yes|   Enable header mode true/false (1 B)| 1 - Succes /0 - failure|
-| CRC TX  | 14  | yes |  Crc check true/false (1 B)| 1 - Succes /0 - failure|
-| CRC RX  | 15  | yes |  Crc check true/false (1 B)| 1 - Succes /0 - failure|
-| preparePacket  | 16  |yes | data[0] - nasledna velikost,  data[N] (N B)| 1 - Succes /0 - failure|
+**Payload**
+| 1B  | 1B   | NB|
+|---|---|--|
+| Command (opCode) |**actionFlags**| data  |
 
 **Action Flags**
 - 1 = only set the value
@@ -76,36 +53,65 @@ CRC is the same for header and whole packet
 - 3 = only get value from LoRaGenerator
 
 
+**Table of radio commands **
+| **cmd meaning**  | **opCode** 1B  |**action flags** 1B |**parameters** NB|  **note** 1B|
+|---|---|--|--|--|
+| TxFreq  | 1  | yes | Frequency (4B)| |
+| RxFreq  | 2  | yes |  Frequency (4B)| |
+| TxPower  | 3  | yes | Power (1B)| |
+| TxSF  | 4  | yes | Spreading factor SF5-SF12 (1B)| |
+| RxSF  | 5  |yes  | Spreading factor SF5-SF12 (1B)| |
+| TxBW  | 6  |yes |  BandWidth 7.81 - 500 kHz (4B)| |
+| RxBW  | 7  |yes  |  BandWidth 7.81 - 500 kHz (4B)||
+| TxIQ  | 8  |yes |  IQ invert true/false (1B)||
+| RxIQ  | 9  |yes |  IQ invert true/false (1B)||
+| TxCR  | 10  |yes |  CodeRate 4/5-4/8 (1B)||
+| RxCR  | 11  |yes  |  CodeRate 4/5-4/8 (1B)||
+| HeaderMode  TX | 12  | yes|   Enable header mode true/false (1 B)| |
+| HeaderMode  RX | 13  | yes|   Enable header mode true/false (1 B)| |
+| CRC TX  | 14  | yes |  Crc check true/false (1 B)| |
+| CRC RX  | 15  | yes |  Crc check true/false (1 B)| |
+| preparePacket  | 16  |yes | data[0] - nasledna velikost,  data[N] (N B)| |
+
+
+
 **Table of short (GET) commands for radio**
 
-| **cmd meaning**  | **opCode** 1B |**parameters** NB|  **retVal** 1B
+| **cmd meaning**  | **opCode** 1B |**parameters** NB|  **note** 1B
 |---|---|--|--|
-| GetTxFreq  | 1+40  |  Frequency (4B)| 1 - Succes /0 - failure|
-| GetRxFreq  | 2+40  |   Frequency (4B)| 1 - Succes /0 - failure|
-| GetTxPower  | 3+40   | Power (1B)| 1 - Succes /0 - failure|
-| GetTxSF  | 4+40   | Spreading factor SF5-SF12 (1B)| 1 - Succes /0 - failure|
-| GetRxSF  | 5+40    | Spreading factor SF5-SF12 (1B)| 1 - Succes /0 - failure|
-| GetTxBW  | 6+40   |  BandWidth 7.81 - 500 kHz (4B)| 1 - Succes /0 - failure|
-| GetRxBW  | 7+40    |  BandWidth 7.81 - 500 kHz (4B)| 1 - Succes /0 - failure|
-| GetTxIQ  | 8+40   |  IQ invert true/false (1B)| 1 - Succes /0 - failure|
-| GetRxIQ  | 9+40   |  IQ invert true/false (1B)| 1 - Succes /0 - failure|
-| GetTxCR  | 10+40   |  CodeRate 4/5-4/8 (1B)| 1 - Succes /0 - failure|
-| GetRxCR  | 11+40    |  CodeRate 4/5-4/8 (1B)| 1 - Succes /0 - failure|
-| GetHeaderMode  TX | 12+40  |   Enable header mode true/false (1 B)| 1 - Succes /0 - failure|
-| GetHeaderMode  RX | 13+40  |   Enable header mode true/false (1 B)| 1 - Succes /0 - failure|
-| GetTxCRC  | 14+40  |   Crc check true/false (1 B)| 1 - Succes /0 - failure|
-| GetRxCRC  | 15+40  |   Crc check true/false (1 B)| 1 - Succes /0 - failure|
-| GetpreparePacket  | 16+40  | data[0] - nasledna velikost,  data[N] (N B)| 1 - Succes /0 - failure|
+| GetTxFreq  | 1+40  |  Frequency (4B)| |
+| GetRxFreq  | 2+40  |   Frequency (4B)| |
+| GetTxPower  | 3+40   | Power (1B)||
+| GetTxSF  | 4+40   | Spreading factor SF5-SF12 (1B)| |
+| GetRxSF  | 5+40    | Spreading factor SF5-SF12 (1B)| |
+| GetTxBW  | 6+40   |  BandWidth 7.81 - 500 kHz (4B)| |
+| GetRxBW  | 7+40    |  BandWidth 7.81 - 500 kHz (4B)| |
+| GetTxIQ  | 8+40   |  IQ invert true/false (1B)| |
+| GetRxIQ  | 9+40   |  IQ invert true/false (1B)| |
+| GetTxCR  | 10+40   |  CodeRate 4/5-4/8 (1B)| |
+| GetRxCR  | 11+40    |  CodeRate 4/5-4/8 (1B)||
+| GetHeaderMode  TX | 12+40  |   Enable header mode true/false (1 B)| |
+| GetHeaderMode  RX | 13+40  |   Enable header mode true/false (1 B)| |
+| GetTxCRC  | 14+40  |   Crc check true/false (1 B)| |
+| GetRxCRC  | 15+40  |   Crc check true/false (1 B)| |
+| GetpreparePacket  | 16+40  | data[0] - nasledna velikost,  data[N] (N B)| |
 
-**Table of systm info**
-|  **cmd meaning**  |  **opCode** |  **data** | **size of data [B]**  |   |
+**Table of system info**
+|  **cmd meaning**  |  **opCode** |  **data** | **size of data [B]**  | **note**  |
 |---|---|---|---|---|
-| resetMCU  |  200 | empty  |  1 |   |
-| getMCU_ID | 201  |  empty | 1  |   |
-| getCPU_ID | 202  | empty  | 1  |   |
-| getRadioChip | 203  | empty  | 1  |   |
-| getMinTxPower | 204  | empty  | 1  |   |
-| getMaxTxPower | 205  | empty  | 1  |   |
+| resetMCU  |  200 | empty  |  1 |  returns ACK |
+| getMCU_ID | 201  |  empty | 1  | returns mcu ID  |
+| getCPU_ID | 202  | empty  | 1  | returns cpu ID  |
+| getRadioChip | 203  | empty  | 1  |  returns "RadioChip " |
+| getMinTxPower | 204  | empty  | 1  |  returns int8_t (power) |
+| getMaxTxPower | 205  | empty  | 1  |  returns int8_t (power) |
+
+**Table of bootloader commands**    (available only in bootloader!!)
+|  **cmd meaning**  |  **opCode** |  **data** | **size of data [B]**  | **note**  |
+|---|---|---|---|---|
+| eraseSector  |  230 | sector  |  1 | 0xFF for all instead those where bootloader is, returns **ACK** when erased  |
+| writeData | 231  |  adress (4 B) + data (16 B) | 1  | when OK - returns **ACK**  |
+
 
 **Table of actions commands **
 | **cmd meaning**  | **opCode** 1B |**parameters** NB|  **retVal** 1B
@@ -118,10 +124,6 @@ CRC is the same for header and whole packet
 | ResetMcu  | 247   || |
 | EraseApp  | 246   || 1 - Eraseed /0 - failure|
 | WriteData  | 245 | Mem addr (4 B) + data (16 B)| 1 - ACK /0 - (NACK) failure|
-
-
-
-**system info**
 
 
 **Odpovedi od LoRaGeneratoru maji stejny tvar paketu az na chybejici Byte action flags**
