@@ -97,12 +97,19 @@ CRC is the same for header and whole packet
 | GetRxCRC  | 15+40  |   Crc check true/false (1 B)| 1 - Succes /0 - failure|
 | GetpreparePacket  | 16+40  | data[0] - nasledna velikost,  data[N] (N B)| 1 - Succes /0 - failure|
 
+**Table of systm info**
+|  **cmd meaning**  |  **opCode** |  **data** | **size of data [B]**  |   |
+|---|---|---|---|---|
+| resetMCU  |  200 | empty  |  1 |   |
+| getMCU_ID | 201  |  empty | 1  |   |
+| getCPU_ID | 202  | empty  | 1  |   |
+| getRadioChip | 203  | empty  | 1  |   |
+| getMinTxPower | 204  | empty  | 1  |   |
+| getMaxTxPower | 205  | empty  | 1  |   |
 
 **Table of actions commands **
 | **cmd meaning**  | **opCode** 1B |**parameters** NB|  **retVal** 1B
 |---|---|--|--|
-| WhoAreYou  | 254 | "MCU " "Radiochip " "minTxPower " "maxTxPower " "mcuID ", (NB)| 1 - Succes /0 - failure|
-| WhatIsYourName  | 253 | "Target name "| 1 - Succes /0 - failure|
 | sendPacket  | 252  | empty | 1 - Succes /0 - failure|
 | startTXCW  | 251  | | 1 - Succes /0 - failure|
 | setStandby  | 250   || 1 - Succes /0 - failure|
