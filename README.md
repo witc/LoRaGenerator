@@ -32,7 +32,7 @@ Universal  LoRa packet generator with user settings.
 
 | 2B  |  4B  |  n |  1B |
 |---|---|---|---|
-| Sync Word  - 0x2DD6  |Header|  payload |  crc - from whole packet |
+| Sync Word  - 0x2DD4  |Header|  payload |  crc - from whole packet |
 
 **Header**
 | 1B  |  2B | 1B  | 
