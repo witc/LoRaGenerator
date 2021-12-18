@@ -137,6 +137,9 @@ bool M_IsMcuLocked()
 int main(void)
 {
   /* USER CODE BEGIN 1 */
+	// __DMB(); //ARM says to use a DMB instruction before relocating VTOR */
+  SCB->VTOR = 0x8004000; //We relocate vector table to the APP sector
+				 // __DSB(); //ARM says to use a DSB instruction just after relocating VTOR */
   /* USER CODE END 1 */
 
   /* MCU Configuration--------------------------------------------------------*/
@@ -174,6 +177,7 @@ int main(void)
 
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
+  LL_GPIO_TogglePin(LED_BLUE_GPIO_Port,LED_BLUE_Pin);
   MX_DMA_Init();
   MX_TIM22_Init();
   MX_TIM7_Init();
@@ -182,6 +186,8 @@ int main(void)
   MX_SPI1_Init();
   MX_USART1_UART_Init();
   /* USER CODE BEGIN 2 */
+  NVIC_ClearPendingIRQ(SysTick_IRQn);
+  NVIC_EnableIRQ(SysTick_IRQn);
 
   /* USER CODE END 2 */
 

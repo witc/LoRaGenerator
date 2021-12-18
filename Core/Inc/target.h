@@ -8,8 +8,8 @@
 #ifndef INC_TARGET_H_
 #define INC_TARGET_H_
 
-#define BOARD_USB_RF_LINK				0
-#define BOARD_LORA_GENERATOR			1
+#define BOARD_USB_RF_LINK				1
+#define BOARD_LORA_GENERATOR			0
 
 
 #define greenLEDPort				GPIOB
