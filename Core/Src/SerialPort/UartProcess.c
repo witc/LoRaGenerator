@@ -10,7 +10,7 @@
 #include "UartProcess.h"
 
 
-uint8_t SyncUartMsg[2] = {0xaa,0xbb};
+uint8_t SyncUartMsg[2] = {0x2d,0xd4};
 uint8_t UartTxDMABuffer[UART_CIRCLE_MAX_BUFFER_SIZE];
 
 extern UART_HandleTypeDef huart1;
@@ -300,8 +300,9 @@ void UP_UartSendData(uint8_t opCode, uint8_t *answer,uint8_t size)
 void UP_UartTransmitRawData(uint8_t *buffer, uint8_t size)
 {
 
-
+	LL_GPIO_SetOutputPin(LED_BLUE_GPIO_Port,LED_BLUE_Pin);
 	HAL_UART_Transmit_DMA(&huart1,buffer,size);
+	//HAL_UART_Transmit_IT()
 
 }
 
@@ -330,8 +331,10 @@ uint8_t UP_CalcCRC(uint8_t *data, uint8_t size)
  */
 void HAL_UART_TxCpltCallback(UART_HandleTypeDef *huart)
 {
-	BaseType_t xHigherPriorityTaskWoken = pdFALSE;
+	huart->gState = HAL_UART_STATE_READY;
 
+	BaseType_t xHigherPriorityTaskWoken = pdFALSE;
+	LL_GPIO_ResetOutputPin(LED_BLUE_GPIO_Port,LED_BLUE_Pin);
 	if(UartTxDoneNotify!=NULL)
 	{
 		/* Notify the task that the transfer is complete. */
@@ -372,7 +375,7 @@ void PCT_InitUartDMA(void)
 	LL_DMA_SetPeriphRequest(DMA1, LL_DMA_CHANNEL_3, LL_DMA_REQUEST_3);
 
 	/* Enable DMA RX Interrupt */
-	LL_USART_EnableDMAReq_RX(USART1);
+//	LL_USART_EnableDMAReq_RX(USART1);
 	/* Enable DMA Channel Rx */
 	LL_DMA_EnableChannel(DMA1, LL_DMA_CHANNEL_3);
 

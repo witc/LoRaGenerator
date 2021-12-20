@@ -224,6 +224,7 @@ static void CORE_StateStartON(DATA_QUEUE ReceiveData,tCoreGlobalData* coreGlData
 		osDelay(200);
 		LL_GPIO_ResetOutputPin(LED_GREEN_GPIO_Port,LED_GREEN_Pin);
 
+		PCT_ShceduleUartCheck();
 	}
 }
 
@@ -305,6 +306,9 @@ static void CORE_StateON(DATA_QUEUE ReceiveData,tCoreGlobalData* coreGlData, tSt
 			while(doCheckAgain == 1 );
 
 			PCT_ShceduleUartCheck();
+			uint32_t dolo = 0x10204080;
+
+			UP_UartSendData(UART_MSG_TX_FREQ,&dolo,4);
 
 			break;
 
