@@ -50,9 +50,9 @@ Is used only in packet with cmd from 1 to 20! In another packet this field does 
 CRC is the same for header and whole packet
 
 **Payload**
-| 1B  | 1B   | NB|
-|---|---|--|
-| Command (opCode) |**actionFlags**| data  |
+| 1B  | NB|
+|---|--|
+| Command (opCode) | data  |
 
 
 **Table of radio commands**
