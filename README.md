@@ -106,14 +106,7 @@ CRC is the same for header and whole packet
 | getMinTxPower | 204  | empty  | 1  |  returns int8_t (power) |
 | getMaxTxPower | 205  | empty  | 1  |  returns int8_t (power) |
 
-**Table of bootloader commands**    (available only in bootloader!!)
-|  **cmd meaning**  |  **opCode** |  **data** | **size of data [B]**  | **note**  |
-|---|---|---|---|---|
-| eraseSector  |  230 | sector  |  1 | 0xFF for all instead those where bootloader is, returns **ACK** when erased  |
-| writeData | 231  |  adress (4 B) + data (16 B) | 1  | when OK - returns **ACK**  |
-
-
-**Table of actions commands **
+**Table of actions commands**
 | **cmd meaning**  | **opCode** 1B |**parameters** NB|  **retVal** 1B
 |---|---|--|--|
 | sendPacket  | 252  | empty | 1 - Succes /0 - failure|
@@ -122,8 +115,6 @@ CRC is the same for header and whole packet
 | readRxPacket  | 249  | payoad size (1B), rssi (1B), payload (NB) | 1 - Succes /0 - failure|
 | startRx  | 248  | singleRX true/false (1 B), payloadSize 1 - 250 (1B) (value does not care in active Header Mode) | 1 - Succes /0 - failure|
 | ResetMcu  | 247   || |
-| EraseApp  | 246   || 1 - Eraseed /0 - failure|
-| WriteData  | 245 | Mem addr (4 B) + data (16 B)| 1 - ACK /0 - (NACK) failure|
 
 
 **Odpovedi od LoRaGeneratoru maji stejny tvar paketu az na chybejici Byte action flags**
