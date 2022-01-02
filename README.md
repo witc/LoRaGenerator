@@ -39,6 +39,13 @@ Universal  LoRa packet generator with user settings.
 |---|---|---|--|
 | size of payload  |action flag | RFU| crc Header  
 
+**Action Flags**
+Is used only in packet with cmd from 1 to 20! In another packet this field does not care.
+
+- 1 = only set the value
+- 2 = set and get answer back
+- 3 = only get value from LoRaGenerator
+- 
 **CRC8 implementation with polynom = x7+ x6+ x4+ x2+ x0 (0xD5)**
 CRC is the same for header and whole packet
 
@@ -47,13 +54,8 @@ CRC is the same for header and whole packet
 |---|---|--|
 | Command (opCode) |**actionFlags**| data  |
 
-**Action Flags**
-- 1 = only set the value
-- 2 = set and get answer back
-- 3 = only get value from LoRaGenerator
 
-
-**Table of radio commands **
+**Table of radio commands**
 | **cmd meaning**  | **opCode** 1B  |**parameters** NB|  **note** 1B|
 |---|---|--|--|
 | TxFreq  | 1   | Frequency (4B)| |
