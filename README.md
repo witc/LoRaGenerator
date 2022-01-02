@@ -36,7 +36,7 @@ Universal  LoRa packet generator with user settings.
 
 **Header**
 | 1B  |  1B|1B | 1B  | 
-|---|---|---|
+|---|---|---|--|
 | size of payload  |action flag | RFU| crc Header  
 
 **CRC8 implementation with polynom = x7+ x6+ x4+ x2+ x0 (0xD5)**
