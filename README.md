@@ -35,9 +35,9 @@ Universal  LoRa packet generator with user settings.
 | Sync Word  - 0x2DD4  |Header|  payload |  crc - from whole packet |
 
 **Header**
-| 1B  |  2B | 1B  | 
+| 1B  |  1B|1B | 1B  | 
 |---|---|---|
-| size of payload  |RFU| crc Header  
+| size of payload  |action flag | RFU| crc Header  
 
 **CRC8 implementation with polynom = x7+ x6+ x4+ x2+ x0 (0xD5)**
 CRC is the same for header and whole packet
@@ -54,24 +54,24 @@ CRC is the same for header and whole packet
 
 
 **Table of radio commands **
-| **cmd meaning**  | **opCode** 1B  |**action flags** 1B |**parameters** NB|  **note** 1B|
-|---|---|--|--|--|
-| TxFreq  | 1  | yes | Frequency (4B)| |
-| RxFreq  | 2  | yes |  Frequency (4B)| |
-| TxPower  | 3  | yes | Power (1B)| |
-| TxSF  | 4  | yes | Spreading factor SF5-SF12 (1B)| |
-| RxSF  | 5  |yes  | Spreading factor SF5-SF12 (1B)| |
-| TxBW  | 6  |yes |  BandWidth 7.81 - 500 kHz (4B)| |
-| RxBW  | 7  |yes  |  BandWidth 7.81 - 500 kHz (4B)||
-| TxIQ  | 8  |yes |  IQ invert true/false (1B)||
-| RxIQ  | 9  |yes |  IQ invert true/false (1B)||
-| TxCR  | 10  |yes |  CodeRate 4/5-4/8 (1B)||
-| RxCR  | 11  |yes  |  CodeRate 4/5-4/8 (1B)||
-| HeaderMode  TX | 12  | yes|   Enable header mode true/false (1 B)| |
-| HeaderMode  RX | 13  | yes|   Enable header mode true/false (1 B)| |
-| CRC TX  | 14  | yes |  Crc check true/false (1 B)| |
-| CRC RX  | 15  | yes |  Crc check true/false (1 B)| |
-| preparePacket  | 16  |yes | data[0] - nasledna velikost,  data[N] (N B)| |
+| **cmd meaning**  | **opCode** 1B  |**parameters** NB|  **note** 1B|
+|---|---|--|--|
+| TxFreq  | 1   | Frequency (4B)| |
+| RxFreq  | 2   |  Frequency (4B)| |
+| TxPower  | 3  | Power (1B)| |
+| TxSF  | 4   | Spreading factor SF5-SF12 (1B)| |
+| RxSF  | 5    | Spreading factor SF5-SF12 (1B)| |
+| TxBW  | 6   |  BandWidth 7.81 - 500 kHz (4B)| |
+| RxBW  | 7    |  BandWidth 7.81 - 500 kHz (4B)||
+| TxIQ  | 8   |  IQ invert true/false (1B)||
+| RxIQ  | 9   |  IQ invert true/false (1B)||
+| TxCR  | 10   |  CodeRate 4/5-4/8 (1B)||
+| RxCR  | 11    |  CodeRate 4/5-4/8 (1B)||
+| HeaderMode  TX | 12  |    Enable header mode true/false (1 B)| |
+| HeaderMode  RX | 13  |    Enable header mode true/false (1 B)| |
+| CRC TX  | 14   |  Crc check true/false (1 B)| |
+| CRC RX  | 15   |  Crc check true/false (1 B)| |
+| preparePacket  | 16   | data[0] - nasledna velikost,  data[N] (N B)| |
 
 
 
