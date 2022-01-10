@@ -64,18 +64,18 @@ CRC is the same for header and whole packet
 ## List of packets available in both Application and Bootloader mode
 | **cmd meaning**  | **opCode** 1B  |**data** N B| **note** |
 |---|---|---|---|
-| ResetMCU  |  7 | empty  |  no return |
-| GetMCU_ID  | 1  | empty| return type of MCU|
-| GetCPU_ID  | 2  | empty| return unique CPU ID |
+| ResetMCU  |  1 | empty  |  no return |
+| GetMCU_ID  | 2  | empty| return type of MCU|
+| GetCPU_ID  | 3  | empty| return unique CPU ID |
 
 ## List of packets available only in Bootloader mode
 **Table of system info**
 | **cmd meaning**  | **opCode** 1B  |**data** N B| **note** |
 |---|---|---|---|
-| EraseSector  | 3  | sector (1B) | 0xFF for all instead those where bootloader is, returns **ACK** when erased|
-| WriteData  | 4  | adress (4 B) + data (16 B)| when OK - returns **ACK**|
-| TryToJumpToApp| 5 | empty | try to jump to the application |
-| ReadData  | 6  | address (4 B) | when OK - returns this type of packet with data (16 B) instead address|
+| EraseSector  | 4  | sector (1B) | 0xFF for all instead those where bootloader is, returns **ACK** when erased|
+| WriteData  | 5  | adress (4 B) + data (16 B)| when OK - returns **ACK**|
+| TryToJumpToApp| 6 | empty | try to jump to the application |
+| ReadData  | 7  | address (4 B) | when OK - returns this type of packet with data (16 B) instead address|
 
 
 ## List of packets available only in Application mode
