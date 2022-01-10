@@ -54,69 +54,67 @@ CRC is the same for header and whole packet
 |---|--|
 | Command (opCode) | data  |
 
+**ACK payloads:** - answers from MCU to PC
 
-**Table of radio commands**
+| **cmd meaning**  | opCode (1B) | data N B |
+|---|---|---|
+| **ACK**  | 0xFF |0x2963 (2 B) |
+| **NACK**  | 0xFF|0x2964 (2 B) |
+
+## List of packets available in both Application and Bootloader mode
+| **cmd meaning**  | **opCode** 1B  |**data** N B| **note** |
+|---|---|---|---|
+| ResetMCU  |  7 | empty  |  no return |
+| GetMCU_ID  | 1  | empty| return type of MCU|
+| GetCPU_ID  | 2  | empty| return unique CPU ID |
+
+## List of packets available only in Bootloader mode
+**Table of system info**
+| **cmd meaning**  | **opCode** 1B  |**data** N B| **note** |
+|---|---|---|---|
+| EraseSector  | 3  | sector (1B) | 0xFF for all instead those where bootloader is, returns **ACK** when erased|
+| WriteData  | 4  | adress (4 B) + data (16 B)| when OK - returns **ACK**|
+| TryToJumpToApp| 5 | empty | try to jump to the application |
+| ReadData  | 6  | address (4 B) | when OK - returns this type of packet with data (16 B) instead address|
+
+
+## List of packets available only in Application mode
+**A) Table of radio commands**
 | **cmd meaning**  | **opCode** 1B  |**parameters** NB|  **note** 1B|
 |---|---|--|--|
-| TxFreq  | 1   | Frequency (4B)| |
-| RxFreq  | 2   |  Frequency (4B)| |
-| TxPower  | 3  | Power (1B)| |
-| TxSF  | 4   | Spreading factor SF5-SF12 (1B)| |
-| RxSF  | 5    | Spreading factor SF5-SF12 (1B)| |
-| TxBW  | 6   |  BandWidth 7.81 - 500 kHz (4B)| |
-| RxBW  | 7    |  BandWidth 7.81 - 500 kHz (4B)||
-| TxIQ  | 8   |  IQ invert true/false (1B)||
-| RxIQ  | 9   |  IQ invert true/false (1B)||
-| TxCR  | 10   |  CodeRate 4/5-4/8 (1B)||
-| RxCR  | 11    |  CodeRate 4/5-4/8 (1B)||
-| HeaderMode  TX | 12  |    Enable header mode true/false (1 B)| |
-| HeaderMode  RX | 13  |    Enable header mode true/false (1 B)| |
-| CRC TX  | 14   |  Crc check true/false (1 B)| |
-| CRC RX  | 15   |  Crc check true/false (1 B)| |
-| preparePacket  | 16   | data[0] - nasledna velikost,  data[N] (N B)| |
+| TxFreq  | 20   | Frequency (4B)| |
+| RxFreq  | 21   |  Frequency (4B)| |
+| TxPower  | 22  | Power (1B)| |
+| TxSF  | 23   | Spreading factor SF5-SF12 (1B)| |
+| RxSF  | 24    | Spreading factor SF5-SF12 (1B)| |
+| TxBW  | 25   |  BandWidth 7.81 - 500 kHz (4B)| |
+| RxBW  | 26    |  BandWidth 7.81 - 500 kHz (4B)||
+| TxIQ  | 27   |  IQ invert true/false (1B)||
+| RxIQ  | 28   |  IQ invert true/false (1B)||
+| TxCR  | 29   |  CodeRate 4/5-4/8 (1B)||
+| RxCR  | 30    |  CodeRate 4/5-4/8 (1B)||
+| HeaderMode  TX | 31  |    Enable header mode true/false (1 B)| |
+| HeaderMode  RX | 32  |    Enable header mode true/false (1 B)| |
+| CRC TX  | 33   |  Crc check true/false (1 B)| |
+| CRC RX  | 34   |  Crc check true/false (1 B)| |
+| preparePacket  | 35   | data[0] - nasledna velikost,  data[N] (N B)| |
 
-
-
-**Table of short (GET) commands for radio**
-
-| **cmd meaning**  | **opCode** 1B |**parameters** NB|  **note** 1B
+**B) Table of actions commands**
+| **cmd meaning**  | **opCode** 1B |**parameters** NB|  **note** 1B|
 |---|---|--|--|
-| GetTxFreq  | 1+40  |  Frequency (4B)| |
-| GetRxFreq  | 2+40  |   Frequency (4B)| |
-| GetTxPower  | 3+40   | Power (1B)||
-| GetTxSF  | 4+40   | Spreading factor SF5-SF12 (1B)| |
-| GetRxSF  | 5+40    | Spreading factor SF5-SF12 (1B)| |
-| GetTxBW  | 6+40   |  BandWidth 7.81 - 500 kHz (4B)| |
-| GetRxBW  | 7+40    |  BandWidth 7.81 - 500 kHz (4B)| |
-| GetTxIQ  | 8+40   |  IQ invert true/false (1B)| |
-| GetRxIQ  | 9+40   |  IQ invert true/false (1B)| |
-| GetTxCR  | 10+40   |  CodeRate 4/5-4/8 (1B)| |
-| GetRxCR  | 11+40    |  CodeRate 4/5-4/8 (1B)||
-| GetHeaderMode  TX | 12+40  |   Enable header mode true/false (1 B)| |
-| GetHeaderMode  RX | 13+40  |   Enable header mode true/false (1 B)| |
-| GetTxCRC  | 14+40  |   Crc check true/false (1 B)| |
-| GetRxCRC  | 15+40  |   Crc check true/false (1 B)| |
-| GetpreparePacket  | 16+40  | data[0] - nasledna velikost,  data[N] (N B)| |
+| sendPacket  | 50  |empty|when OK - returns **ACK**|
+| startTXCW  | 51  | empty| when OK - returns **ACK**|
+| setStandby  | 52   |empty| when OK - returns **ACK**|
+| readRxPacket  | 53  | payoad size (1B), rssi (1B), payload (NB) |when OK - returns this type of packet with data|
+| startRx  | 54 | singleRX true/false (1 B), payloadSize 1 - 250 (1B) (value does not care in active Header Mode) | when OK - returns **ACK**|
 
-**Table of system info**
-|  **cmd meaning**  |  **opCode** |  **data** | **size of data [B]**  | **note**  |
-|---|---|---|---|---|
-| resetMCU  |  200 | empty  |  1 |  returns ACK |
-| getMCU_ID | 201  |  empty | 1  | returns mcu ID  |
-| getCPU_ID | 202  | empty  | 1  | returns cpu ID  |
-| getRadioChip | 203  | empty  | 1  |  returns "RadioChip " |
-| getMinTxPower | 204  | empty  | 1  |  returns int8_t (power) |
-| getMaxTxPower | 205  | empty  | 1  |  returns int8_t (power) |
 
-**Table of actions commands**
-| **cmd meaning**  | **opCode** 1B |**parameters** NB|  **retVal** 1B
-|---|---|--|--|
-| sendPacket  | 252  | empty | 1 - Succes /0 - failure|
-| startTXCW  | 251  | | 1 - Succes /0 - failure|
-| setStandby  | 250   || 1 - Succes /0 - failure|
-| readRxPacket  | 249  | payoad size (1B), rssi (1B), payload (NB) | 1 - Succes /0 - failure|
-| startRx  | 248  | singleRX true/false (1 B), payloadSize 1 - 250 (1B) (value does not care in active Header Mode) | 1 - Succes /0 - failure|
-| ResetMcu  | 247   || |
+**C) Table of system info**
+|  **cmd meaning**  |  **opCode** |  **data**   | **note**  |
+|---|---|---|---|
+| getRadioChip | 203  | empty   |  returns "RadioChip " |
+| getMinTxPower | 204  | empty   |  returns int8_t (power) |
+| getMaxTxPower | 205  | empty   |  returns int8_t (power) |
 
 
 **Odpovedi od LoRaGeneratoru maji stejny tvar paketu az na chybejici Byte action flags**
