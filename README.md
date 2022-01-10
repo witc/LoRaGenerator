@@ -79,6 +79,7 @@ CRC is the same for header and whole packet
 
 
 ## List of packets available only in Application mode
+
 **A) Table of radio commands**
 | **cmd meaning**  | **opCode** 1B  |**parameters** NB|  **note** 1B|
 |---|---|--|--|
@@ -99,10 +100,11 @@ CRC is the same for header and whole packet
 | CRC RX  | 34   |  Crc check true/false (1 B)| |
 | preparePacket  | 35   | data[0] - nasledna velikost,  data[N] (N B)| |
 
+
 **B) Table of actions commands**
 | **cmd meaning**  | **opCode** 1B |**parameters** NB|  **note** 1B|
 |---|---|--|--|
-| sendPacket  | 50  |empty|when OK - returns **ACK**|
+| sendPacket  | 50  |empty|send prepared packet, when OK - returns **ACK**|
 | startTXCW  | 51  | empty| when OK - returns **ACK**|
 | setStandby  | 52   |empty| when OK - returns **ACK**|
 | readRxPacket  | 53  | payoad size (1B), rssi (1B), payload (NB) |when OK - returns this type of packet with data|
