@@ -66,11 +66,11 @@ uint8_t PCT_DecodeUartRxMsg(uint8_t *rxBuffer)
 		PCT_ProcessSetCommands(rxBuffer);
 	}
 	/* only get */
-	else if(rxBuffer[0] <= UART_MSG_GET_PREP_PACKET)
-	{
-		PCT_SendMyParam(rxBuffer[0]-40);
-	}
-	else
+	//else if(rxBuffer[0] <= UART_MSG_GET_PREP_PACKET)
+	//{/
+	//	PCT_SendMyParam(rxBuffer[0]-40);
+//	}
+	//else
 	{
 		/* general commands */
 		PCT_ProcessSystemCommands(rxBuffer);
@@ -192,6 +192,10 @@ void PCT_ProcessSystemCommands(uint8_t *rxBuffer)
 
 	switch(cmd)
 	{
+		case UART_MSG_RESET_MCU:
+			HAL_NVIC_SystemReset();
+			break;
+
 		case UART_MSG_START_RX:
 			PCT_SetRadioRX(rxBuffer[1] /* single */, rxBuffer[2] /* payload Size*/);
 			osThreadYield();
