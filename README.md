@@ -30,6 +30,9 @@ Universal  LoRa packet generator with user settings.
 
 # USART Packet:
 
+All multi-byte values are sent in big-endian byte order.
+
+
 | 2B  |  4B  |  n |  1B |
 |---|---|---|---|
 | Sync Word  - 0x2DD4  |Header|  payload |  crc - from whole packet |
@@ -65,8 +68,8 @@ CRC is the same for header and whole packet
 | **cmd meaning**  | **opCode** 1B  |**data** N B| **note** |
 |---|---|---|---|
 | ResetMCU  |  1 | empty  |  no return |
-| GetMCU_ID  | 2  | empty| return type of MCU|
-| GetCPU_ID  | 3  | empty| return unique CPU ID |
+| GetMCU_ID  | 2  | xy| return type of MCU|
+| GetCPU_ID  | 3  | xy| return unique CPU ID |
 
 ## List of packets available only in Bootloader mode
 **Table of system info**
@@ -83,13 +86,13 @@ CRC is the same for header and whole packet
 **A) Table of radio commands**
 | **cmd meaning**  | **opCode** 1B  |**parameters** NB|  **note** 1B|
 |---|---|--|--|
-| TxFreq  | 20   | Frequency (4B)| |
-| RxFreq  | 21   |  Frequency (4B)| |
+| TxFreq  | 20   | Frequency (4B)| 1<frequency<5 |
+| RxFreq  | 21   |  Frequency (4B)| 1<frequency<5|
 | TxPower  | 22  | Power (1B)| |
 | TxSF  | 23   | Spreading factor SF5-SF12 (1B)| |
 | RxSF  | 24    | Spreading factor SF5-SF12 (1B)| |
-| TxBW  | 25   |  BandWidth 7.81 - 500 kHz (4B)| |
-| RxBW  | 26    |  BandWidth 7.81 - 500 kHz (4B)||
+| TxBW  | 25   |  BandWidth 7810 - 500000 Hz (4B)| |
+| RxBW  | 26    |  BandWidth 7810 - 500000 Hz (4B)||
 | TxIQ  | 27   |  IQ invert true/false (1B)||
 | RxIQ  | 28   |  IQ invert true/false (1B)||
 | TxCR  | 29   |  CodeRate 4/5-4/8 (1B)||
@@ -114,9 +117,9 @@ CRC is the same for header and whole packet
 **C) Table of system info**
 |  **cmd meaning**  |  **opCode** |  **data**   | **note**  |
 |---|---|---|---|
-| getRadioChip | 203  | empty   |  returns "RadioChip " |
-| getMinTxPower | 204  | empty   |  returns int8_t (power) |
-| getMaxTxPower | 205  | empty   |  returns int8_t (power) |
+| getRadioChip | 203  | empty   |  returns "RadioChip " in this packet|
+| getMinTxPower | 204  | empty   |  returns int8_t (power) in this packet|
+| getMaxTxPower | 205  | empty   |  returns int8_t (power) in this packet|
 
 
 **Odpovedi od LoRaGeneratoru maji stejny tvar paketu az na chybejici Byte action flags**
