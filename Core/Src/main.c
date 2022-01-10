@@ -137,7 +137,7 @@ int main(void)
 {
   /* USER CODE BEGIN 1 */
 	// __DMB(); //ARM says to use a DMB instruction before relocating VTOR */
-  //SCB->VTOR = 0x8004000; //We relocate vector table to the APP sector
+  SCB->VTOR = 0x8004000; //We relocate vector table to the APP sector
 				 // __DSB(); //ARM says to use a DSB instruction just after relocating VTOR */
   /* USER CODE END 1 */
 

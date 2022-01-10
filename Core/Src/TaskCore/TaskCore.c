@@ -224,6 +224,7 @@ static void CORE_StateStartON(DATA_QUEUE ReceiveData,tCoreGlobalData* coreGlData
 		osDelay(200);
 		LL_GPIO_ResetOutputPin(LED_GREEN_GPIO_Port,LED_GREEN_Pin);
 
+		PCT_InitUartDMA();
 		PCT_ShceduleUartCheck();
 	}
 }

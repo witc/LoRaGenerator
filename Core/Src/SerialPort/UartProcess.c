@@ -375,7 +375,7 @@ void PCT_InitUartDMA(void)
 	LL_DMA_SetPeriphRequest(DMA1, LL_DMA_CHANNEL_3, LL_DMA_REQUEST_3);
 
 	/* Enable DMA RX Interrupt */
-//	LL_USART_EnableDMAReq_RX(USART1);
+	LL_USART_EnableDMAReq_RX(USART1);
 	/* Enable DMA Channel Rx */
 	LL_DMA_EnableChannel(DMA1, LL_DMA_CHANNEL_3);
 
@@ -385,9 +385,9 @@ void PCT_InitUartDMA(void)
 	HAL_NVIC_EnableIRQ(TIM6_IRQn);
 
 	LL_TIM_SetAutoReload(TIM6,__LL_TIM_CALC_ARR(32000000,LL_TIM_GetPrescaler(TIM6),UART_CHECK_FREQUENCY));   //(1/MINIMAL_SIZE_USART_RX_MSG)
-	LL_TIM_EnableIT_UPDATE(TIM6);
-	LL_TIM_SetCounter(TIM6,0);
-	LL_TIM_EnableCounter(TIM6);
+	//LL_TIM_EnableIT_UPDATE(TIM6);
+	//LL_TIM_SetCounter(TIM6,0);
+	//LL_TIM_EnableCounter(TIM6);
 
 }
 
